@@ -12,7 +12,7 @@ from loguru import logger
 #                           CONFIGURATION
 # ---------------------------------------------------------------------------
 OPENAI_API_KEY = "sk-"
-STREAM_KEY = None                # or "h6kd-6g1g-djdc-ma57-a0v3" for YouTube
+STREAM_KEY = None
 SEARCH_LIMIT = 5
 LOG_FILE = "broadcast.log"
 
