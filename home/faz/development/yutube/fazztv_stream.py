@@ -1,0 +1,11 @@
+def log_state(self):
+    logger.info("=== Stream State ===")
+    logger.info("NOW PLAYING:")
+    logger.info(f"  Artist: {self.current_singer}")
+    logger.info(f"  Song: {self.current_song_title}")
+    logger.info(f"  Marquee: {self.current_tax_info[:100]}..." if self.current_tax_info else "  Marquee: None")
+    logger.info("NEXT UP:")
+    logger.info(f"  Artist: {self.next_singer}")
+    logger.info(f"  Song: {self.next_song_title}")
+    logger.info(f"  Marquee: {self.next_tax_info[:100]}..." if self.next_tax_info else "  Marquee: None")
+    logger.info("================")
