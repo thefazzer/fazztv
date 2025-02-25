@@ -2,6 +2,7 @@ import yt_dlp
 import openai
 import subprocess
 import time
+import requests
 import random
 import os
 import textwrap
@@ -12,6 +13,8 @@ from loguru import logger
 #                           CONFIGURATION
 # ---------------------------------------------------------------------------
 OPENAI_API_KEY = "sk-"
+OPENROUTER_API_KEY = "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"
+
 STREAM_KEY = None
 SEARCH_LIMIT = 5
 LOG_FILE = "broadcast.log"
@@ -20,8 +23,6 @@ BASE_RES = "640x360"
 FADE_LENGTH = 3
 MARQUEE_DURATION = 86400
 SCROLL_SPEED = 40
-
-openai.api_key = OPENAI_API_KEY
 
 # 20 Singers
 SINGERS = sorted([
@@ -55,19 +56,48 @@ def safe_get_tax_info(singer):
         return "Tax info unavailable (OpenAI quota exceeded)."
 
 def get_tax_info(singer):
-    resp = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{
-            "role": "system",
-            "content": (
-                f"Provide a concise summary of {singer}'s tax problems, including key dates, "
-                "fines, amounts, or relevant penalties."
-            )
-        }]
-    )
-    facts = resp["choices"][0]["message"]["content"]
-    logger.info(f"Tax info for {singer}: {facts}")
-    return facts
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional
+        "X-Title": "<YOUR_SITE_NAME>",  # Optional
+    }
+    
+    data = {
+        "model": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
+        "messages": [
+            {
+                "role": "user",
+                "content": (
+                    f"Provide a concise summary of {singer}'s tax problems, including key dates, "
+                    "fines, amounts, or relevant penalties."
+                )
+            }
+        ],
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()  # Raises an error for HTTP errors
+        result = response.json()
+
+        # Ensure the expected structure exists before accessing
+        if "choices" in result and result["choices"]:
+            message_content = result["choices"][0].get("message", {}).get("content", "")
+            if message_content:
+                logger.info(f"Tax info for {singer}: {message_content[:100]}...")  # Log first 100 chars
+                return message_content
+            else:
+                logger.error(f"No content found in response for {singer}")
+                return "Tax info unavailable"
+        else:
+            logger.error(f"Unexpected API response structure: {result}")
+            return "Tax info unavailable"
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"API request failed: {e}")
+        return "Tax info unavailable"
 
 def get_video_duration(filename):
     logger.debug(f"Probing duration for {filename}")
