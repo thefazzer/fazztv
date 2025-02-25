@@ -23,11 +23,11 @@ class StreamState:
         logger.info("NOW PLAYING:")
         logger.info(f"  Artist: {self.current_singer}")
         logger.info(f"  Song: {self.current_song_title}")
-        logger.info(f"  Marquee: {self.current_tax_info[:100]}...")
+        logger.info(f"  Marquee: {self.current_tax_info[:100]}..." if self.current_tax_info else "  Marquee: None")
         logger.info("NEXT UP:")
         logger.info(f"  Artist: {self.next_singer}")
         logger.info(f"  Song: {self.next_song_title}")
-        logger.info(f"  Marquee: {self.next_tax_info[:100]}...")
+        logger.info(f"  Marquee: {self.next_tax_info[:100]}..." if self.next_tax_info else "  Marquee: None")
         logger.info("================")
 
     def update_current(self, singer, song_title, tax_info):
@@ -67,7 +67,7 @@ def safe_get_tax_info(singer):
 
 def get_tax_info(singer):
     resp = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-4o-mini",
         messages=[{
             "role": "system",
             "content": (
