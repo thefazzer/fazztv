@@ -3,11 +3,18 @@ import time
 import os
 import openai
 from loguru import logger
+import requests
 
 from fazztv.models import MediaItem
 from fazztv.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
+from dotenv import load_dotenv
 
+# Load environment variables from the .env file
+load_dotenv()
+
+# Access variables
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 # ---------------------------------------------------------------------------
 #                           CONFIGURATION
 # ---------------------------------------------------------------------------
@@ -25,11 +32,35 @@ openai.api_key = OPENAI_API_KEY
 
 # 20 Singers
 SINGERS = sorted([
-    "Lauryn Hill", "Shakira", "Toni Braxton", "Willie Nelson", "Lil Wayne",
-    "Fat Joe", "Ja Rule", "DMX", "R. Kelly", "Dionne Warwick",
-    "Ozzy Osbourne", "Lionel Richie", "Iggy Azalea", "Flo Rida", "Akon",
-    "Ron Isley", "Sean Kingston", "Nas", "MC Hammer", "Chris Tucker"
+    "Lauryn Hill", "Shakira", 
+     "Toni Braxton", "Willie Nelson", "Lil Wayne",
+    #"Fat Joe", "Ja Rule", "DMX", "R. Kelly", "Dionne Warwick",
+    #"Ozzy Osbourne", "Lionel Richie", "Iggy Azalea", "Flo Rida", "Akon",
+    #"Ron Isley", "Sean Kingston", "Nas", "MC Hammer", "Chris Tucker"
 ])
+
+ftv_shows = [
+    {"title": "Tax Evasion Nation", "byline": "A deep dive into the biggest tax scandals in music."},
+    {"title": "Audit This!", "byline": "When the IRS comes knocking, these artists start rocking."},
+    {"title": "Cash Under the Mattress", "byline": "Where did all the money go? Hidden assets and shady deals."},
+    {"title": "Behind Bars & Behind the Music", "byline": "The true crime stories of tax-dodging musicians."},
+    {"title": "IRS Unplugged", "byline": "Famous cases where the taxman turned off the money tap."},
+    {"title": "Fraud Files: The Remix", "byline": "A look at artists who remixed their income statements."},
+    {"title": "Return to Sender", "byline": "Tax returns gone wrong and the consequences."},
+    {"title": "Deduction Destruction", "byline": "When creative accounting turns criminal."},
+    {"title": "Offshore & On Tour", "byline": "Rockstars, shell companies, and secret bank accounts."},
+    {"title": "Taxman’s Greatest Hits", "byline": "A countdown of the most notorious tax-dodging musicians."},
+    {"title": "Hide Yo Money, Hide Yo Taxes", "byline": "When the IRS slides into your DMs with a subpoena."},
+    {"title": "W2 Hell & Back", "byline": "Musicians who faked their income until the feds came knocking."},
+    {"title": "Death & Taxes (But Mostly Taxes)", "byline": "Because even rockstars can’t escape the taxman."},
+    {"title": "Straight Outta Cayman", "byline": "The offshore accounts that almost worked."},
+    {"title": "No Refund, No Peace", "byline": "When dodging the IRS goes horribly wrong."},
+    {"title": "Mo’ Money, Mo’ Problems: IRS Edition", "byline": "The richest, dumbest tax evaders in music."},
+    {"title": "Audit Me If You Can", "byline": "A reality show where celebs try (and fail) to dodge taxes."},
+    {"title": "Filing Single, Ready to Flee", "byline": "When tax fraudsters ghost the government."},
+    {"title": "The Write-Offs", "byline": "Musicians who wrote off EVERYTHING… until they got caught."},
+    {"title": "99 Problems & The IRS Is One", "byline": "Because Jay-Z warned us, but they didn’t listen."}
+]
 
 logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 
@@ -48,19 +79,48 @@ def safe_get_tax_info(singer):
         return "Tax info unavailable (OpenAI quota exceeded)."
 
 def get_tax_info(singer):
-    resp = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{
-            "role": "system",
-            "content": (
-                f"Provide a concise summary of {singer}'s tax problems, including key dates, "
-                "fines, amounts, or relevant penalties."
-            )
-        }]
-    )
-    facts = resp["choices"][0]["message"]["content"]
-    logger.info(f"Tax info for {singer}: {facts}")
-    return facts
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional
+        "X-Title": "<YOUR_SITE_NAME>",  # Optional
+    }
+    
+    data = {
+        "model": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
+        "messages": [
+            {
+                "role": "user",
+                "content": (
+                    f"Provide a concise summary of {singer}'s tax problems, including key dates, "
+                    "fines, amounts, or relevant penalties."
+                )
+            }
+        ],
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()  # Raises an error for HTTP errors
+        result = response.json()
+
+        # Ensure the expected structure exists before accessing
+        if "choices" in result and result["choices"]:
+            message_content = result["choices"][0].get("message", {}).get("content", "")
+            if message_content:
+                logger.info(f"Tax info for {singer}: {message_content[:100]}...")  # Log first 100 chars
+                return message_content
+            else:
+                logger.error(f"No content found in response for {singer}")
+                return "Tax info unavailable"
+        else:
+            logger.error(f"Unexpected API response structure: {result}")
+            return "Tax info unavailable"
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"API request failed: {e}")
+        return "Tax info unavailable"
 
 def get_random_song_url(singer):
     logger.debug(f"Searching random official music video for {singer}...")
@@ -89,7 +149,7 @@ def get_random_song_url(singer):
         logger.error(f"Error searching {singer}: {e}")
         return None, None
 
-def create_media_item(artist, length_percent=100):
+def create_media_item(artist, length_percent=10):
     """Create a MediaItem for the given artist."""
     url, song = get_random_song_url(artist)
     if not url or not song:
