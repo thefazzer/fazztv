@@ -4,8 +4,11 @@ import tempfile
 from typing import List, Optional, Callable, Tuple
 import json
 from loguru import logger
-
+import random
+import subprocess
 from fazztv.models import MediaItem
+from typing import List, Optional, Callable, Tuple, Dict
+import random
 
 class MediaSerializer:
     """Handles serialization of MediaItems into FFmpeg-compatible streams."""
@@ -67,13 +70,15 @@ class MediaSerializer:
             logger.error(f"Could not read duration for {filename}: {e}")
             return 0.0
     
-    def serialize_media_item(self, media_item: MediaItem, output_file: Optional[str] = None) -> bool:
+    def serialize_media_item(self, media_item: MediaItem, output_file: Optional[str] = None,
+                            ftv_shows: Optional[List[dict]] = None) -> bool:
         """
         Serialize a media item to a file or memory buffer.
         
         Args:
             media_item: The MediaItem to serialize
             output_file: Optional output file path. If None, serializes to a temporary file.
+            ftv_shows: Optional list of show dictionaries with title and byline
             
         Returns:
             bool: True if serialization was successful
@@ -106,8 +111,29 @@ class MediaSerializer:
             # Determine output path
             final_output = output_file if output_file else tempfile.NamedTemporaryFile(suffix='.mp4', delete=False).name
             
-            # Prepare FFmpeg command
-            cmd = self._build_ffmpeg_command(temp_path, marquee_path, final_output, target_duration)
+            # Select a random show if ftv_shows is provided
+            show_title = ""
+            show_byline = ""
+            if ftv_shows and len(ftv_shows) > 0:
+                show = random.choice(ftv_shows)
+                show_title = show.get("title", "")
+                show_byline = show.get("byline", "")
+            
+            # Prepare FFmpeg command with artist, song, and show information
+            cmd = self._build_ffmpeg_command(
+                temp_path, 
+                marquee_path, 
+                final_output, 
+                target_duration,
+                artist=media_item.artist,
+                song=media_item.song,
+                show_title=show_title,
+                show_byline=show_byline
+            )
+            
+            # Add the -t parameter to limit the output duration
+            cmd.insert(-1, "-t")
+            cmd.insert(-1, str(target_duration))
             
             # Run FFmpeg
             logger.debug(f"Running FFmpeg command: {' '.join(cmd)}")
@@ -132,7 +158,9 @@ class MediaSerializer:
                 os.remove(marquee_path)
     
     def _build_ffmpeg_command(self, input_path: str, marquee_path: str, 
-                             output_path: str, target_duration: float) -> List[str]:
+                         output_path: str, target_duration: float,
+                         artist: str = "", song: str = "",
+                         show_title: str = "", show_byline: str = "") -> List[str]:
         """Build the FFmpeg command for serializing a media item."""
         # Check logo
         logo_input = []
@@ -144,44 +172,60 @@ class MediaSerializer:
             scale_logo = "[2:v]scale=100:-1[logosize];"
             overlay_logo = "[temp][logosize]overlay=10:10[outv]"
         
+        # Escape single quotes in text fields
+        safe_artist = artist.replace("'", "\\'")
+        safe_song = song.replace("'", "\\'")
+        safe_title = show_title.replace("'", "\\'")
+        safe_byline = show_byline.replace("'", "\\'")
+        
+        # Create title and byline overlays in 80s MTV style
+        title_overlay = (
+            "[v0]drawtext=text='" + safe_title + "':"
+            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:"
+            "fontsize=36:fontcolor=yellow:bordercolor=blue:borderw=2:"
+            "x=(w-text_w)/2:y=30:enable=1[titled];"
+            
+            "[titled]drawtext=text='" + safe_byline + "':"
+            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:"
+            "fontsize=20:fontcolor=cyan:bordercolor=purple:borderw=1:"
+            "x=(w-text_w)/2:y=75:enable=1[titledbylined];"
+        )
+        
         filter_str = (
             f"[0:v]scale={self.base_res},setsar=1,trim=duration={target_duration}[v0];"
-            f"[0:a]atrim=duration={target_duration}[a0];"
+            f"{title_overlay}"
             
             "[1:v]scale=640:100[marq];"
-            "[v0][marq]overlay=0:360-100[temp];"
+            "[titledbylined][marq]overlay=0:360-100[temp];"
             
             f"{scale_logo}"
             f"{overlay_logo}"
         )
-        
         cmd = [
-            "ffmpeg", "-y",
-            "-i", input_path,
-            "-f", "lavfi",
-            "-i", (
-                f"color=c=black:s=1280x100:d={self.marquee_duration},"
-                "drawtext="
-                "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                f"textfile={marquee_path}:"
-                "fontsize=16:"
-                "fontcolor=white:"
-                "y=10:"
-                f"x='1280 - mod(t*{self.scroll_speed}, 1280+text_w)':"
-                "enable=1"
-            )
-        ] + logo_input + [
-            "-filter_complex", filter_str,
-            "-map", "[outv]", "-map", "[a0]",
-            
-            "-c:v", "libx264", "-preset", "fast",
-            "-c:a", "aac", "-b:a", "128k",
-            "-r", "30", "-vsync", "2",
-            "-movflags", "+faststart",
-            "-t", str(target_duration),
-            output_path
-        ]
-        
+        "ffmpeg", "-y",
+        "-i", input_path,
+        "-f", "lavfi",
+        "-i", (
+            f"color=c=black:s=1280x100:d={self.marquee_duration},"
+            "drawtext="
+            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+            f"textfile={marquee_path}:"
+            "fontsize=16:"
+            "fontcolor=white:"
+            "y=10:"
+            f"x='1280 - mod(t*{self.scroll_speed}, 1280+text_w)':"
+            "enable=1"
+                )
+            ] + logo_input + [
+                "-filter_complex", filter_str,
+                "-map", "[outv]", "-map", "[a0]",
+                
+                "-c:v", "libx264", "-preset", "fast",
+                "-c:a", "aac", "-b:a", "128k",
+                "-r", "30", "-vsync", "2",
+                "-movflags", "+faststart",
+                output_path
+            ]
         return cmd
     
     def serialize_collection(self, media_items: List[MediaItem]) -> List[Tuple[MediaItem, bool]]:

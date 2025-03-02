@@ -32,8 +32,9 @@ openai.api_key = OPENAI_API_KEY
 
 # 20 Singers
 SINGERS = sorted([
-    "Lauryn Hill", "Shakira", 
-     "Toni Braxton", "Willie Nelson", "Lil Wayne",
+    "Lauryn Hill",
+     # "Shakira", 
+    # "Toni Braxton", "Willie Nelson", "Lil Wayne",
     #"Fat Joe", "Ja Rule", "DMX", "R. Kelly", "Dionne Warwick",
     #"Ozzy Osbourne", "Lionel Richie", "Iggy Azalea", "Flo Rida", "Akon",
     #"Ron Isley", "Sean Kingston", "Nas", "MC Hammer", "Chris Tucker"
@@ -195,10 +196,10 @@ def main():
     
     logger.info(f"Created {len(media_items)} media items")
     
-    # Serialize the media items
+    # Serialize the media items with show information
     serialized_items = []
     for item in media_items:
-        if serializer.serialize_media_item(item):
+        if serializer.serialize_media_item(item, ftv_shows=ftv_shows):
             serialized_items.append(item)
     
     logger.info(f"Serialized {len(serialized_items)} media items")
