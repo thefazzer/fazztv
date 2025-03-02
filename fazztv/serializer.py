@@ -181,14 +181,14 @@ class MediaSerializer:
         # Create title and byline overlays in 80s MTV style
         title_overlay = (
             "[v0]drawtext=text='" + safe_title + "':"
-            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:"
-            "fontsize=36:fontcolor=yellow:bordercolor=blue:borderw=2:"
-            "x=(w-text_w)/2:y=30:enable=1[titled];"
+            "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+            "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
+            "x=(w-text_w)/2:y=15:enable=1[titled];"
             
             "[titled]drawtext=text='" + safe_byline + "':"
-            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:"
-            "fontsize=20:fontcolor=cyan:bordercolor=purple:borderw=1:"
-            "x=(w-text_w)/2:y=75:enable=1[titledbylined];"
+            "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+            "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
+            "x=(w-text_w)/2:y=35:enable=1[titledbylined];"
         )
         
         filter_str = (
@@ -218,7 +218,7 @@ class MediaSerializer:
                 )
             ] + logo_input + [
                 "-filter_complex", filter_str,
-                "-map", "[outv]", "-map", "[a0]",
+                "-map", "[outv]", "-map", "0:a?",
                 
                 "-c:v", "libx264", "-preset", "fast",
                 "-c:a", "aac", "-b:a", "128k",

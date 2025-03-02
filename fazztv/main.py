@@ -32,12 +32,11 @@ openai.api_key = OPENAI_API_KEY
 
 # 20 Singers
 SINGERS = sorted([
-    "Lauryn Hill",
-     # "Shakira", 
-    # "Toni Braxton", "Willie Nelson", "Lil Wayne",
-    #"Fat Joe", "Ja Rule", "DMX", "R. Kelly", "Dionne Warwick",
-    #"Ozzy Osbourne", "Lionel Richie", "Iggy Azalea", "Flo Rida", "Akon",
-    #"Ron Isley", "Sean Kingston", "Nas", "MC Hammer", "Chris Tucker"
+     "Lauryn Hill", "Shakira", 
+     "Toni Braxton", "Willie Nelson", "Lil Wayne",
+    "Fat Joe", "Ja Rule", "DMX", "R. Kelly", "Dionne Warwick",
+    "Ozzy Osbourne", "Lionel Richie", "Iggy Azalea", "Flo Rida", "Akon",
+    "Ron Isley", "Sean Kingston", "Nas", "MC Hammer", "Chris Tucker"
 ])
 
 ftv_shows = [
@@ -206,7 +205,7 @@ def main():
     
     # Broadcast the media items with a filter
     # Example filter: only artists with 'i' in their name
-    filter_func = lambda item: 'i' in item.artist.lower()
+    filter_func = lambda item: True
     
     results = broadcaster.broadcast_filtered_collection(serialized_items, filter_func)
     
