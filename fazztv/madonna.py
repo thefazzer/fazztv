@@ -81,20 +81,10 @@ def download_audio_only(url, output_file):
     """Download only the audio from a YouTube video."""
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
-    
-    # Get the directory path and ensure it exists
-    output_dir = os.path.dirname(output_file)
-    if output_dir and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
-    # Remove the file extension as yt-dlp will add its own
-    base_output = os.path.splitext(output_file)[0]
-    
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": base_output,
-        "quiet": False,
-        "verbose": True,
+        "outtmpl": output_file,
+        "quiet": True,
         "overwrites": True,
         "continuedl": False,
         "postprocessors": [{
@@ -105,31 +95,8 @@ def download_audio_only(url, output_file):
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            if not info:
-                logger.error(f"No information extracted for URL: {url}")
-                return False
-        
-        # Check for possible file extensions that yt-dlp might have created
-        possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.mp3']
-        found_file = None
-        
-        for ext in possible_extensions:
-            potential_file = f"{base_output}{ext}"
-            if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
-                found_file = potential_file
-                logger.debug(f"Found audio file: {found_file} ({os.path.getsize(found_file)} bytes)")
-                break
-        
-        if found_file:
-            # Rename to the expected output file
-            os.rename(found_file, output_file)
-            logger.debug(f"Renamed {found_file} to {output_file}")
-            return True
-        else:
-            logger.error(f"No valid audio file found for {base_output} with any expected extension")
-            return False
-            
+            ydl.download([url])
+        return True
     except Exception as e:
         logger.error(f"Error downloading audio: {e}")
         return False
@@ -168,74 +135,81 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     
     # Check if logo exists
     logo_exists = os.path.exists("fztv-logo.png")
-    if logo_exists:
-        logo_input = ["-i", "fztv-logo.png"]
-        scale_logo = "[3:v]scale=100:-1[logosize];"
-        overlay_logo = "[temp][logosize]overlay=10:10[outv]"
-    else:
-        logo_input = []
-        scale_logo = ""
-        overlay_logo = "[temp]copy[outv]"
     
     # Escape single quotes in text
     safe_title = documentary_title.replace("'", "\\'")
     
-    # Create filter string
-    filter_str = (
-        "[0:v]scale=640:360,setsar=1[v0];"
-        
-        # Add title overlay
-        "[v0]drawtext=text='" + safe_title + "':"
-        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
-        "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
-        "x=(w-text_w)/2:y=15:enable=1[titled];"
-        
-        # Add song info overlay
-        "[titled]drawtext=textfile=" + song_path + ":"
-        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
-        "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
-        "x=(w-text_w)/2:y=35:enable=1[titledbylined];"
-        
-        # Add marquee
-        "[2:v]scale=640:100[marq];"
-        "[titledbylined][marq]overlay=0:360-100[temp];"
-        
-        # Add logo
-        f"{scale_logo}"
-        f"{overlay_logo}"
-    )
-    
-    # Build FFmpeg command
-    cmd = [
-        "ffmpeg", "-y",
-        "-i", video_file,
-        "-i", audio_file,
-        "-f", "lavfi",
-        "-i", (
-            f"color=c=black:s=1280x100:d={MARQUEE_DURATION},"
-            "drawtext="
-            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-            f"textfile={war_path}:"
-            "fontsize=16:"
-            "fontcolor=white:"
-            "y=10:"
-            f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
-            "enable=1"
-        )
-    ] + logo_input + [
-        "-filter_complex", filter_str,
-        "-map", "[outv]", "-map", "1:a",
-        "-c:v", "libx264", "-preset", "fast",
-        "-c:a", "aac", "-b:a", "128k",
-        "-shortest",
-        "-r", "30", "-vsync", "2",
-        "-movflags", "+faststart",
-        output_file
-    ]
-    
-    # Run FFmpeg
-    logger.debug(f"Running FFmpeg command: {' '.join(cmd)}")
     try:
+        # Build FFmpeg command with separate filter chains
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", video_file,
+            "-i", audio_file,
+            "-f", "lavfi",
+            "-i", (
+                f"color=c=black:s=1280x100:d={MARQUEE_DURATION},"
+                "drawtext="
+                "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+                f"textfile={war_path}:"
+                "fontsize=16:"
+                "fontcolor=white:"
+                "y=10:"
+                f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
+                "enable=1"
+            )
+        ]
+        
+        # Add logo input if it exists
+        if logo_exists:
+            cmd.extend(["-i", "fztv-logo.png"])
+        
+        # Create filter complex string
+        filter_complex = [
+            # Scale video
+            "[0:v]scale=640:360,setsar=1[v0]",
+            
+            # Add title overlay
+            "[v0]drawtext=text='" + safe_title + "':"
+            "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+            "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
+            "x=(w-text_w)/2:y=15:enable=1[titled]",
+            
+            # Add song info overlay
+            "[titled]drawtext=textfile=" + song_path + ":"
+            "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+            "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
+            "x=(w-text_w)/2:y=35:enable=1[titledbylined]",
+            
+            # Scale marquee
+            "[2:v]scale=640:100[marq]",
+            
+            # Overlay marquee
+            "[titledbylined][marq]overlay=0:260[temp]"
+        ]
+        
+        # Add logo overlay if logo exists
+        if logo_exists:
+            filter_complex.extend([
+                "[3:v]scale=100:-1[logosize]",
+                "[temp][logosize]overlay=10:10[outv]"
+            ])
+        else:
+            filter_complex.append("[temp]copy[outv]")
+        
+        # Add filter complex to command
+        cmd.extend([
+            "-filter_complex", ";".join(filter_complex),
+            "-map", "[outv]", "-map", "1:a",
+            "-c:v", "libx264", "-preset", "fast",
+            "-c:a", "aac", "-b:a", "128k",
+            "-shortest",
+            "-r", "30", "-vsync", "2",
+            "-movflags", "+faststart",
+            output_file
+        ])
+        
+        # Run FFmpeg
+        logger.debug(f"Running FFmpeg command: {' '.join(cmd)}")
         result = subprocess.run(cmd, capture_output=True)
         if result.returncode != 0:
             logger.error(f"FFmpeg error: {result.stderr.decode('utf-8', 'ignore')}")
@@ -267,7 +241,7 @@ def create_media_item_from_episode(episode):
         video_path = video_file.name
     
     with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as output_file:
-        output_path = output_file.name
+        output_path = video_file.name
     
     try:
         # Download audio from Madonna song
