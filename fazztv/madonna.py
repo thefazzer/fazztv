@@ -81,10 +81,22 @@ def download_audio_only(url, output_file):
     """Download only the audio from a YouTube video."""
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
+    
+    # Get the directory path and ensure it exists
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    # Create a base output without any extension
+    base_output = os.path.splitext(output_file)[0]
+    if base_output.endswith('.aac'):
+        base_output = base_output[:-4]  # Remove .aac if it's still there
+    
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": output_file,
-        "quiet": True,
+        "outtmpl": f"{base_output}.%(ext)s",  # Let yt-dlp handle the extension
+        "quiet": False,
+        "verbose": True,
         "overwrites": True,
         "continuedl": False,
         "postprocessors": [{
@@ -93,10 +105,51 @@ def download_audio_only(url, output_file):
             "preferredquality": "192",
         }]
     }
+    
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        return True
+            info = ydl.extract_info(url, download=True)
+            if not info:
+                logger.error(f"No information extracted for URL: {url}")
+                return False
+        
+        # Check for possible file extensions that yt-dlp might have created
+        possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.aac.mp4', '.mp3']
+        found_file = None
+        
+        for ext in possible_extensions:
+            potential_file = f"{base_output}{ext}"
+            if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
+                found_file = potential_file
+                logger.debug(f"Found audio file: {found_file} ({os.path.getsize(found_file)} bytes)")
+                break
+        
+        if found_file:
+            # Rename to the expected output file
+            if found_file != output_file:
+                logger.debug(f"Renaming {found_file} to {output_file}")
+                if os.path.exists(output_file):
+                    os.remove(output_file)
+                os.rename(found_file, output_file)
+            return True
+        else:
+            # Try a more aggressive search in the directory
+            dir_path = os.path.dirname(base_output)
+            base_name = os.path.basename(base_output)
+            logger.debug(f"Searching directory {dir_path} for files starting with {base_name}")
+            
+            for file in os.listdir(dir_path):
+                if file.startswith(os.path.basename(base_name)) and os.path.getsize(os.path.join(dir_path, file)) > 0:
+                    found_file = os.path.join(dir_path, file)
+                    logger.debug(f"Found alternative audio file: {found_file}")
+                    if os.path.exists(output_file):
+                        os.remove(output_file)
+                    os.rename(found_file, output_file)
+                    return True
+            
+            logger.error(f"No valid audio file found for {base_output} with any expected extension")
+            return False
+            
     except Exception as e:
         logger.error(f"Error downloading audio: {e}")
         return False
@@ -133,16 +186,27 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         war_path = war_file.name
         war_file.write(war_info)
     
-    # Check if logo exists
-    logo_exists = os.path.exists("fztv-logo.png")
-    if logo_exists:
-        logo_input = ["-i", "fztv-logo.png"]
-        scale_logo = "[3:v]scale=100:-1[logosize];"
-        overlay_logo = "[temp][logosize]overlay=10:10[outv]"
+    # Check if logos exist
+    logo1_exists = os.path.exists("fztv-logo.png")
+    logo2_exists = os.path.exists("logo-madmil.png")
+    
+    logo_inputs = []
+    scale_logo1, overlay_logo1 = "", ""
+    scale_logo2, overlay_logo2 = ""
+    
+    if logo1_exists:
+        logo_inputs += ["-i", "fztv-logo.png"]
+        scale_logo1 = "[3:v]scale=100:-1[logosize1];"
+        overlay_logo1 = "[temp][logosize1]overlay=10:10[with_logo1];"
     else:
-        logo_input = []
-        scale_logo = ""
-        overlay_logo = "[temp]copy[outv]"
+        overlay_logo1 = "[temp]copy[with_logo1];"
+    
+    if logo2_exists:
+        logo_inputs += ["-i", "logo-madmil.png"]
+        scale_logo2 = "[4:v]scale=100:-1[logosize2];"
+        overlay_logo2 = "[with_logo1][logosize2]overlay=10:50[outv];"
+    else:
+        overlay_logo2 = "[with_logo1]copy[outv];"
     
     # Escape single quotes in text
     safe_title = documentary_title.replace("'", "\\'")
@@ -167,9 +231,9 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "[2:v]scale=640:100[marq];"
         "[titledbylined][marq]overlay=0:360-100[temp];"
         
-        # Add logo
-        f"{scale_logo}"
-        f"{overlay_logo}"
+        # Add logos
+        f"{scale_logo1}{overlay_logo1}"
+        f"{scale_logo2}{overlay_logo2}"
     )
     
     # Build FFmpeg command
@@ -189,7 +253,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
             f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
             "enable=1"
         )
-    ] + logo_input + [
+    ] + logo_inputs + [
         "-filter_complex", filter_str,
         "-map", "[outv]", "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
