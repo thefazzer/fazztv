@@ -81,26 +81,78 @@ def download_audio_only(url, output_file):
     """Download only the audio from a YouTube video."""
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "outtmpl": output_file,
-        "quiet": True,
-        "overwrites": True,
-        "continuedl": False,
-        "postprocessors": [{
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "aac",
-            "preferredquality": "192",
-        }]
-    }
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        return True
-    except Exception as e:
-        logger.error(f"Error downloading audio: {e}")
-        return False
-
+    
+    # Get the directory path and ensure it exists
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    # Create a unique temporary directory for this download
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Use a simple filename without extension in the temp directory
+        temp_base = os.path.join(temp_dir, "audio_download")
+        
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "outtmpl": temp_base,
+            "quiet": False,
+            "verbose": True,
+            "overwrites": True,
+            "continuedl": False,
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "aac",
+                "preferredquality": "192",
+            }]
+        }
+        
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+                if not info:
+                    logger.error(f"No information extracted for URL: {url}")
+                    return False
+            
+            # Find the downloaded file in the temp directory
+            downloaded_files = os.listdir(temp_dir)
+            logger.debug(f"Files in temp directory: {downloaded_files}")
+            
+            if not downloaded_files:
+                logger.error("No files found in temporary directory after download")
+                return False
+            
+            # Find the audio file (should be the only file in the directory)
+            audio_file = None
+            for file in downloaded_files:
+                file_path = os.path.join(temp_dir, file)
+                if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+                    audio_file = file_path
+                    break
+            
+            if not audio_file:
+                logger.error("No valid audio file found in temporary directory")
+                return False
+                
+            logger.debug(f"Found downloaded audio file: {audio_file}")
+            
+            # Copy the file to the desired output location
+            import shutil
+            shutil.copy2(audio_file, output_file)
+            logger.debug(f"Copied audio file to {output_file}")
+            
+            # Verify the output file exists and has content
+            if os.path.exists(output_file) and os.path.getsize(output_file) > 0:
+                return True
+            else:
+                logger.error(f"Output file {output_file} is missing or empty after copy")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error downloading audio: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return False
+        
 def download_video_only(url, output_file):
     """Download only the video from a YouTube video."""
     logger.debug(f"Downloading video from {url} to {output_file}")
