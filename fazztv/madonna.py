@@ -81,22 +81,10 @@ def download_audio_only(url, output_file):
     """Download only the audio from a YouTube video."""
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
-    
-    # Get the directory path and ensure it exists
-    output_dir = os.path.dirname(output_file)
-    if output_dir and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
-    # Create a base output without any extension
-    base_output = os.path.splitext(output_file)[0]
-    if base_output.endswith('.aac'):
-        base_output = base_output[:-4]  # Remove .aac if it's still there
-    
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": f"{base_output}.%(ext)s",  # Let yt-dlp handle the extension
-        "quiet": False,
-        "verbose": True,
+        "outtmpl": output_file,
+        "quiet": True,
         "overwrites": True,
         "continuedl": False,
         "postprocessors": [{
@@ -105,51 +93,10 @@ def download_audio_only(url, output_file):
             "preferredquality": "192",
         }]
     }
-    
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            if not info:
-                logger.error(f"No information extracted for URL: {url}")
-                return False
-        
-        # Check for possible file extensions that yt-dlp might have created
-        possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.aac.mp4', '.mp3']
-        found_file = None
-        
-        for ext in possible_extensions:
-            potential_file = f"{base_output}{ext}"
-            if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
-                found_file = potential_file
-                logger.debug(f"Found audio file: {found_file} ({os.path.getsize(found_file)} bytes)")
-                break
-        
-        if found_file:
-            # Rename to the expected output file
-            if found_file != output_file:
-                logger.debug(f"Renaming {found_file} to {output_file}")
-                if os.path.exists(output_file):
-                    os.remove(output_file)
-                os.rename(found_file, output_file)
-            return True
-        else:
-            # Try a more aggressive search in the directory
-            dir_path = os.path.dirname(base_output)
-            base_name = os.path.basename(base_output)
-            logger.debug(f"Searching directory {dir_path} for files starting with {base_name}")
-            
-            for file in os.listdir(dir_path):
-                if file.startswith(os.path.basename(base_name)) and os.path.getsize(os.path.join(dir_path, file)) > 0:
-                    found_file = os.path.join(dir_path, file)
-                    logger.debug(f"Found alternative audio file: {found_file}")
-                    if os.path.exists(output_file):
-                        os.remove(output_file)
-                    os.rename(found_file, output_file)
-                    return True
-            
-            logger.error(f"No valid audio file found for {base_output} with any expected extension")
-            return False
-            
+            ydl.download([url])
+        return True
     except Exception as e:
         logger.error(f"Error downloading audio: {e}")
         return False
@@ -186,27 +133,16 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         war_path = war_file.name
         war_file.write(war_info)
     
-    # Check if logos exist
-    logo1_exists = os.path.exists("fztv-logo.png")
-    logo2_exists = os.path.exists("logo-madmil.png")
-    
-    logo_inputs = []
-    scale_logo1, overlay_logo1 = "", ""
-    scale_logo2, overlay_logo2 = ""
-    
-    if logo1_exists:
-        logo_inputs += ["-i", "fztv-logo.png"]
-        scale_logo1 = "[3:v]scale=100:-1[logosize1];"
-        overlay_logo1 = "[temp][logosize1]overlay=10:10[with_logo1];"
+    # Check if logo exists
+    logo_exists = os.path.exists("fztv-logo.png")
+    if logo_exists:
+        logo_input = ["-i", "fztv-logo.png"]
+        scale_logo = "[3:v]scale=100:-1[logosize];"
+        overlay_logo = "[temp][logosize]overlay=10:10[outv]"
     else:
-        overlay_logo1 = "[temp]copy[with_logo1];"
-    
-    if logo2_exists:
-        logo_inputs += ["-i", "logo-madmil.png"]
-        scale_logo2 = "[4:v]scale=100:-1[logosize2];"
-        overlay_logo2 = "[with_logo1][logosize2]overlay=10:50[outv];"
-    else:
-        overlay_logo2 = "[with_logo1]copy[outv];"
+        logo_input = []
+        scale_logo = ""
+        overlay_logo = "[temp]copy[outv]"
     
     # Escape single quotes in text
     safe_title = documentary_title.replace("'", "\\'")
@@ -231,9 +167,9 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "[2:v]scale=640:100[marq];"
         "[titledbylined][marq]overlay=0:360-100[temp];"
         
-        # Add logos
-        f"{scale_logo1}{overlay_logo1}"
-        f"{scale_logo2}{overlay_logo2}"
+        # Add logo
+        f"{scale_logo}"
+        f"{overlay_logo}"
     )
     
     # Build FFmpeg command
@@ -253,7 +189,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
             f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
             "enable=1"
         )
-    ] + logo_inputs + [
+    ] + logo_input + [
         "-filter_complex", filter_str,
         "-map", "[outv]", "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
@@ -286,17 +222,17 @@ def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
     
-    # Extract song name from title
-    song_match = re.match(r"^(.*?)\s*\(", episode['title'])
-    song_name = song_match.group(1) if song_match else "Unknown Song"
-    
-    # Create temporary files with proper extensions
-    temp_dir = tempfile.gettempdir()
-    audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
-    video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
-    output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
-    
     try:
+        # Extract song name from title
+        song_match = re.match(r"^(.*?)\s*\(", episode['title'])
+        song_name = song_match.group(1) if song_match else "Unknown Song"
+        
+        # Create temporary files with proper extensions
+        temp_dir = tempfile.gettempdir()
+        audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
+        video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
+        output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
+        
         # Download audio from Madonna song
         logger.debug(f"Attempting to download audio from {episode['music_url']} to {audio_path}")
         if not download_audio_only(episode['music_url'], audio_path):
@@ -318,10 +254,10 @@ def create_media_item_from_episode(episode):
         logger.debug(f"Successfully downloaded audio to {audio_path}")
         
         # Download video from war documentary
-        war_url = episode['war_url'] if episode['war_url'] else "https://www.youtube.com/watch?v=8a8fqGpHgsk"
+        war_url = episode.get('war_url', "https://www.youtube.com/watch?v=8a8fqGpHgsk")
         logger.debug(f"Attempting to download video from {war_url} to {video_path}")
         if not download_video_only(war_url, video_path):
-            logger.error(f"Failed to download video for {episode['war_title']}")
+            logger.error(f"Failed to download video for {episode.get('war_title', 'Unknown War')}")
             return None
             
         # Verify the video file exists and has content
@@ -333,31 +269,28 @@ def create_media_item_from_episode(episode):
         
         # Combine audio and video
         logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
-        if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], episode['war_title']):
+        war_title = episode.get('war_title', 'Unknown War Documentary')
+        if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], war_title):
             logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
         
         # Create MediaItem
-        try:
-            media_item = MediaItem(
-                artist="Madonna",
-                song=song_name,
-                url=episode['music_url'],
-                taxprompt=episode['commentary'],
-                length_percent=100
-            )
-            # Set the serialized path directly
-            media_item.serialized = output_path
-            return media_item
-        except ValueError as e:
-            logger.error(f"Error creating MediaItem: {e}")
-            return None
+        media_item = MediaItem(
+            artist="Madonna",
+            song=song_name,
+            url=episode['music_url'],
+            taxprompt=episode['commentary'],
+            length_percent=100
+        )
+        # Set the serialized path directly
+        media_item.serialized = output_path
+        return media_item
     except Exception as e:
         logger.error(f"Error in create_media_item: {e}")
+        # Log the traceback for more detailed debugging
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return None
-    finally:
-        # We don't delete the files here as they're needed for broadcasting
-        pass
 
 def main():
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
