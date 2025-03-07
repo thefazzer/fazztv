@@ -17,9 +17,6 @@ from dotenv import load_dotenv
 # Load environment variables from the .env file
 load_dotenv()
 
-# Access variables
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-
 # ---------------------------------------------------------------------------
 #                           CONFIGURATION
 # ---------------------------------------------------------------------------
@@ -85,96 +82,6 @@ logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 # ---------------------------------------------------------------------------
 #                       HELPER FUNCTIONS
 # ---------------------------------------------------------------------------
-
-def get_song_info(song_name):
-    """Get information about a Madonna song."""
-    logger.debug(f"Requesting song info for {song_name} via OpenAI...")
-    try:
-        url = "https://openrouter.ai/api/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional
-            "X-Title": "<YOUR_SITE_NAME>",  # Optional
-        }
-        
-        data = {
-            "model": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": (
-                        f"Provide a concise summary of Madonna's song '{song_name}', "
-                        "including when it was released, its chart performance, and cultural impact."
-                    )
-                }
-            ],
-        }
-        
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        result = response.json()
-
-        if "choices" in result and result["choices"]:
-            message_content = result["choices"][0].get("message", {}).get("content", "")
-            if message_content:
-                logger.info(f"Song info for {song_name}: {message_content[:100]}...")
-                return message_content
-            else:
-                logger.error(f"No content found in response for {song_name}")
-                return f"Information about '{song_name}' unavailable"
-        else:
-            logger.error(f"Unexpected API response structure: {result}")
-            return f"Information about '{song_name}' unavailable"
-
-    except Exception as e:
-        logger.error(f"OpenAI error for {song_name}: {e}")
-        return f"Information about '{song_name}' unavailable (API error)."
-
-def get_war_info(documentary_title):
-    """Get information about a war documentary."""
-    logger.debug(f"Requesting war info for {documentary_title}...")
-    try:
-        url = "https://openrouter.ai/api/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional
-            "X-Title": "<YOUR_SITE_NAME>",  # Optional
-        }
-        
-        data = {
-            "model": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": (
-                        f"Provide a detailed historical summary about {documentary_title}, "
-                        "including key dates, military strategies, casualties, and historical significance."
-                    )
-                }
-            ],
-        }
-        
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()
-        result = response.json()
-
-        if "choices" in result and result["choices"]:
-            message_content = result["choices"][0].get("message", {}).get("content", "")
-            if message_content:
-                logger.info(f"War info for {documentary_title}: {message_content[:100]}...")
-                return message_content
-            else:
-                logger.error(f"No content found in response for {documentary_title}")
-                return f"Information about '{documentary_title}' unavailable"
-        else:
-            logger.error(f"Unexpected API response structure: {result}")
-            return f"Information about '{documentary_title}' unavailable"
-
-    except Exception as e:
-        logger.error(f"API error for {documentary_title}: {e}")
-        return f"Information about '{documentary_title}' unavailable (API error)."
 
 def get_madonna_song_url(song_name):
     """Search for a Madonna song on YouTube."""
@@ -354,10 +261,6 @@ def create_media_item(song_name, documentary):
     if not song_url:
         logger.error(f"Could not find URL for Madonna - {song_name}")
         return None
-    
-    # Get information
-    song_info = get_song_info(song_name)
-    war_info = get_war_info(documentary["title"])
     
     # Create temporary files
     with tempfile.NamedTemporaryFile(suffix='.aac', delete=False) as audio_file:
