@@ -81,9 +81,18 @@ def download_audio_only(url, output_file):
     """Download only the audio from a YouTube video."""
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
+    
+    # Get the directory path and ensure it exists
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    # Remove the file extension as yt-dlp will add its own
+    base_output = os.path.splitext(output_file)[0]
+    
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": output_file,
+        "outtmpl": base_output,
         "quiet": True,
         "overwrites": True,
         "continuedl": False,
@@ -96,7 +105,17 @@ def download_audio_only(url, output_file):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        return True
+        
+        # Check if the file exists with .aac extension
+        actual_output = f"{base_output}.aac"
+        if os.path.exists(actual_output):
+            # If the output path is different from what we want, rename it
+            if actual_output != output_file:
+                os.rename(actual_output, output_file)
+            return True
+        else:
+            logger.error(f"Audio file not found at expected path: {actual_output}")
+            return False
     except Exception as e:
         logger.error(f"Error downloading audio: {e}")
         return False
