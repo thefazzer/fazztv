@@ -29,59 +29,25 @@ FADE_LENGTH = 3
 MARQUEE_DURATION = 86400
 SCROLL_SPEED = 40
 
-# Madonna songs
-MADONNA_SONGS = [
-    "Like a Virgin",
-    "Material Girl",
-    "Like a Prayer",
-    "Vogue",
-    "Express Yourself",
-    "Ray of Light",
-    "Frozen",
-    "Music",
-    "Hung Up",
-    "4 Minutes",
-    "La Isla Bonita",
-    "Papa Don't Preach",
-    "Borderline",
-    "Holiday",
-    "Into the Groove",
-    "Crazy for You",
-    "Open Your Heart",
-    "Justify My Love",
-    "Erotica",
-    "Take a Bow"
-]
-
-# War documentaries
-WAR_DOCUMENTARIES = [
-    {"title": "The Battle of the Bulge: Hitler's Last Blood-Soaked Gamble", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "D-Day: The Allied Invasion of Normandy", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "The Pacific War: Island Hopping Campaign", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "Battle of Stalingrad: The Turning Point", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "Operation Barbarossa: The German Invasion of Russia", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "The Fall of Berlin: The Soviet Victory", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "Pearl Harbor: Day of Infamy", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "The Battle of Britain: RAF vs Luftwaffe", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "The North African Campaign: Desert Warfare", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"},
-    {"title": "The Battle of Midway: Turning Point in the Pacific", 
-     "url": "https://www.youtube.com/watch?v=8a8fqGpHgsk"}
-]
+# Path to the JSON data file
+DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
 
 logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 
 # ---------------------------------------------------------------------------
 #                       HELPER FUNCTIONS
 # ---------------------------------------------------------------------------
+
+def load_madonna_data():
+    """Load Madonna and war documentary data from JSON file."""
+    try:
+        with open(DATA_FILE, 'r') as f:
+            data = json.load(f)
+        logger.info(f"Successfully loaded {len(data['episodes'])} episodes from {DATA_FILE}")
+        return data
+    except Exception as e:
+        logger.error(f"Error loading data from {DATA_FILE}: {e}")
+        return {"episodes": []}
 
 def get_madonna_song_url(song_name):
     """Search for a Madonna song on YouTube."""
@@ -252,15 +218,13 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         if os.path.exists(war_path):
             os.remove(war_path)
 
-def create_media_item(song_name, documentary):
-    """Create a MediaItem combining Madonna song audio with war documentary video."""
-    logger.info(f"Creating media item for '{song_name}' with '{documentary['title']}'")
+def create_media_item_from_episode(episode):
+    """Create a MediaItem from an episode in the JSON data."""
+    logger.info(f"Creating media item for '{episode['title']}'")
     
-    # Get URLs
-    song_url = get_madonna_song_url(song_name)
-    if not song_url:
-        logger.error(f"Could not find URL for Madonna - {song_name}")
-        return None
+    # Extract song name from title
+    song_match = re.match(r"^(.*?)\s*\(", episode['title'])
+    song_name = song_match.group(1) if song_match else "Unknown Song"
     
     # Create temporary files
     with tempfile.NamedTemporaryFile(suffix='.aac', delete=False) as audio_file:
@@ -274,18 +238,19 @@ def create_media_item(song_name, documentary):
     
     try:
         # Download audio from Madonna song
-        if not download_audio_only(song_url, audio_path):
-            logger.error(f"Failed to download audio for Madonna - {song_name}")
+        if not download_audio_only(episode['music_url'], audio_path):
+            logger.error(f"Failed to download audio for {episode['title']}")
             return None
         
         # Download video from war documentary
-        if not download_video_only(documentary["url"], video_path):
-            logger.error(f"Failed to download video for {documentary['title']}")
+        war_url = episode['war_url'] if episode['war_url'] else "https://www.youtube.com/watch?v=8a8fqGpHgsk"
+        if not download_video_only(war_url, video_path):
+            logger.error(f"Failed to download video for {episode['war_title']}")
             return None
         
         # Combine audio and video
-        if not combine_audio_video(audio_path, video_path, output_path, song_info, war_info, documentary["title"]):
-            logger.error(f"Failed to combine audio and video for {song_name} + {documentary['title']}")
+        if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], episode['war_title']):
+            logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
         
         # Create MediaItem
@@ -293,8 +258,8 @@ def create_media_item(song_name, documentary):
             media_item = MediaItem(
                 artist="Madonna",
                 song=song_name,
-                url=song_url,
-                taxprompt=war_info,
+                url=episode['music_url'],
+                taxprompt=episode['commentary'],
                 length_percent=100
             )
             # Set the serialized path directly
@@ -313,6 +278,9 @@ def create_media_item(song_name, documentary):
 def main():
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
     
+    # Load data from JSON
+    data = load_madonna_data()
+    
     # Create broadcaster
     rtmp_url = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}" if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test"
     broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
@@ -320,13 +288,13 @@ def main():
     # Create a collection of media items
     media_items = []
     
-    # Shuffle songs and documentaries
-    random.shuffle(MADONNA_SONGS)
-    random.shuffle(WAR_DOCUMENTARIES)
+    # Shuffle episodes
+    episodes = data.get('episodes', [])
+    random.shuffle(episodes)
     
-    # Create media items by pairing songs with documentaries
-    for i in range(min(len(MADONNA_SONGS), len(WAR_DOCUMENTARIES))):
-        media_item = create_media_item(MADONNA_SONGS[i], WAR_DOCUMENTARIES[i % len(WAR_DOCUMENTARIES)])
+    # Create media items from episodes
+    for episode in episodes:
+        media_item = create_media_item_from_episode(episode)
         if media_item:
             media_items.append(media_item)
     
