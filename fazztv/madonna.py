@@ -137,11 +137,40 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     logo_exists = os.path.exists("fztv-logo.png")
     if logo_exists:
         logo_input = ["-i", "fztv-logo.png"]
+        scale_logo = "[3:v]scale=100:-1[logosize];"
+        overlay_logo = "[temp][logosize]overlay=10:10[outv]"
     else:
         logo_input = []
+        scale_logo = ""
+        overlay_logo = "[temp]copy[outv]"
     
     # Escape single quotes in text
     safe_title = documentary_title.replace("'", "\\'")
+    
+    # Create filter string
+    filter_str = (
+        "[0:v]scale=640:360,setsar=1[v0];"
+        
+        # Add title overlay
+        "[v0]drawtext=text='" + safe_title + "':"
+        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+        "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
+        "x=(w-text_w)/2:y=15:enable=1[titled];"
+        
+        # Add song info overlay
+        "[titled]drawtext=textfile=" + song_path + ":"
+        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+        "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
+        "x=(w-text_w)/2:y=35:enable=1[titledbylined];"
+        
+        # Add marquee
+        "[2:v]scale=640:100[marq];"
+        "[titledbylined][marq]overlay=0:360-100[temp];"
+        
+        # Add logo
+        f"{scale_logo}"
+        f"{overlay_logo}"
+    )
     
     # Build FFmpeg command
     cmd = [
@@ -160,46 +189,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
             f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
             "enable=1"
         )
-    ] + logo_input
-    
-    # Create filter string - the key fix is to separate the complex filter into multiple parts
-    filter_parts = []
-    
-    # Scale and prepare video
-    filter_parts.append("[0:v]scale=640:360,setsar=1[v0]")
-    
-    # Add title overlay
-    filter_parts.append(
-        "[v0]drawtext=text='" + safe_title + "':"
-        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
-        "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
-        "x=(w-text_w)/2:y=15:enable=1[titled]"
-    )
-    
-    # Add song info overlay
-    filter_parts.append(
-        "[titled]drawtext=textfile=" + song_path + ":"
-        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
-        "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
-        "x=(w-text_w)/2:y=35:enable=1[titledbylined]"
-    )
-    
-    # Add marquee
-    filter_parts.append("[2:v]scale=640:100[marq]")
-    filter_parts.append("[titledbylined][marq]overlay=0:260[temp]")
-    
-    # Add logo if it exists
-    if logo_exists:
-        filter_parts.append("[3:v]scale=100:-1[logosize]")
-        filter_parts.append("[temp][logosize]overlay=10:10[outv]")
-    else:
-        filter_parts.append("[temp]copy[outv]")
-    
-    # Join all filter parts with semicolons
-    filter_str = ";".join(filter_parts)
-    
-    # Add the filter complex and output mapping
-    cmd.extend([
+    ] + logo_input + [
         "-filter_complex", filter_str,
         "-map", "[outv]", "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
@@ -208,7 +198,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "-r", "30", "-vsync", "2",
         "-movflags", "+faststart",
         output_file
-    ])
+    ]
     
     # Run FFmpeg
     logger.debug(f"Running FFmpeg command: {' '.join(cmd)}")
@@ -236,29 +226,49 @@ def create_media_item_from_episode(episode):
     song_match = re.match(r"^(.*?)\s*\(", episode['title'])
     song_name = song_match.group(1) if song_match else "Unknown Song"
     
-    # Create temporary files
-    with tempfile.NamedTemporaryFile(suffix='.aac', delete=False) as audio_file:
-        audio_path = audio_file.name
-    
-    with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as video_file:
-        video_path = video_file.name
-    
-    with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as output_file:
-        output_path = output_file.name
+    # Create temporary files with proper extensions
+    temp_dir = tempfile.gettempdir()
+    audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
+    video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
+    output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
     
     try:
         # Download audio from Madonna song
+        logger.debug(f"Attempting to download audio from {episode['music_url']} to {audio_path}")
         if not download_audio_only(episode['music_url'], audio_path):
             logger.error(f"Failed to download audio for {episode['title']}")
+            # Try an alternative URL if available
+            if 'alternative_music_url' in episode and episode['alternative_music_url']:
+                logger.info(f"Trying alternative music URL for {episode['title']}")
+                if not download_audio_only(episode['alternative_music_url'], audio_path):
+                    logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
+                    return None
+            else:
+                return None
+        
+        # Verify the audio file exists and has content
+        if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
+            logger.error(f"Audio file is missing or empty: {audio_path}")
             return None
+            
+        logger.debug(f"Successfully downloaded audio to {audio_path}")
         
         # Download video from war documentary
         war_url = episode['war_url'] if episode['war_url'] else "https://www.youtube.com/watch?v=8a8fqGpHgsk"
+        logger.debug(f"Attempting to download video from {war_url} to {video_path}")
         if not download_video_only(war_url, video_path):
             logger.error(f"Failed to download video for {episode['war_title']}")
             return None
+            
+        # Verify the video file exists and has content
+        if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
+            logger.error(f"Video file is missing or empty: {video_path}")
+            return None
+            
+        logger.debug(f"Successfully downloaded video to {video_path}")
         
         # Combine audio and video
+        logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
         if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], episode['war_title']):
             logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
