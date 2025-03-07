@@ -81,18 +81,9 @@ def download_audio_only(url, output_file):
     """Download only the audio from a YouTube video."""
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
-    
-    # Get the directory path and ensure it exists
-    output_dir = os.path.dirname(output_file)
-    if output_dir and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
-    # Remove the file extension as yt-dlp will add its own
-    base_output = os.path.splitext(output_file)[0]
-    
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": base_output,
+        "outtmpl": output_file,
         "quiet": True,
         "overwrites": True,
         "continuedl": False,
@@ -105,17 +96,7 @@ def download_audio_only(url, output_file):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        
-        # Check if the file exists with .aac extension
-        actual_output = f"{base_output}.aac"
-        if os.path.exists(actual_output):
-            # If the output path is different from what we want, rename it
-            if actual_output != output_file:
-                os.rename(actual_output, output_file)
-            return True
-        else:
-            logger.error(f"Audio file not found at expected path: {actual_output}")
-            return False
+        return True
     except Exception as e:
         logger.error(f"Error downloading audio: {e}")
         return False
@@ -124,17 +105,34 @@ def download_video_only(url, output_file):
     """Download only the video from a YouTube video."""
     logger.debug(f"Downloading video from {url} to {output_file}")
     import yt_dlp
+    
+    # Get the directory path and ensure it exists
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
     ydl_opts = {
         "format": "bestvideo[ext=mp4]",
         "outtmpl": output_file,
-        "quiet": True,
+        "quiet": False,  # Set to False to see more detailed output
+        "verbose": True,  # Add verbose output for debugging
         "overwrites": True,
         "continuedl": False
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        return True
+            info = ydl.extract_info(url, download=True)
+            if not info:
+                logger.error(f"No information extracted for URL: {url}")
+                return False
+        
+        # Verify the file exists and has content
+        if os.path.exists(output_file) and os.path.getsize(output_file) > 0:
+            logger.debug(f"Video file downloaded successfully: {output_file} ({os.path.getsize(output_file)} bytes)")
+            return True
+        else:
+            logger.error(f"Video file is missing or empty: {output_file}")
+            return False
     except Exception as e:
         logger.error(f"Error downloading video: {e}")
         return False
