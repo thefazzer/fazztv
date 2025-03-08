@@ -257,14 +257,14 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     
     if fztv_logo_exists:
         filters.append(f"[{next_input}:v]scale=100:-1[logosize]")
-        filters.append(f"[{last_output}][logosize]overlay=10:10[logo1]")
+        filters.append(f"[{last_output}][logosize]overlay=30:10[logo1]")  # Moved more to the center of black column
         last_output = "logo1"
         next_input += 1
     
     # Add MADMIL image if it exists, positioned below the FZTV logo, inside the black column, with rotation
     if madmil_image_exists:
-        filters.append(f"[{next_input}:v]scale=100:-1,rotate=2*PI*t/10:ow=rotw(iw):oh=roth(ih):c=black[madmilimg]")  # Rotate slowly over 10 seconds
-        filters.append(f"[{last_output}][madmilimg]overlay=10:120[outv]")  # Positioning in black column
+        filters.append(f"[{next_input}:v]scale=120:-1,rotate=2*PI*t/10:ow=rotw(iw):oh=roth(ih):c=black@0[madmilimg]")  # Increased size and made background transparent
+        filters.append(f"[{last_output}][madmilimg]overlay=20:120[outv]")  # Centered in black column
     else:
         filters.append(f"[{last_output}]copy[outv]")
     
@@ -278,6 +278,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
         "-shortest",
+        "-t", "180",  # Limit output to 3 minutes
         "-r", "30", "-vsync", "2",
         "-movflags", "+faststart",
         output_file
