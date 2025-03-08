@@ -272,12 +272,13 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     filter_complex = ";".join(filters)
     
     # Build FFmpeg command
-    cmd = ["ffmpeg", "-y"] + input_args + [
+    cmd = ["ffmpeg", "-y", "-loglevel", "error"] + input_args + [  # Add loglevel error to reduce output
         "-filter_complex", filter_complex,
         "-map", "[outv]", "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
         "-shortest",
+        "-t", str(ELAPSED_TUNE_SECONDS),  # Limit output to configured duration
         "-r", "30", "-vsync", "2",
         "-movflags", "+faststart",
         output_file
@@ -377,16 +378,6 @@ def create_media_item_from_episode(episode):
 
 def main():
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
-    
-    # Check for command line arguments to override default duration
-    import sys
-    global ELAPSED_TUNE_SECONDS
-    if len(sys.argv) > 1:
-        try:
-            ELAPSED_TUNE_SECONDS = int(sys.argv[1])
-            logger.info(f"Setting clip duration to {ELAPSED_TUNE_SECONDS} seconds")
-        except ValueError:
-            logger.error(f"Invalid duration argument: {sys.argv[1]}. Using default {ELAPSED_TUNE_SECONDS} seconds.")
     
     # Load data from JSON
     data = load_madonna_data()
