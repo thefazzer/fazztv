@@ -28,6 +28,7 @@ BASE_RES = "640x360"
 FADE_LENGTH = 3
 MARQUEE_DURATION = 86400
 SCROLL_SPEED = 40
+ELAPSED_TUNE_SECONDS = 10  # Default duration for media clips in seconds
 
 # Path to the JSON data file
 DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
@@ -87,79 +88,72 @@ def download_audio_only(url, output_file):
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
-    # Create a unique temporary directory for this download
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Use a simple filename without extension in the temp directory
-        temp_base = os.path.join(temp_dir, "audio_download")
+    # Create a base output without any extension
+    base_output = os.path.splitext(output_file)[0]
+    if base_output.endswith('.aac'):
+        base_output = base_output[:-4]  # Remove .aac if it's still there
+    
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "outtmpl": f"{base_output}.%(ext)s",  # Let yt-dlp handle the extension
+        "quiet": False,
+        "verbose": True,
+        "overwrites": True,
+        "continuedl": False,
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "aac",
+            "preferredquality": "192",
+        }]
+    }
+    
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            if not info:
+                logger.error(f"No information extracted for URL: {url}")
+                return False
         
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "outtmpl": temp_base + ".%(ext)s",  # Add extension placeholder
-            "max_duration": 180,
-            "quiet": False,
-            "verbose": True,
-            "overwrites": True,
-            "continuedl": False,
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "aac",
-                "preferredquality": "192",
-            }]
-        }
+        # Check for possible file extensions that yt-dlp might have created
+        possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.aac.mp4', '.mp3']
+        found_file = None
         
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-                if not info:
-                    logger.error(f"No information extracted for URL: {url}")
-                    return False
+        for ext in possible_extensions:
+            potential_file = f"{base_output}{ext}"
+            if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
+                found_file = potential_file
+                logger.debug(f"Found audio file: {found_file} ({os.path.getsize(found_file)} bytes)")
+                break
+        
+        if found_file:
+            # Rename to the expected output file
+            if found_file != output_file:
+                logger.debug(f"Renaming {found_file} to {output_file}")
+                if os.path.exists(output_file):
+                    os.remove(output_file)
+                os.rename(found_file, output_file)
+            return True
+        else:
+            # Try a more aggressive search in the directory
+            dir_path = os.path.dirname(base_output)
+            base_name = os.path.basename(base_output)
+            logger.debug(f"Searching directory {dir_path} for files starting with {base_name}")
             
-            # Find the downloaded file in the temp directory
-            downloaded_files = os.listdir(temp_dir)
-            logger.debug(f"Files in temp directory: {downloaded_files}")
+            for file in os.listdir(dir_path):
+                if file.startswith(os.path.basename(base_name)) and os.path.getsize(os.path.join(dir_path, file)) > 0:
+                    found_file = os.path.join(dir_path, file)
+                    logger.debug(f"Found alternative audio file: {found_file}")
+                    if os.path.exists(output_file):
+                        os.remove(output_file)
+                    os.rename(found_file, output_file)
+                    return True
             
-            if not downloaded_files:
-                logger.error("No files found in temporary directory after download")
-                return False
-            
-            # Look specifically for the audio file with .aac extension
-            audio_file = None
-            for file in downloaded_files:
-                if file.startswith("audio_download") and file.endswith(".aac"):
-                    audio_file = os.path.join(temp_dir, file)
-                    break
-            
-            # If no .aac file found, try to find any non-empty file
-            if not audio_file:
-                for file in downloaded_files:
-                    file_path = os.path.join(temp_dir, file)
-                    if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
-                        audio_file = file_path
-                        break
-            
-            if not audio_file:
-                logger.error("No valid audio file found in temporary directory")
-                return False
-                
-            logger.debug(f"Found downloaded audio file: {audio_file}")
-            
-            # Copy the file to the desired output location
-            import shutil
-            shutil.copy2(audio_file, output_file)
-            logger.debug(f"Copied audio file to {output_file}")
-            
-            # Verify the output file exists and has content
-            if os.path.exists(output_file) and os.path.getsize(output_file) > 0:
-                return True
-            else:
-                logger.error(f"Output file {output_file} is missing or empty after copy")
-                return False
-                
-        except Exception as e:
-            logger.error(f"Error downloading audio: {e}")
-            import traceback
-            logger.error(f"Traceback: {traceback.format_exc()}")
+            logger.error(f"No valid audio file found for {base_output} with any expected extension")
             return False
+            
+    except Exception as e:
+        logger.error(f"Error downloading audio: {e}")
+        return False
 
 def download_video_only(url, output_file):
     """Download only the video from a YouTube video."""
@@ -167,7 +161,7 @@ def download_video_only(url, output_file):
     import yt_dlp
     ydl_opts = {
         "format": "bestvideo[ext=mp4]",
-         "max_duration": 180,
+         "max_duration": ELAPSED_TUNE_SECONDS,
         "outtmpl": output_file,
         "quiet": True,
         "overwrites": True,
@@ -211,8 +205,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
             "fontsize=16:"
             "fontcolor=white:"
             "y=10:"
-            f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
-            "enable=1"
+            "x=(1280 - mod(t*40\, 1280+text_w))"
         )
     ]
     
@@ -243,7 +236,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "[out_v]drawtext=text='" + safe_title + "':"
         "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
         "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
-        "x=(w-text_w)/2:y=15:enable=1[titled]"
+        "x=(w-text_w)/2:y=15[titled]"
     )
     
     # Add song info overlay
@@ -251,7 +244,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "[titled]drawtext=textfile=" + song_path + ":"
         "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
         "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
-        "x=(w-text_w)/2:y=35:enable=1[titledbylined]"
+        "x=(w-text_w)/2:y=35[titledbylined]"
     )
     
     # Add marquee
@@ -270,7 +263,7 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     
     # Add MADMIL image if it exists, positioned below the FZTV logo, inside the black column, with rotation
     if madmil_image_exists:
-        filters.append(f"[{next_input}:v]scale=100:-1,rotate=2*PI*t/10:ow=rotw(iw):oh=roth(ih):c=black[madmilimg]")  # Rotate slowly over 10 seconds
+        filters.append(f"[{next_input}:v]format=rgba,scale=100:-1,rotate=3.141592653589793*2*t/10:ow=rotw(iw):oh=roth(ih):c=black[madmilimg]")  # Rotate slowly over 10 seconds
         filters.append(f"[{last_output}][madmilimg]overlay=10:120[outv]")  # Positioning in black column
     else:
         filters.append(f"[{last_output}]copy[outv]")
@@ -279,13 +272,12 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     filter_complex = ";".join(filters)
     
     # Build FFmpeg command
-    cmd = ["ffmpeg", "-y", "-loglevel", "error"] + input_args + [  # Add loglevel error to reduce output
+    cmd = ["ffmpeg", "-y"] + input_args + [
         "-filter_complex", filter_complex,
         "-map", "[outv]", "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
         "-shortest",
-        "-t", str(ELAPSED_TUNE_SECONDS),  # Limit output to configured duration
         "-r", "30", "-vsync", "2",
         "-movflags", "+faststart",
         output_file
