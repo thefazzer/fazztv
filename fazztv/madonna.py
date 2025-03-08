@@ -94,7 +94,7 @@ def download_audio_only(url, output_file):
         
         ydl_opts = {
             "format": "bestaudio/best",
-            "outtmpl": temp_base,
+            "outtmpl": temp_base + ".%(ext)s",  # Add extension placeholder
             "max_duration": 180,
             "quiet": False,
             "verbose": True,
@@ -122,13 +122,20 @@ def download_audio_only(url, output_file):
                 logger.error("No files found in temporary directory after download")
                 return False
             
-            # Find the audio file (should be the only file in the directory)
+            # Look specifically for the audio file with .aac extension
             audio_file = None
             for file in downloaded_files:
-                file_path = os.path.join(temp_dir, file)
-                if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
-                    audio_file = file_path
+                if file.startswith("audio_download") and file.endswith(".aac"):
+                    audio_file = os.path.join(temp_dir, file)
                     break
+            
+            # If no .aac file found, try to find any non-empty file
+            if not audio_file:
+                for file in downloaded_files:
+                    file_path = os.path.join(temp_dir, file)
+                    if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+                        audio_file = file_path
+                        break
             
             if not audio_file:
                 logger.error("No valid audio file found in temporary directory")
@@ -153,7 +160,7 @@ def download_audio_only(url, output_file):
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return False
-        
+
 def download_video_only(url, output_file):
     """Download only the video from a YouTube video."""
     logger.debug(f"Downloading video from {url} to {output_file}")
