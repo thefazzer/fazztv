@@ -95,6 +95,7 @@ def download_audio_only(url, output_file):
         ydl_opts = {
             "format": "bestaudio/best",
             "outtmpl": temp_base,
+            "max_duration": 180,
             "quiet": False,
             "verbose": True,
             "overwrites": True,
@@ -159,6 +160,7 @@ def download_video_only(url, output_file):
     import yt_dlp
     ydl_opts = {
         "format": "bestvideo[ext=mp4]",
+         "max_duration": 180,
         "outtmpl": output_file,
         "quiet": True,
         "overwrites": True,
@@ -185,48 +187,12 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         war_path = war_file.name
         war_file.write(war_info)
     
-    # Check if logo exists
-    logo_exists = os.path.exists("fztv-logo.png")
-    if logo_exists:
-        logo_input = ["-i", "fztv-logo.png"]
-        scale_logo = "[3:v]scale=100:-1[logosize];"
-        overlay_logo = "[temp][logosize]overlay=10:10[outv]"
-    else:
-        logo_input = []
-        scale_logo = ""
-        overlay_logo = "[temp]copy[outv]"
+    # Check if logos exist
+    fztv_logo_exists = os.path.exists("fztv-logo.png")
+    madmil_image_exists = os.path.exists("madmil-disk2.png")
     
-    # Escape single quotes in text
-    safe_title = documentary_title.replace("'", "\\'")
-    
-    # Create filter string
-    filter_str = (
-        "[0:v]scale=640:360,setsar=1[v0];"
-        
-        # Add title overlay
-        "[v0]drawtext=text='" + safe_title + "':"
-        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
-        "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
-        "x=(w-text_w)/2:y=15:enable=1[titled];"
-        
-        # Add song info overlay
-        "[titled]drawtext=textfile=" + song_path + ":"
-        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
-        "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
-        "x=(w-text_w)/2:y=35:enable=1[titledbylined];"
-        
-        # Add marquee
-        "[2:v]scale=640:100[marq];"
-        "[titledbylined][marq]overlay=0:360-100[temp];"
-        
-        # Add logo
-        f"{scale_logo}"
-        f"{overlay_logo}"
-    )
-    
-    # Build FFmpeg command
-    cmd = [
-        "ffmpeg", "-y",
+    # Prepare input arguments for FFmpeg
+    input_args = [
         "-i", video_file,
         "-i", audio_file,
         "-f", "lavfi",
@@ -241,8 +207,73 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
             f"x='1280 - mod(t*{SCROLL_SPEED}, 1280+text_w)':"
             "enable=1"
         )
-    ] + logo_input + [
-        "-filter_complex", filter_str,
+    ]
+    
+    # Add logo and image inputs if they exist
+    if fztv_logo_exists:
+        input_args.extend(["-i", "fztv-logo.png"])
+    
+    if madmil_image_exists:
+        input_args.extend(["-i", "madmil-disk2.png"])  # Static image to be rotated
+    
+    # Escape single quotes in text
+    safe_title = documentary_title.replace("'", "\\'")
+    
+    # Build the filter complex string in parts
+    filters = []
+    
+    # Create black column on the left
+    filters.append("color=c=black:s=160x360[black_col]")  # 4cm wide black column assuming 40px/cm
+    
+    # Scale and prepare main video
+    filters.append("[0:v]scale=1120:360,setsar=1[v0]")
+    
+    # Combine black column and video side by side
+    filters.append("[black_col][v0]hstack[out_v]")
+    
+    # Add title overlay
+    filters.append(
+        "[out_v]drawtext=text='" + safe_title + "':"
+        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+        "fontsize=24:fontcolor=cyan:bordercolor=green:borderw=2:"
+        "x=(w-text_w)/2:y=15:enable=1[titled]"
+    )
+    
+    # Add song info overlay
+    filters.append(
+        "[titled]drawtext=textfile=" + song_path + ":"
+        "fontfile=/usr/share/fonts/truetype/unifont/unifont.ttf:"
+        "fontsize=10:fontcolor=black:bordercolor=green:borderw=1:"
+        "x=(w-text_w)/2:y=35:enable=1[titledbylined]"
+    )
+    
+    # Add marquee
+    filters.append("[2:v]scale=1280:100[marq]")
+    filters.append("[titledbylined][marq]overlay=0:260[temp]")
+    
+    # Add FZTV logo if it exists, aligned within black column
+    next_input = 3  # Start with input index 3
+    last_output = "temp"
+    
+    if fztv_logo_exists:
+        filters.append(f"[{next_input}:v]scale=100:-1[logosize]")
+        filters.append(f"[{last_output}][logosize]overlay=10:10[logo1]")
+        last_output = "logo1"
+        next_input += 1
+    
+    # Add MADMIL image if it exists, positioned below the FZTV logo, inside the black column, with rotation
+    if madmil_image_exists:
+        filters.append(f"[{next_input}:v]scale=100:-1,rotate=2*PI*t/10:ow=rotw(iw):oh=roth(ih):c=black[madmilimg]")  # Rotate slowly over 10 seconds
+        filters.append(f"[{last_output}][madmilimg]overlay=10:120[outv]")  # Positioning in black column
+    else:
+        filters.append(f"[{last_output}]copy[outv]")
+    
+    # Join all filter parts with semicolons
+    filter_complex = ";".join(filters)
+    
+    # Build FFmpeg command
+    cmd = ["ffmpeg", "-y"] + input_args + [
+        "-filter_complex", filter_complex,
         "-map", "[outv]", "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",

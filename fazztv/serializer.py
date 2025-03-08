@@ -158,18 +158,23 @@ class MediaSerializer:
                 os.remove(marquee_path)
     
     def _build_ffmpeg_command(self, input_path: str, marquee_path: str, 
-                         output_path: str, target_duration: float,
-                         artist: str = "", song: str = "",
-                         show_title: str = "", show_byline: str = "") -> List[str]:
+                     output_path: str, target_duration: float,
+                     artist: str = "", song: str = "",
+                     show_title: str = "", show_byline: str = "") -> List[str]:
         """Build the FFmpeg command for serializing a media item."""
-        # Check logo
+        # Check for madmil disk mp4
+        madmil_disk = "madmil-disk.mp4"
         logo_input = []
         scale_logo = ""
         overlay_logo = "[temp]copy[outv]"
         
-        if self.logo_path and os.path.exists(self.logo_path):
+        if os.path.exists(madmil_disk):
+            logo_input = ["-stream_loop", "-1", "-i", madmil_disk]
+            scale_logo = "[2:v]scale=50:-1[logosize];"
+            overlay_logo = "[temp][logosize]overlay=10:10[outv]"
+        elif self.logo_path and os.path.exists(self.logo_path):
             logo_input = ["-i", self.logo_path]
-            scale_logo = "[2:v]scale=100:-1[logosize];"
+            scale_logo = "[2:v]scale=50:-1[logosize];"  # 50% smaller (was 100:-1)
             overlay_logo = "[temp][logosize]overlay=10:10[outv]"
         
         # Escape single quotes in text fields
