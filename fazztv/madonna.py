@@ -257,14 +257,14 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
     
     if fztv_logo_exists:
         filters.append(f"[{next_input}:v]scale=100:-1[logosize]")
-        filters.append(f"[{last_output}][logosize]overlay=30:10[logo1]")  # Moved more to the center of black column
+        filters.append(f"[{last_output}][logosize]overlay=10:10[logo1]")
         last_output = "logo1"
         next_input += 1
     
     # Add MADMIL image if it exists, positioned below the FZTV logo, inside the black column, with rotation
     if madmil_image_exists:
-        filters.append(f"[{next_input}:v]scale=120:-1,rotate=2*PI*t/10:ow=rotw(iw):oh=roth(ih):c=black@0[madmilimg]")  # Increased size and made background transparent
-        filters.append(f"[{last_output}][madmilimg]overlay=20:120[outv]")  # Centered in black column
+        filters.append(f"[{next_input}:v]scale=100:-1,rotate=2*PI*t/10:ow=rotw(iw):oh=roth(ih):c=black[madmilimg]")  # Rotate slowly over 10 seconds
+        filters.append(f"[{last_output}][madmilimg]overlay=10:120[outv]")  # Positioning in black column
     else:
         filters.append(f"[{last_output}]copy[outv]")
     
@@ -278,7 +278,6 @@ def combine_audio_video(audio_file, video_file, output_file, song_info, war_info
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
         "-shortest",
-        "-t", "180",  # Limit output to 3 minutes
         "-r", "30", "-vsync", "2",
         "-movflags", "+faststart",
         output_file
@@ -378,6 +377,16 @@ def create_media_item_from_episode(episode):
 
 def main():
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
+    
+    # Check for command line arguments to override default duration
+    import sys
+    global ELAPSED_TUNE_SECONDS
+    if len(sys.argv) > 1:
+        try:
+            ELAPSED_TUNE_SECONDS = int(sys.argv[1])
+            logger.info(f"Setting clip duration to {ELAPSED_TUNE_SECONDS} seconds")
+        except ValueError:
+            logger.error(f"Invalid duration argument: {sys.argv[1]}. Using default {ELAPSED_TUNE_SECONDS} seconds.")
     
     # Load data from JSON
     data = load_madonna_data()
