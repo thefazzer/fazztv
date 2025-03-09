@@ -487,6 +487,10 @@ def combine_audio_video(
     logger.debug("FFmpeg cmd: " + " ".join(cmd))
 
     try:
+        # Log the command in a format that's easy to copy and run
+        logger.info("FFmpeg command for manual execution:")
+        logger.info(" \\\n".join(cmd))
+        
         result = subprocess.run(cmd, capture_output=True)
         if result.returncode != 0:
             logger.error("FFmpeg error: " + result.stderr.decode("utf-8", "ignore"))
