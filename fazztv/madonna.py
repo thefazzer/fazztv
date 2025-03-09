@@ -239,8 +239,7 @@ def combine_audio_video(
     song_info,
     war_info,
     release_date,
-    disable_eq=False,
-    war_url=None  # Add war_url parameter
+    disable_eq=False
 ):
     """
     Combine:
@@ -259,7 +258,6 @@ def combine_audio_video(
       war_info (str): Text for marquee
       release_date (str): Possibly "YYYY-MM-DD", else ignored
       disable_eq (bool): If True, skip the graphic EQ entirely (default True).
-      war_url (str): URL of the war documentary (for intro audio)
     """
     import datetime
     import subprocess
@@ -339,7 +337,10 @@ def combine_audio_video(
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
 
-    next_input = 4
+    logo_idx = 5 if war_audio_file and os.path.exists(war_audio_file) else 4
+    madmil_idx = logo_idx + 1 if fztv_logo_exists else logo_idx
+    
+    next_input = logo_idx
     last_output = "outv"
     if fztv_logo_exists:
         filter_main.append(f"[{next_input}:v]scale=120:120[logosize]")
@@ -534,15 +535,7 @@ def create_media_item_from_episode(episode):
         
         # Combine audio and video
         logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
-        if not combine_audio_video(
-            audio_path, 
-            video_path, 
-            output_path, 
-            episode['title'], 
-            episode['commentary'], 
-            episode.get('release_date', war_title),
-            war_url=war_url  # Pass war_url for intro audio
-        ):
+        if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], episode.get('release_date', war_title)):
             logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
         
