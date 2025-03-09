@@ -308,15 +308,16 @@ def combine_audio_video(
     fztv_logo_exists = os.path.exists("fztv-logo.png")
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
 
-    # Marquee input (#2): wrap drawtext in single quotes to avoid FFmpeg parse errors with colons
-    # Also note we escape the comma in mod(40*t\, w+text_w).
+    # Marquee input (#2): use text parameter instead of textfile
+    war_info_short = war_info_sanitized[:200] + "..." if len(war_info_sanitized) > 200 else war_info_sanitized
+    
     marquee_text_expr = (
         "color=c=black:s=1280x50,"
-        "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        f"textfile={war_path}:"
+        "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+        f"text='{war_info_short}':"
         "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
-        "x=w - mod(40*t\\, w+text_w):"
-        "y=h-th-10'"
+        "x=w-mod(40*t\\\\,w+tw):"
+        "y=h-th-10"
     )
 
     # EQ background input (#3)
