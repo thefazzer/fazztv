@@ -240,26 +240,26 @@ def combine_audio_video(
     war_info,
     release_date,
     disable_eq=False,
-    war_url=None
+    war_url=None  # Add war_url parameter
 ):
     """
     Combine:
       1) video_file + audio_file
       2) scrolling marquee at bottom
-      3) a graphic equalizer "footer" from the snippet (if disable_eq=False)
+      3) a graphic equalizer “footer” from the snippet (if disable_eq=False)
       4) The title replaced by:
-         "This song is X days old today - so ancient Madonnas release date was closer in history to the {war_title_part} !"
+         “This song is X days old today - so ancient Madonnas release date was closer in history to the {war_title_part} !”
          where war_title_part is everything before the first colon in war_info.
 
     Parameters:
-      audio_file (str): Path to input audio (Madonna music)
-      video_file (str): Path to input video (war documentary)
+      audio_file (str): Path to input audio
+      video_file (str): Path to input video
       output_file (str): Path to output combined file
       song_info (str): Text for the byline
       war_info (str): Text for marquee
       release_date (str): Possibly "YYYY-MM-DD", else ignored
       disable_eq (bool): If True, skip the graphic EQ entirely (default True).
-      war_url (str): URL to war video for intro audio
+      war_url (str): URL of the war documentary (for intro audio)
     """
     import datetime
     import subprocess
@@ -269,12 +269,6 @@ def combine_audio_video(
     import re
 
     logger = logging.getLogger(__name__)
-
-    # Download war audio for intro if war_url is provided
-    war_audio_file = None
-    if war_url:
-        war_audio_file = os.path.join(tempfile.gettempdir(), f"war_audio_{int(time.time())}.aac")
-        download_audio_only(war_url, war_audio_file)
 
     today = datetime.date.today()
     from datetime import datetime
@@ -302,7 +296,10 @@ def combine_audio_video(
 
     logger.debug(f"Combining {audio_file} + {video_file} => {output_file}")
 
-    # We don't need the song file anymore as we're using the title directly
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as song_file:
+        song_path = song_file.name
+        song_file.write(song_info)
+
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
         war_path = war_file.name
         war_file.write(war_info_sanitized)
@@ -311,7 +308,7 @@ def combine_audio_video(
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
 
     marquee_text_expr = (
-        "color=c=black:s=1280x80,"
+        "color=c=black:s=1280x50,"
         "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
         f"textfile={war_path}:"
         "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
@@ -327,38 +324,22 @@ def combine_audio_video(
         "-f", "lavfi", "-i", marquee_text_expr,
         "-f", "lavfi", "-i", eq_bg_expr
     ]
-    
-    if war_audio_file and os.path.exists(war_audio_file):
-        input_args += ["-i", war_audio_file]
-        
     if fztv_logo_exists:
         input_args += ["-i", "fztv-logo.png"]
     if madmil_video_exists:
         input_args += ["-stream_loop", "-1", "-i", "madonna-rotator.mp4"]
 
-    # Determine the next input index
-    next_input_idx = 5
-    if war_audio_file and os.path.exists(war_audio_file):
-        next_input_idx += 1
-
     filter_main = [
         "color=c=black:s=200x608[black_col]",
         "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
         "[black_col][v0]hstack[out_v]",
-        # Use the new title text directly instead of song_info
         f"[out_v]drawtext=text='{safe_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        # Skip the byline text since we're using the title directly
-        "[titled]copy[titledbylined]",
+        f"[titled]drawtext=textfile={song_path}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=1280:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
 
-
-    # Calculate input indices correctly
-    logo_idx = 5 if war_audio_file and os.path.exists(war_audio_file) else 4
-    madmil_idx = logo_idx + 1 if fztv_logo_exists else logo_idx
-    
-    next_input = logo_idx
+    next_input = 4
     last_output = "outv"
     if fztv_logo_exists:
         filter_main.append(f"[{next_input}:v]scale=120:120[logosize]")
@@ -371,7 +352,6 @@ def combine_audio_video(
     else:
         filter_main.append(f"[{last_output}]copy[mainOut]")
 
-
     # --- EQ CHAIN => [eqOut], if disable_eq=False ---
     # We'll produce a 1280x200 final eqOut for easy vstack with mainOut (1280 wide).
     # Each band is ~125 wide, 200 high => total ~500 wide => we scale to 1280 wide.
@@ -380,132 +360,74 @@ def combine_audio_video(
     filter_combine = []
 
     if not disable_eq:
-# Updated EQ visualization - smaller, green, centered, closer together
+        # 1) 4 freq bands => each ~25 wide + 100 pad => ~125 wide x 200 high
+        # 2) hstack=4 => ~500 wide x 200 high
+        # 3) scale that to 1280x200
+        # 4) overlay onto eq_bg_expr (1280x200) => eqOut
         filter_eq = [
-            # Low freq - light green
+            # Low freq
             "[1:a]bandpass=frequency=40:width=20:width_type=h[s0];"
-            "[s0]showvolume=b=0:c=0x00FF00FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s1];"
-            "[s1]crop=h=ih/2:w=32:x=0:y=0[s2];"
-            "[s2]scale=h=50:w=32[s3];"  # Fixed width to match crop
+            "[s0]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s1];"
+            "[s1]crop=h=ih/2:w=25:x=0:y=0[s2];"
+            "[s2]scale=h=200:w=-1[s3];"
             "[s3]smartblur[s4];"
-            "[s4]split=2[s7][s8];"
+            "[s4]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s5];"
+            "[s5]smartblur[s6];"
+            "[s6]split=2[s7][s8];"
             "[s7]vflip[s9];"
             "[s8][s9]vstack[s10];"
             "[s10]format=rgba[s11];"
-            # Ensure pad width is at least as large as input
-            "[s11]pad=color=black@0:height=ih:width=iw+20:x=0:y=0[s12]",
+            "[s11]pad=color=black@0:height=0:width=100:x=25:y=0[s12]",
 
-            # Mid freq - medium green
+            # Mid freq
             "[1:a]bandpass=frequency=155:width=95:width_type=h[s13];"
-            "[s13]showvolume=b=0:c=0x00CC00FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s14];"
-            "[s14]crop=h=ih/2:w=32:x=0:y=0[s15];"
-            "[s15]scale=h=50:w=32[s16];"  # Fixed width to match crop
+            "[s13]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s14];"
+            "[s14]crop=h=ih/2:w=25:x=0:y=0[s15];"
+            "[s15]scale=h=200:w=-1[s16];"
             "[s16]smartblur[s17];"
-            "[s17]split=2[s20][s21];"
+            "[s17]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s18];"
+            "[s18]smartblur[s19];"
+            "[s19]split=2[s20][s21];"
             "[s20]vflip[s22];"
             "[s21][s22]vstack[s23];"
             "[s23]format=rgba[s24];"
-            # Ensure pad width is at least as large as input
-            "[s24]pad=color=black@0:height=ih:width=iw+20:x=0:y=0[s25]",
+            "[s24]pad=color=black@0:height=0:width=100:x=25:y=0[s25]",
 
-            # Upper-mid freq - dark green
+            # Upper-mid freq
             "[1:a]bandpass=frequency=375:width=125:width_type=h[s26];"
-            "[s26]showvolume=b=0:c=0x009900FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s27];"
-            "[s27]crop=h=ih/2:w=32:x=0:y=0[s28];"
-            "[s28]scale=h=50:w=32[s29];"  # Fixed width to match crop
+            "[s26]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s27];"
+            "[s27]crop=h=ih/2:w=25:x=0:y=0[s28];"
+            "[s28]scale=h=200:w=-1[s29];"
             "[s29]smartblur[s30];"
-            "[s30]split=2[s33][s34];"
+            "[s30]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s31];"
+            "[s31]smartblur[s32];"
+            "[s32]split=2[s33][s34];"
             "[s33]vflip[s35];"
             "[s34][s35]vstack[s36];"
             "[s36]format=rgba[s37];"
-            # Ensure pad width is at least as large as input
-            "[s37]pad=color=black@0:height=ih:width=iw+20:x=0:y=0[s38]",
+            "[s37]pad=color=black@0:height=0:width=100:x=25:y=0[s38]",
 
-            # High freq - forest green
+            # High freq
             "[1:a]bandpass=frequency=1250:width=750:width_type=h[s39];"
-            "[s39]showvolume=b=0:c=0x006600FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s40];"
-            "[s40]crop=h=ih/2:w=32:x=0:y=0[s41];"
-            "[s41]scale=h=50:w=32[s42];"  # Fixed width to match crop
+            "[s39]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s40];"
+            "[s40]crop=h=ih/2:w=25:x=0:y=0[s41];"
+            "[s41]scale=h=200:w=-1[s42];"
             "[s42]smartblur[s43];"
-            "[s43]split=2[s46][s47];"
+            "[s43]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s44];"
+            "[s44]smartblur[s45];"
+            "[s45]split=2[s46][s47];"
             "[s46]vflip[s48];"
             "[s47][s48]vstack[s49];"
             "[s49]format=rgba[s50];"
-            # Ensure pad width is at least as large as input
-            "[s50]pad=color=black@0:height=ih:width=iw+20:x=0:y=0[s51]",
+            "[s50]pad=color=black@0:height=0:width=100:x=25:y=0[s51]",
 
-            # horizontally stack => ~125 wide x 50 high
+            # horizontally stack => ~500 wide x 200 high
             "[s12][s25][s38][s51]hstack=inputs=4[s52]",
-            # now scale and center [s52] => 320x50 (25% of 1280x200)
-            "[s52]scale=320:50[eqScaled]",
-            # overlay eqScaled onto eq background (which is 1280x200) - centered
-            "[3:v][eqScaled]overlay=(W-w)/2:(H-h)/2[eqOut]"
-        ]        
-        
-        # filter_eq = [
-        #     # Low freq - light green
-        #     "[1:a]bandpass=frequency=40:width=20:width_type=h[s0];"
-        #     "[s0]showvolume=b=0:c=0x00FF00FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s1];"
-        #     "[s1]crop=h=ih/2:w=15:x=0:y=0[s2];"
-        #     "[s2]scale=h=50:w=-1[s3];"
-        #     "[s3]smartblur[s4];"
-        #     "[s4]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s5];"
-        #     "[s5]smartblur[s6];"
-        #     "[s6]split=2[s7][s8];"
-        #     "[s7]vflip[s9];"
-        #     "[s8][s9]vstack[s10];"
-        #     "[s10]format=rgba[s11];"
-        #     "[s11]pad=color=black@0:height=0:width=20:x=15:y=0[s12]",
-
-        #     # Mid freq - medium green
-        #     "[1:a]bandpass=frequency=155:width=95:width_type=h[s13];"
-        #     "[s13]showvolume=b=0:c=0x00CC00FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s14];"
-        #     "[s14]crop=h=ih/2:w=15:x=0:y=0[s15];"
-        #     "[s15]scale=h=50:w=-1[s16];"
-        #     "[s16]smartblur[s17];"
-        #     "[s17]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s18];"
-        #     "[s18]smartblur[s19];"
-        #     "[s19]split=2[s20][s21];"
-        #     "[s20]vflip[s22];"
-        #     "[s21][s22]vstack[s23];"
-        #     "[s23]format=rgba[s24];"
-        #     "[s24]pad=color=black@0:height=0:width=20:x=15:y=0[s25]",
-
-        #     # Upper-mid freq - dark green
-        #     "[1:a]bandpass=frequency=375:width=125:width_type=h[s26];"
-        #     "[s26]showvolume=b=0:c=0x009900FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s27];"
-        #     "[s27]crop=h=ih/2:w=15:x=0:y=0[s28];"
-        #     "[s28]scale=h=50:w=-1[s29];"
-        #     "[s29]smartblur[s30];"
-        #     "[s30]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s31];"
-        #     "[s31]smartblur[s32];"
-        #     "[s32]split=2[s33][s34];"
-        #     "[s33]vflip[s35];"
-        #     "[s34][s35]vstack[s36];"
-        #     "[s36]format=rgba[s37];"
-        #     "[s37]pad=color=black@0:height=0:width=20:x=15:y=0[s38]",
-
-        #     # High freq - forest green
-        #     "[1:a]bandpass=frequency=1250:width=750:width_type=h[s39];"
-        #     "[s39]showvolume=b=0:c=0x006600FF:ds=log:f=0:h=50:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=80[s40];"
-        #     "[s40]crop=h=ih/2:w=15:x=0:y=0[s41];"
-        #     "[s41]scale=h=50:w=-1[s42];"
-        #     "[s42]smartblur[s43];"
-        #     "[s43]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s44];"
-        #     "[s44]smartblur[s45];"
-        #     "[s45]split=2[s46][s47];"
-        #     "[s46]vflip[s48];"
-        #     "[s47][s48]vstack[s49];"
-        #     "[s49]format=rgba[s50];"
-        #     "[s50]pad=color=black@0:height=0:width=20:x=15:y=0[s51]",
-
-        #     # horizontally stack => ~125 wide x 50 high
-        #     "[s12][s25][s38][s51]hstack=inputs=4[s52]",
-        #     # now scale and center [s52] => 320x50 (25% of 1280x200)
-        #     "[s52]scale=320:80[eqScaled]",
-        #     # overlay eqScaled onto eq background (which is 1280x200) - centered
-        #     "[3:v][eqScaled]overlay=(W-w)/2:(H-h)/2[eqOut]"
-        # ]
+            # now scale [s52] => 1280x200
+            "[s52]scale=1280:200[eqScaled]",
+            # overlay eqScaled onto eq background (which is 1280x200)
+            "[3:v][eqScaled]overlay=0:0[eqOut]"
+        ]
 
         # vstack final => [outfinal]
         filter_combine = [
@@ -519,30 +441,14 @@ def combine_audio_video(
             "[mainOut]copy[outfinal]"
         ]
 
-    # Audio mixing - if we have war audio, use it for first 10 seconds then switch to Madonna
-    audio_filter = []
-    if war_audio_file and os.path.exists(war_audio_file):
-        audio_filter = [
-            # Create a 10-second segment of war audio
-            "[4:a]atrim=0:10,asetpts=PTS-STARTPTS[war_a]",
-            # Delay Madonna audio by 10 seconds
-            "[1:a]adelay=10000|10000[music_a]",
-            # Crossfade between war audio and Madonna audio
-            "[war_a][music_a]acrossfade=d=1:c1=tri:c2=tri[final_a]"
-        ]
-        audio_map = "-map", "[final_a]"
-    else:
-        # Just use Madonna audio
-        audio_map = "-map", "1:a"
-
-    filter_complex = ";".join(filter_main + filter_eq + filter_combine + audio_filter)
+    filter_complex = ";".join(filter_main + filter_eq + filter_combine)
 
     cmd = [
         "ffmpeg", "-y",
         *input_args,
         "-filter_complex", filter_complex,
         "-map", "[outfinal]",
-        *audio_map,
+        "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
         "-shortest", "-r", "30", "-vsync", "2",
@@ -563,82 +469,17 @@ def combine_audio_video(
         logger.error(f"FFmpeg exception: {e}")
         return False
     finally:
+        if os.path.exists(song_path):
+            os.remove(song_path)
         if os.path.exists(war_path):
             os.remove(war_path)
-        if war_audio_file and os.path.exists(war_audio_file):
-            os.remove(war_audio_file)
 
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
-    logger.info(f"Creating media item for '{episode['title']}'")
+    # ... existing code ...
     
     try:
-        # Extract song name from title
-        song_match = re.match(r"^(.*?)\s*\(", episode['title'])
-        song_name = song_match.group(1) if song_match else "Unknown Song"
-        
-        # Get episode GUID
-        guid = episode.get('guid')
-        if not guid:
-            guid = str(uuid.uuid4())
-            episode['guid'] = guid
-            logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
-        
-        # Create temporary files with proper extensions
-        temp_dir = tempfile.gettempdir()
-        audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
-        video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
-        output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
-        
-        # Download audio from Madonna song using GUID for caching
-        logger.debug(f"Attempting to download/retrieve audio for {episode['title']} (GUID: {guid})")
-        if not download_audio_only(episode['music_url'], audio_path, guid):
-            logger.error(f"Failed to download audio for {episode['title']}")
-            # Try an alternative URL if available
-            if 'alternative_music_url' in episode and episode['alternative_music_url']:
-                logger.info(f"Trying alternative music URL for {episode['title']}")
-                if not download_audio_only(episode['alternative_music_url'], audio_path, guid):
-                    logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
-                    return None
-            else:
-                return None
-        
-        # Verify the audio file exists and has content
-        if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
-            logger.error(f"Audio file is missing or empty: {audio_path}")
-            return None
-            
-        logger.debug(f"Successfully obtained audio at {audio_path}")
-        
-        # Download video from war documentary using GUID for caching
-        war_title = episode.get('war_title', 'Unknown War Documentary')
-        war_url = episode.get('war_url', "https://www.youtube.com/watch?v=8a8fqGpHgsk")
-        
-        logger.debug(f"Attempting to download/retrieve video for {war_title} (GUID: {guid})")
-        if not download_video_only(war_url, video_path, guid):
-            logger.error(f"Failed to download video for {war_title}")
-            return None
-        
-        # Verify the video file exists and has content
-        if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
-            logger.error(f"Video file is missing or empty: {video_path}")
-            return None
-            
-        logger.debug(f"Successfully obtained video at {video_path}")
-        
-        # Combine audio and video
-        logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
-        if not combine_audio_video(
-            audio_path, 
-            video_path, 
-            output_path, 
-            episode['title'], 
-            episode['commentary'], 
-            episode.get('release_date', war_title),
-            war_url=war_url  # Pass war_url for intro audio
-        ):
-            logger.error(f"Failed to combine audio and video for {episode['title']}")
-            return None
+        # ... existing code ...
         
         # Create MediaItem
         media_item = MediaItem(
@@ -646,55 +487,10 @@ def create_media_item_from_episode(episode):
             song=song_name,
             url=episode['music_url'],
             taxprompt=episode['commentary'],
-            length_percent=100
+            length_percent=100,
+            duration=ELAPSED_TUNE_SECONDS  # Add explicit duration
         )
         # Set the serialized path directly
         media_item.serialized = output_path
         return media_item
     except Exception as e:
-        logger.error(f"Error in create_media_item: {e}")
-        # Log the traceback for more detailed debugging
-        import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return None
-
-def main():
-    logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
-    
-    # Load data from JSON
-    data = load_madonna_data()
-    
-    # Create broadcaster
-    rtmp_url = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}" if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test"
-    broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
-    
-    # Create a collection of media items
-    media_items = []
-    
-    # Shuffle episodes
-    episodes = data.get('episodes', [])
-    random.shuffle(episodes)
-    
-    # Create media items from episodes
-    for episode in episodes:
-        media_item = create_media_item_from_episode(episode)
-        if media_item:
-            media_items.append(media_item)
-    
-    logger.info(f"Created {len(media_items)} media items")
-    
-    # Broadcast the media items
-    results = []
-    for item in media_items:
-        success = broadcaster.broadcast_item(item)
-        results.append((item, success))
-        
-        # Clean up the serialized file after broadcasting
-        if os.path.exists(item.serialized):
-            os.remove(item.serialized)
-    
-    logger.info(f"Broadcast {sum(1 for _, success in results if success)} media items successfully")
-    logger.info("=== Finished Madonna Military History FazzTV broadcast ===")
-
-if __name__ == "__main__":
-    main()
