@@ -231,6 +231,10 @@ class MediaSerializer:
                 "-movflags", "+faststart",
                 output_path
             ]
+        # Log the command in a format that's easy to copy and run
+        logger.info("FFmpeg command for manual execution:")
+        logger.info(" \\\n".join(cmd))
+        
         return cmd
     
     def serialize_collection(self, media_items: List[MediaItem]) -> List[Tuple[MediaItem, bool]]:
