@@ -269,11 +269,20 @@ def combine_audio_video(
     # Also backslash-escape any single-quotes
     def sanitize_for_drawtext(s: str) -> str:
         """Remove or escape problematic characters so FFmpeg won't interpret them as filter syntax."""
-        s = s.replace('\n', ' ')
+        if not s:
+            return ""
+        
+        # First, replace newlines with spaces
+        s = s.replace('\n', ' ').replace('\r', ' ')
+        
+        # Replace problematic characters
         s = s.replace(';', ',')         # semicolons can break filter-chains
         s = s.replace("'", "\\'")       # single quotes must be escaped
-        s = s.replace(':', ',')         # colons can also confuse FFmpeg if unquoted
-        # you might remove more characters if needed
+        s = s.replace(':', ',')         # colons can also confuse FFmpeg
+        
+        # Remove any other potentially problematic characters
+        s = re.sub(r'[\\](?![\'[\]=,@])', '', s)
+        
         return s
 
     war_info_sanitized = sanitize_for_drawtext(war_info)
@@ -308,16 +317,15 @@ def combine_audio_video(
     fztv_logo_exists = os.path.exists("fztv-logo.png")
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
 
-    # Marquee input (#2): use text parameter instead of textfile
-    war_info_short = war_info_sanitized[:200] + "..." if len(war_info_sanitized) > 200 else war_info_sanitized
-    
+    # Marquee input (#2): wrap drawtext in single quotes to avoid FFmpeg parse errors with colons
+    # Also note we escape the comma in mod(40*t\, w+text_w).
     marquee_text_expr = (
         "color=c=black:s=1280x50,"
-        "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        f"text='{war_info_short}':"
+        "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+        f"textfile={war_path}:"
         "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
-        "x=w-mod(40*t\\\\,w+tw):"
-        "y=h-th-10"
+        "x=w - mod(40*t\\, w+text_w):"
+        "y=h-th-10'"
     )
 
     # EQ background input (#3)
