@@ -1,12 +1,4 @@
-{
-  "episodes": [
-    {
-      "title": "Borderline (1984) - January 29, 1943",
-      "music_url": "https://www.youtube.com/watch?v=rSaC-YbSDpo&list=RDMM&index=7&ab_channel=Madonna",
-      "war_url": "https://www.youtube.com/watch?v=eI24zwFLcuU&ab_channel=Drachinifel",
-      "war_title": "The Battle of Rennell Island: America's Staggering Loss in the Pacific",
-      "commentary": "As World War II raged across the Pacific, the U.S. Navy suffered a humiliating defeat at Rennell Island. American forces, overconfident and unprepared, were caught in a deadly storm of Japanese torpedoes, sending the USS Chicago to a watery grave. With bodies sinking beneath the waves and the war machine creaking under its own weight, hope seemed to slip away as the Imperial Japanese Navy celebrated another savage victory."
-    },
+,
     {
       "title": "Like a Virgin (1984) - June 30, 1944",
       "music_url": "https://www.youtube.com/watch?v=s__rX_WL100&ab_channel=Madonna",
@@ -84,5 +76,3 @@
       "war_title": "The First Taiwan Strait Crisis",
       "commentary": "The First Taiwan Strait Crisis was a brutal display of Cold War aggression, plunging the region into chaos. In 1954, the People's Republic of China unleashed relentless artillery barrages on the Kinmen and Matsu islands, pounding civilian and military targets alike in an unprovoked attempt to strangle Taiwan into submission. The skies were thick with smoke, the ground littered with shattered bodies, and every moment brought the looming specter of full-scale war. As the United States scrambled to react, nuclear catastrophe hung in the air, with superpowers teetering on the edge of annihilation. The world watched in terror as the crisis spiraled, proving once again that no nation was safe from the unchecked, bloodthirsty ambitions of Cold War titans."
     }
-  ]
-}
