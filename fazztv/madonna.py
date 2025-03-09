@@ -8,6 +8,8 @@ import subprocess
 import tempfile
 from typing import List, Optional, Tuple
 import re
+import uuid
+import shutil
 
 from fazztv.models import MediaItem
 from fazztv.serializer import MediaSerializer
@@ -33,6 +35,10 @@ ELAPSED_TUNE_SECONDS = 10  # Default duration for media clips in seconds
 # Path to the JSON data file
 DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
 
+# Cache directory for downloaded media files
+CACHE_DIR = os.path.join("/tmp", "fazztv")
+os.makedirs(CACHE_DIR, exist_ok=True)
+
 logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 
 # ---------------------------------------------------------------------------
@@ -44,6 +50,20 @@ def load_madonna_data():
     try:
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
+        
+        # Add GUIDs to episodes that don't have them
+        modified = False
+        for episode in data['episodes']:
+            if 'guid' not in episode:
+                episode['guid'] = str(uuid.uuid4())
+                modified = True
+        
+        # Save the updated data if any GUIDs were added
+        if modified:
+            with open(DATA_FILE, 'w') as f:
+                json.dump(data, f, indent=2)
+            logger.info(f"Added GUIDs to episodes in {DATA_FILE}")
+        
         logger.info(f"Successfully loaded {len(data['episodes'])} episodes from {DATA_FILE}")
         return data
     except Exception as e:
@@ -78,8 +98,16 @@ def get_madonna_song_url(song_name):
         logger.error(f"Error searching Madonna - {song_name}: {e}")
         return None
 
-def download_audio_only(url, output_file):
+def download_audio_only(url, output_file, guid=None):
     """Download only the audio from a YouTube video."""
+    # Check if cached file exists
+    if guid:
+        cached_file = os.path.join(CACHE_DIR, f"{guid}_audio.aac")
+        if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
+            logger.info(f"Using cached audio file for GUID {guid}")
+            shutil.copy(cached_file, output_file)
+            return True
+    
     logger.debug(f"Downloading audio from {url} to {output_file}")
     import yt_dlp
     
@@ -93,7 +121,7 @@ def download_audio_only(url, output_file):
     if base_output.endswith('.aac'):
         base_output = base_output[:-4]  # Remove .aac if it's still there
     
-    ydl_opts = {
+    yt_dlp_opts = {
         "format": "bestaudio/best",
         "outtmpl": f"{base_output}.%(ext)s",  # Let yt-dlp handle the extension
         "quiet": False,
@@ -108,7 +136,7 @@ def download_audio_only(url, output_file):
     }
     
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(yt_dlp_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             if not info:
                 logger.error(f"No information extracted for URL: {url}")
@@ -132,6 +160,13 @@ def download_audio_only(url, output_file):
                 if os.path.exists(output_file):
                     os.remove(output_file)
                 os.rename(found_file, output_file)
+            
+            # Cache the file if guid is provided
+            if guid:
+                cached_file = os.path.join(CACHE_DIR, f"{guid}_audio.aac")
+                logger.debug(f"Caching audio file to {cached_file}")
+                shutil.copy(output_file, cached_file)
+                
             return True
         else:
             # Try a more aggressive search in the directory
@@ -146,6 +181,13 @@ def download_audio_only(url, output_file):
                     if os.path.exists(output_file):
                         os.remove(output_file)
                     os.rename(found_file, output_file)
+                    
+                    # Cache the file if guid is provided
+                    if guid:
+                        cached_file = os.path.join(CACHE_DIR, f"{guid}_audio.aac")
+                        logger.debug(f"Caching audio file to {cached_file}")
+                        shutil.copy(output_file, cached_file)
+                        
                     return True
             
             logger.error(f"No valid audio file found for {base_output} with any expected extension")
@@ -155,13 +197,21 @@ def download_audio_only(url, output_file):
         logger.error(f"Error downloading audio: {e}")
         return False
 
-def download_video_only(url, output_file):
+def download_video_only(url, output_file, guid=None):
     """Download only the video from a YouTube video."""
+    # Check if cached file exists
+    if guid:
+        cached_file = os.path.join(CACHE_DIR, f"{guid}_video.mp4")
+        if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
+            logger.info(f"Using cached video file for GUID {guid}")
+            shutil.copy(cached_file, output_file)
+            return True
+    
     logger.debug(f"Downloading video from {url} to {output_file}")
     import yt_dlp
     ydl_opts = {
         "format": "bestvideo[ext=mp4]",
-         "max_duration": ELAPSED_TUNE_SECONDS,
+        "max_duration": ELAPSED_TUNE_SECONDS,
         "outtmpl": output_file,
         "quiet": True,
         "overwrites": True,
@@ -170,10 +220,18 @@ def download_video_only(url, output_file):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+        
+        # Cache the file if guid is provided and download was successful
+        if guid and os.path.exists(output_file) and os.path.getsize(output_file) > 0:
+            cached_file = os.path.join(CACHE_DIR, f"{guid}_video.mp4")
+            logger.debug(f"Caching video file to {cached_file}")
+            shutil.copy(output_file, cached_file)
+            
         return True
     except Exception as e:
         logger.error(f"Error downloading video: {e}")
         return False
+
 def combine_audio_video(
     audio_file,
     video_file,
@@ -431,32 +489,31 @@ def create_media_item_from_episode(episode):
         song_match = re.match(r"^(.*?)\s*\(", episode['title'])
         song_name = song_match.group(1) if song_match else "Unknown Song"
         
+        # Get episode GUID
+        guid = episode.get('guid')
+        if not guid:
+            guid = str(uuid.uuid4())
+            episode['guid'] = guid
+            logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
+        
         # Create temporary files with proper extensions
         temp_dir = tempfile.gettempdir()
         audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
         video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
         output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
         
-        # Check if audio file already exists with a consistent naming pattern
-        audio_filename = f"madonna_audio_{song_name.replace(' ', '_')}.aac"
-        existing_audio_path = os.path.join(temp_dir, audio_filename)
-        
-        if os.path.exists(existing_audio_path) and os.path.getsize(existing_audio_path) > 0:
-            logger.info(f"Using existing audio file: {existing_audio_path}")
-            audio_path = existing_audio_path
-        else:
-            # Download audio from Madonna song
-            logger.debug(f"Attempting to download audio from {episode['music_url']} to {audio_path}")
-            if not download_audio_only(episode['music_url'], audio_path):
-                logger.error(f"Failed to download audio for {episode['title']}")
-                # Try an alternative URL if available
-                if 'alternative_music_url' in episode and episode['alternative_music_url']:
-                    logger.info(f"Trying alternative music URL for {episode['title']}")
-                    if not download_audio_only(episode['alternative_music_url'], audio_path):
-                        logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
-                        return None
-                else:
+        # Download audio from Madonna song using GUID for caching
+        logger.debug(f"Attempting to download/retrieve audio for {episode['title']} (GUID: {guid})")
+        if not download_audio_only(episode['music_url'], audio_path, guid):
+            logger.error(f"Failed to download audio for {episode['title']}")
+            # Try an alternative URL if available
+            if 'alternative_music_url' in episode and episode['alternative_music_url']:
+                logger.info(f"Trying alternative music URL for {episode['title']}")
+                if not download_audio_only(episode['alternative_music_url'], audio_path, guid):
+                    logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
                     return None
+            else:
+                return None
         
         # Verify the audio file exists and has content
         if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
@@ -465,21 +522,14 @@ def create_media_item_from_episode(episode):
             
         logger.debug(f"Successfully obtained audio at {audio_path}")
         
-        # Check if video file already exists with a consistent naming pattern
+        # Download video from war documentary using GUID for caching
         war_title = episode.get('war_title', 'Unknown War Documentary')
-        video_filename = f"madonna_video_{war_title.replace(' ', '_')}.mp4"
-        existing_video_path = os.path.join(temp_dir, video_filename)
+        war_url = episode.get('war_url', "https://www.youtube.com/watch?v=8a8fqGpHgsk")
         
-        if os.path.exists(existing_video_path) and os.path.getsize(existing_video_path) > 0:
-            logger.info(f"Using existing video file: {existing_video_path}")
-            video_path = existing_video_path
-        else:
-            # Download video from war documentary
-            war_url = episode.get('war_url', "https://www.youtube.com/watch?v=8a8fqGpHgsk")
-            logger.debug(f"Attempting to download video from {war_url} to {video_path}")
-            if not download_video_only(war_url, video_path):
-                logger.error(f"Failed to download video for {episode.get('war_title', 'Unknown War')}")
-                return None
+        logger.debug(f"Attempting to download/retrieve video for {war_title} (GUID: {guid})")
+        if not download_video_only(war_url, video_path, guid):
+            logger.error(f"Failed to download video for {war_title}")
+            return None
         
         # Verify the video file exists and has content
         if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
@@ -490,7 +540,7 @@ def create_media_item_from_episode(episode):
         
         # Combine audio and video
         logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
-        if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], war_title):
+        if not combine_audio_video(audio_path, video_path, output_path, episode['title'], episode['commentary'], episode.get('release_date', war_title)):
             logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
         
