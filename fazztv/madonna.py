@@ -238,18 +238,27 @@ def combine_audio_video(
     output_file,
     song_info,
     war_info,
-    release_date
+    release_date,
+    disable_eq=False
 ):
     """
     Combine:
       1) video_file + audio_file
       2) scrolling marquee at bottom
-      3) a graphic equalizer “footer” from the snippet
+      3) a graphic equalizer “footer” from the snippet (if disable_eq=False)
       4) The title replaced by:
-         “This song is X days old today - so ancient Madonna's release date was closer in history to the  {war_title_part} !”
+         “This song is X days old today - so ancient Madonnas release date was closer in history to the {war_title_part} !”
          where war_title_part is everything before the first colon in war_info.
-    """
 
+    Parameters:
+      audio_file (str): Path to input audio
+      video_file (str): Path to input video
+      output_file (str): Path to output combined file
+      song_info (str): Text for the byline
+      war_info (str): Text for marquee
+      release_date (str): Possibly "YYYY-MM-DD", else ignored
+      disable_eq (bool): If True, skip the graphic EQ entirely (default True).
+    """
     import datetime
     import subprocess
     import tempfile
@@ -259,57 +268,36 @@ def combine_audio_video(
 
     logger = logging.getLogger(__name__)
 
-    # Compute days_old if release_date matches YYYY-MM-DD
     today = datetime.date.today()
     from datetime import datetime
-
     days_old = 0
 
-    # Replace newlines with spaces, semicolons with commas, etc.
-    # Also backslash-escape any single-quotes
     def sanitize_for_drawtext(s: str) -> str:
-        """Remove or escape problematic characters so FFmpeg won't interpret them as filter syntax."""
         if not s:
             return ""
-        
-        # First, replace newlines with spaces
         s = s.replace('\n', ' ').replace('\r', ' ')
-        
-        # Replace problematic characters
-        s = s.replace(';', ',')         # semicolons can break filter-chains
-        s = s.replace("'", "\\'")       # single quotes must be escaped
-        s = s.replace(':', ',')         # colons can also confuse FFmpeg
-        
-        # Remove any other potentially problematic characters
+        s = s.replace(';', ' ').replace("'", "\\'").replace(':', ' ').replace(',', ' ')
         s = re.sub(r'[\\](?![\'[\]=,@])', '', s)
-        
         return s
 
     war_info_sanitized = sanitize_for_drawtext(war_info)
-
     if re.match(r'^\d{4}-\d{2}-\d{2}$', release_date):
         release_date_val = datetime.strptime(release_date, '%Y-%m-%d').date()
         days_old = (today - release_date_val).days
 
-    # Extract everything before the first colon in war_info
     war_title_part = war_info.split(":", 1)[0].strip()
-
-    # Build the new title text
     new_title_text = (
-        f"This song is {days_old} days old today - so ancient  "
-        f"Madonna's release date was closer in history to the  {war_title_part} !"
+        f"This song is {days_old} days old today and so ancient  "
+        f"Madonnas release date was closer in history to the  {war_title_part} !"
     )
-    # Escape single quotes
     safe_title = new_title_text.replace("'", "\\'")
 
     logger.debug(f"Combining {audio_file} + {video_file} => {output_file}")
 
-    # Temporary text files for byline (song_info) and marquee (war_info)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as song_file:
         song_path = song_file.name
         song_file.write(song_info)
 
-    war_info_sanitized = sanitize_for_drawtext(war_info)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
         war_path = war_file.name
         war_file.write(war_info_sanitized)
@@ -317,8 +305,6 @@ def combine_audio_video(
     fztv_logo_exists = os.path.exists("fztv-logo.png")
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
 
-    # Marquee input (#2): wrap drawtext in single quotes to avoid FFmpeg parse errors with colons
-    # Also note we escape the comma in mod(40*t\, w+text_w).
     marquee_text_expr = (
         "color=c=black:s=1280x50,"
         "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
@@ -328,16 +314,8 @@ def combine_audio_video(
         "y=h-th-10'"
     )
 
-    # EQ background input (#3)
-    eq_bg_expr = "color=black:s=400x400"
+    eq_bg_expr = "color=black:s=1280x200"
 
-    # Input arguments
-    #   [0]: video_file
-    #   [1]: audio_file
-    #   [2]: marquee
-    #   [3]: eq background
-    #   [4]: fztv logo (optional)
-    #   [5]: madonna rotator (optional)
     input_args = [
         "-i", video_file,
         "-i", audio_file,
@@ -349,148 +327,137 @@ def combine_audio_video(
     if madmil_video_exists:
         input_args += ["-stream_loop", "-1", "-i", "madonna-rotator.mp4"]
 
-    # ---- MAIN VIDEO + MARQUEE CHAIN => [mainOut]
     filter_main = [
-        # Black column
-        "color=c=black:s=200x720[black_col]",
-        # Scale main video
-        "[0:v]scale=1080:720:force_original_aspect_ratio=decrease,setsar=1[v0]",
-        # hstack side by side
+        "color=c=black:s=200x608[black_col]",
+        "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
         "[black_col][v0]hstack[out_v]",
-        # Title
-        (
-            f"[out_v]drawtext=text='{safe_title}':"
-            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-            "fontsize=50:fontcolor=yellow:bordercolor=black:borderw=4:"
-            "x=(w-text_w)/2:y=90[titled]"
-        ),
-        # Byline below title
-        (
-            f"[titled]drawtext=textfile={song_path}:"
-            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-            "fontsize=26:fontcolor=white:bordercolor=black:borderw=3:"
-            "x=(w-text_w)/2:y=160[titledbylined]"
-        ),
-        # Scale marquee (#2)
+        f"[out_v]drawtext=text='{safe_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+        f"[titled]drawtext=textfile={song_path}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=1280:50[marq]",
-        # Overlay marquee at bottom
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
 
     next_input = 4
     last_output = "outv"
-
-    # Logo
     if fztv_logo_exists:
         filter_main.append(f"[{next_input}:v]scale=120:120[logosize]")
         filter_main.append(f"[{last_output}][logosize]overlay=20:20[logo1]")
         last_output = "logo1"
         next_input += 1
-
-    # Madonna rotator
     if madmil_video_exists:
         filter_main.append(f"[{next_input}:v]scale=150:150,setpts=PTS-STARTPTS[madmilvid]")
         filter_main.append(f"[{last_output}][madmilvid]overlay=10:h-160[mainOut]")
     else:
         filter_main.append(f"[{last_output}]copy[mainOut]")
 
-    # ---- EQ CHAIN => [eqOut]
-    filter_eq = [
-        # Low freq
-        "[1:a]bandpass=frequency=40:width=20:width_type=h[s0];"
-        "[s0]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s1];"
-        "[s1]crop=h=ih/2:w=25:x=0:y=0[s2];"
-        "[s2]scale=h=200:w=-1[s3];"
-        "[s3]smartblur[s4];"
-        "[s4]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s5];"
-        "[s5]smartblur[s6];"
-        "[s6]split=2[s7][s8];"
-        "[s7]vflip[s9];"
-        "[s8][s9]vstack[s10];"
-        "[s10]format=rgba[s11];"
-        "[s11]pad=color=black@0:height=0:width=100:x=25:y=0[s12]",
+    # --- EQ CHAIN => [eqOut], if disable_eq=False ---
+    # We'll produce a 1280x200 final eqOut for easy vstack with mainOut (1280 wide).
+    # Each band is ~125 wide, 200 high => total ~500 wide => we scale to 1280 wide.
+    # We'll first build the snippet; if disabled, we skip it.
+    filter_eq = []
+    filter_combine = []
 
-        # Mid freq
-        "[1:a]bandpass=frequency=155:width=95:width_type=h[s13];"
-        "[s13]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s14];"
-        "[s14]crop=h=ih/2:w=25:x=0:y=0[s15];"
-        "[s15]scale=h=200:w=-1[s16];"
-        "[s16]smartblur[s17];"
-        "[s17]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s18];"
-        "[s18]smartblur[s19];"
-        "[s19]split=2[s20][s21];"
-        "[s20]vflip[s22];"
-        "[s21][s22]vstack[s23];"
-        "[s23]format=rgba[s24];"
-        "[s24]pad=color=black@0:height=0:width=100:x=25:y=0[s25]",
+    if not disable_eq:
+        # 1) 4 freq bands => each ~25 wide + 100 pad => ~125 wide x 200 high
+        # 2) hstack=4 => ~500 wide x 200 high
+        # 3) scale that to 1280x200
+        # 4) overlay onto eq_bg_expr (1280x200) => eqOut
+        filter_eq = [
+            # Low freq
+            "[1:a]bandpass=frequency=40:width=20:width_type=h[s0];"
+            "[s0]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s1];"
+            "[s1]crop=h=ih/2:w=25:x=0:y=0[s2];"
+            "[s2]scale=h=200:w=-1[s3];"
+            "[s3]smartblur[s4];"
+            "[s4]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s5];"
+            "[s5]smartblur[s6];"
+            "[s6]split=2[s7][s8];"
+            "[s7]vflip[s9];"
+            "[s8][s9]vstack[s10];"
+            "[s10]format=rgba[s11];"
+            "[s11]pad=color=black@0:height=0:width=100:x=25:y=0[s12]",
 
-        # Upper-mid freq
-        "[1:a]bandpass=frequency=375:width=125:width_type=h[s26];"
-        "[s26]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s27];"
-        "[s27]crop=h=ih/2:w=25:x=0:y=0[s28];"
-        "[s28]scale=h=200:w=-1[s29];"
-        "[s29]smartblur[s30];"
-        "[s30]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s31];"
-        "[s31]smartblur[s32];"
-        "[s32]split=2[s33][s34];"
-        "[s33]vflip[s35];"
-        "[s34][s35]vstack[s36];"
-        "[s36]format=rgba[s37];"
-        "[s37]pad=color=black@0:height=0:width=100:x=25:y=0[s38]",
+            # Mid freq
+            "[1:a]bandpass=frequency=155:width=95:width_type=h[s13];"
+            "[s13]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s14];"
+            "[s14]crop=h=ih/2:w=25:x=0:y=0[s15];"
+            "[s15]scale=h=200:w=-1[s16];"
+            "[s16]smartblur[s17];"
+            "[s17]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s18];"
+            "[s18]smartblur[s19];"
+            "[s19]split=2[s20][s21];"
+            "[s20]vflip[s22];"
+            "[s21][s22]vstack[s23];"
+            "[s23]format=rgba[s24];"
+            "[s24]pad=color=black@0:height=0:width=100:x=25:y=0[s25]",
 
-        # High freq
-        "[1:a]bandpass=frequency=1250:width=750:width_type=h[s39];"
-        "[s39]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s40];"
-        "[s40]crop=h=ih/2:w=25:x=0:y=0[s41];"
-        "[s41]scale=h=200:w=-1[s42];"
-        "[s42]smartblur[s43];"
-        "[s43]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s44];"
-        "[s44]smartblur[s45];"
-        "[s45]split=2[s46][s47];"
-        "[s46]vflip[s48];"
-        "[s47][s48]vstack[s49];"
-        "[s49]format=rgba[s50];"
-        "[s50]pad=color=black@0:height=0:width=100:x=25:y=0[s51]",
+            # Upper-mid freq
+            "[1:a]bandpass=frequency=375:width=125:width_type=h[s26];"
+            "[s26]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s27];"
+            "[s27]crop=h=ih/2:w=25:x=0:y=0[s28];"
+            "[s28]scale=h=200:w=-1[s29];"
+            "[s29]smartblur[s30];"
+            "[s30]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s31];"
+            "[s31]smartblur[s32];"
+            "[s32]split=2[s33][s34];"
+            "[s33]vflip[s35];"
+            "[s34][s35]vstack[s36];"
+            "[s36]format=rgba[s37];"
+            "[s37]pad=color=black@0:height=0:width=100:x=25:y=0[s38]",
 
-        # Combine bars horizontally
-        "[s12][s25][s38][s51]hstack=inputs=4[s52]",
-        # Overlay bars on [3:v] => eqOut
-        "[3:v][s52]overlay[eqOut]"
-    ]
+            # High freq
+            "[1:a]bandpass=frequency=1250:width=750:width_type=h[s39];"
+            "[s39]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s40];"
+            "[s40]crop=h=ih/2:w=25:x=0:y=0[s41];"
+            "[s41]scale=h=200:w=-1[s42];"
+            "[s42]smartblur[s43];"
+            "[s43]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s44];"
+            "[s44]smartblur[s45];"
+            "[s45]split=2[s46][s47];"
+            "[s46]vflip[s48];"
+            "[s47][s48]vstack[s49];"
+            "[s49]format=rgba[s50];"
+            "[s50]pad=color=black@0:height=0:width=100:x=25:y=0[s51]",
 
-    # Finally vstack mainOut + eqOut => outfinal
-    filter_combine = [
-        "[mainOut][eqOut]vstack=inputs=2[outfinal]"
-    ]
+            # horizontally stack => ~500 wide x 200 high
+            "[s12][s25][s38][s51]hstack=inputs=4[s52]",
+            # now scale [s52] => 1280x200
+            "[s52]scale=1280:200[eqScaled]",
+            # overlay eqScaled onto eq background (which is 1280x200)
+            "[3:v][eqScaled]overlay=0:0[eqOut]"
+        ]
 
-    # Combine filter strings
-    filter_complex = (
-        ";".join(filter_main)
-        + ";"
-        + ";".join(filter_eq)
-        + ";"
-        + ";".join(filter_combine)
-    )
+        # vstack final => [outfinal]
+        filter_combine = [
+            "[mainOut][eqOut]vstack=inputs=2[outfinal]"
+        ]
+    else:
+        # EQ disabled => directly rename [mainOut] => [outfinal]
+        # no additional filters
+        filter_eq = []
+        filter_combine = [
+            "[mainOut]copy[outfinal]"
+        ]
 
-    cmd = ["ffmpeg", "-y"] + input_args + [
+    filter_complex = ";".join(filter_main + filter_eq + filter_combine)
+
+    cmd = [
+        "ffmpeg", "-y",
+        *input_args,
         "-filter_complex", filter_complex,
-        "-map", "[outfinal]",  # final video
-        "-map", "1:a",         # main audio
+        "-map", "[outfinal]",
+        "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
-        "-shortest",
-        "-r", "30", "-vsync", "2",
+        "-shortest", "-r", "30", "-vsync", "2",
         "-movflags", "+faststart",
         output_file
     ]
 
     logger.debug("FFmpeg cmd: " + " ".join(cmd))
+    logger.info("FFmpeg command for manual execution:\n" + " \\\n".join(cmd))
 
     try:
-        # Log the command in a format that's easy to copy and run
-        logger.info("FFmpeg command for manual execution:")
-        logger.info(" \\\n".join(cmd))
-        
         result = subprocess.run(cmd, capture_output=True)
         if result.returncode != 0:
             logger.error("FFmpeg error: " + result.stderr.decode("utf-8", "ignore"))
