@@ -264,12 +264,23 @@ def combine_audio_video(
     from datetime import datetime
 
     days_old = 0
+
+    # Replace newlines with spaces, semicolons with commas, etc.
+    # Also backslash-escape any single-quotes
+    def sanitize_for_drawtext(s: str) -> str:
+        """Remove or escape problematic characters so FFmpeg won't interpret them as filter syntax."""
+        s = s.replace('\n', ' ')
+        s = s.replace(';', ',')         # semicolons can break filter-chains
+        s = s.replace("'", "\\'")       # single quotes must be escaped
+        s = s.replace(':', ',')         # colons can also confuse FFmpeg if unquoted
+        # you might remove more characters if needed
+        return s
+
+    war_info_sanitized = sanitize_for_drawtext(war_info)
+
     if re.match(r'^\d{4}-\d{2}-\d{2}$', release_date):
         release_date_val = datetime.strptime(release_date, '%Y-%m-%d').date()
         days_old = (today - release_date_val).days
-
-    war_info_safe = war_info.replace('\n', ' ').replace(';', ',')
-    war_file.write(war_info_safe)
 
     # Extract everything before the first colon in war_info
     war_title_part = war_info.split(":", 1)[0].strip()
@@ -289,9 +300,10 @@ def combine_audio_video(
         song_path = song_file.name
         song_file.write(song_info)
 
+    war_info_sanitized = sanitize_for_drawtext(war_info)
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
         war_path = war_file.name
-        war_file.write(war_info)
+        war_file.write(war_info_sanitized)
 
     fztv_logo_exists = os.path.exists("fztv-logo.png")
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
