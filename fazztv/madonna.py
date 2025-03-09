@@ -123,6 +123,7 @@ def download_audio_only(url, output_file, guid=None):
     
     yt_dlp_opts = {
         "format": "bestaudio/best",
+        "max_duration": ELAPSED_TUNE_SECONDS,
         "outtmpl": f"{base_output}.%(ext)s",  # Let yt-dlp handle the extension
         "quiet": False,
         "verbose": True,
@@ -476,10 +477,75 @@ def combine_audio_video(
 
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
-    # ... existing code ...
+    logger.info(f"Creating media item for '{episode['title']}'")
     
     try:
-        # ... existing code ...
+        # Extract song name from title
+        song_match = re.match(r"^(.*?)\s*\(", episode['title'])
+        song_name = song_match.group(1) if song_match else "Unknown Song"
+        
+        # Get episode GUID
+        guid = episode.get('guid')
+        if not guid:
+            guid = str(uuid.uuid4())
+            episode['guid'] = guid
+            logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
+        
+        # Create temporary files with proper extensions
+        temp_dir = tempfile.gettempdir()
+        audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
+        video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
+        output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
+        
+        # Download audio from Madonna song using GUID for caching
+        logger.debug(f"Attempting to download/retrieve audio for {episode['title']} (GUID: {guid})")
+        if not download_audio_only(episode['music_url'], audio_path, guid):
+            logger.error(f"Failed to download audio for {episode['title']}")
+            # Try an alternative URL if available
+            if 'alternative_music_url' in episode and episode['alternative_music_url']:
+                logger.info(f"Trying alternative music URL for {episode['title']}")
+                if not download_audio_only(episode['alternative_music_url'], audio_path, guid):
+                    logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
+                    return None
+            else:
+                return None
+        
+        # Verify the audio file exists and has content
+        if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
+            logger.error(f"Audio file is missing or empty: {audio_path}")
+            return None
+            
+        logger.debug(f"Successfully obtained audio at {audio_path}")
+        
+        # Download video from war documentary using GUID for caching
+        war_title = episode.get('war_title', 'Unknown War Documentary')
+        war_url = episode.get('war_url', "https://www.youtube.com/watch?v=8a8fqGpHgsk")
+        
+        logger.debug(f"Attempting to download/retrieve video for {war_title} (GUID: {guid})")
+        if not download_video_only(war_url, video_path, guid):
+            logger.error(f"Failed to download video for {war_title}")
+            return None
+        
+        # Verify the video file exists and has content
+        if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
+            logger.error(f"Video file is missing or empty: {video_path}")
+            return None
+            
+        logger.debug(f"Successfully obtained video at {video_path}")
+        
+        # Combine audio and video
+        logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
+        if not combine_audio_video(
+            audio_path, 
+            video_path, 
+            output_path, 
+            episode['title'], 
+            episode['commentary'], 
+            episode.get('release_date', war_title),
+            war_url=war_url  # Pass war_url for intro audio
+        ):
+            logger.error(f"Failed to combine audio and video for {episode['title']}")
+            return None
         
         # Create MediaItem
         media_item = MediaItem(
@@ -488,9 +554,55 @@ def create_media_item_from_episode(episode):
             url=episode['music_url'],
             taxprompt=episode['commentary'],
             length_percent=100,
-            duration=ELAPSED_TUNE_SECONDS  # Add explicit duration
+            duration=ELAPSED_TUNE_SECONDS
         )
         # Set the serialized path directly
         media_item.serialized = output_path
         return media_item
     except Exception as e:
+        logger.error(f"Error in create_media_item: {e}")
+        # Log the traceback for more detailed debugging
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return None
+
+def main():
+    logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
+    
+    # Load data from JSON
+    data = load_madonna_data()
+    
+    # Create broadcaster
+    rtmp_url = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}" if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test"
+    broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
+    
+    # Create a collection of media items
+    media_items = []
+    
+    # Shuffle episodes
+    episodes = data.get('episodes', [])
+    random.shuffle(episodes)
+    
+    # Create media items from episodes
+    for episode in episodes:
+        media_item = create_media_item_from_episode(episode)
+        if media_item:
+            media_items.append(media_item)
+    
+    logger.info(f"Created {len(media_items)} media items")
+    
+    # Broadcast the media items
+    results = []
+    for item in media_items:
+        success = broadcaster.broadcast_item(item)
+        results.append((item, success))
+        
+        # Clean up the serialized file after broadcasting
+        if os.path.exists(item.serialized):
+            os.remove(item.serialized)
+    
+    logger.info(f"Broadcast {sum(1 for _, success in results if success)} media items successfully")
+    logger.info("=== Finished Madonna Military History FazzTV broadcast ===")
+
+if __name__ == "__main__":
+    main()

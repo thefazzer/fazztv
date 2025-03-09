@@ -1,3 +1,6 @@
+from typing import Optional
+import os
+
 class MediaItem:
     """Represents a media item to be broadcast."""
     
