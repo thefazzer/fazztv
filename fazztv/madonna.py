@@ -334,7 +334,9 @@ def combine_audio_video(
         "color=c=black:s=200x608[black_col]",
         "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
         "[black_col][v0]hstack[out_v]",
-        f"[out_v]drawtext=text='{safe_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+        # Replace the current drawtext with two separate ones - war title and safe_title
+        f"[out_v]drawtext=text='{war_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+        f"[war_titled]drawtext=text='{safe_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
         f"[titled]drawtext=textfile={song_path}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=1280:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
