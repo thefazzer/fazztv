@@ -1,3 +1,4 @@
+from datetime import date
 import random
 import time
 import os
@@ -283,15 +284,23 @@ def combine_audio_video(
         s = re.sub(r'[\\](?![\'[\]=,@])', '', s)
         return s
 
+    def calculate_days_old(song_info: str) -> int:
+        date_match = re.search(r'- ([A-Za-z]+ \d{1,2} \d{4})$', song_info)
+        if date_match:
+            reference_date = datetime.strptime(date_match.group(1), '%B %d %Y').date()
+            days_old = (date.today() - reference_date).days
+            return days_old
+        return 0
+
     war_info_sanitized = sanitize_for_drawtext(war_info)
-    if re.match(r'^\d{4}-\d{2}-\d{2}$', release_date):
-        release_date_val = datetime.strptime(release_date, '%Y-%m-%d').date()
-        days_old = (today - release_date_val).days
+
+    days_old = calculate_days_old(song_info)
 
     war_title_part = war_info.split(":", 1)[0].strip()
+    
     new_title_text = (
         f"This song is {days_old} days old today and so ancient  "
-        f"Madonnas release date was closer in history to the  {war_title_part} !"
+        f"Madonnas release date was closer in history to {release_date} !"
     )
     safe_title = new_title_text.replace("'", "\\'")
 
@@ -335,9 +344,9 @@ def combine_audio_video(
         "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
         "[black_col][v0]hstack[out_v]",
         # Replace the current drawtext with two separate ones - war title and safe_title
-        f"[out_v]drawtext=text='{war_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+        f"[out_v]drawtext=text='{release_date}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
         f"[war_titled]drawtext=text='{safe_title}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        f"[titled]drawtext=textfile={song_path}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
+        f"[titled]drawtext=text='abc':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=1280:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
