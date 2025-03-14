@@ -249,9 +249,11 @@ def combine_audio_video(
     song_info,
     war_info,
     release_date,
+    commentary,
     disable_eq=False,
-    war_url=None  # Add war_url parameter
+    war_url=None,
 ):
+    
     """
     Combine:
       1) video_file + audio_file
@@ -344,10 +346,18 @@ def combine_audio_video(
         "color=c=black:s=200x608[black_col]",
         "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
         "[black_col][v0]hstack[out_v]",
-        # Replace the current drawtext with two separate ones - war title and safe_title
-        f"[out_v]drawtext=text='{war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-        f"[war_titled]drawtext=text='{song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        f"[titled]drawtext=text={safe_title}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
+
+        # War title
+        "[out_v]drawtext=text='':font='Storytime':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+
+        # Safe title
+        "[war_titled]drawtext=text='':font='Storytime':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+
+       f"[titled]drawtext=text='This song is {days_old} today\\nMadonna\\'s release was closer in time\\nto the {war_title_part}!':"
+        "font='Storytime':fontsize=26:fontcolor=white:bordercolor=black:borderw=3:"
+        "x=(w-text_w)/2:y=160:line_spacing=8[titledbylined]"
+
+        # Marquee overlay
         "[2:v]scale=1280:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
@@ -554,7 +564,8 @@ def create_media_item_from_episode(episode):
             episode['title'], 
             episode['war_title'], 
             calculate_days_old( episode['title']),
-            war_url=war_url  # Pass war_url for intro audio
+            war_url=war_url,  # Pass war_url for intro audio
+            commentary=episode['commentary'], 
         ):
             logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
