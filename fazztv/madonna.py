@@ -256,10 +256,20 @@ def combine_audio_video(
     Combine:
       1) video_file + audio_file
       2) scrolling marquee at bottom
-      3) a graphic equalizer "footer" from the snippet (if disable_eq=False)
+      3) a graphic equalizer “footer” from the snippet (if disable_eq=False)
       4) The title replaced by:
-         "This song is X days old today - so ancient Madonnas release date was closer in history to the {war_title_part} !"
+         “This song is X days old today - so ancient Madonnas release date was closer in history to the {war_title_part} !”
          where war_title_part is everything before the first colon in war_info.
+
+    Parameters:
+      audio_file (str): Path to input audio
+      video_file (str): Path to input video
+      output_file (str): Path to output combined file
+      song_info (str): Text for the byline
+      war_info (str): Text for marquee
+      release_date (str): Possibly "YYYY-MM-DD", else ignored
+      disable_eq (bool): If True, skip the graphic EQ entirely (default True).
+      war_url (str): URL of the war documentary (for intro audio)
     """
     import datetime
     import subprocess
@@ -605,20 +615,6 @@ def main():
     
     logger.info(f"Broadcast {sum(1 for _, success in results if success)} media items successfully")
     logger.info("=== Finished Madonna Military History FazzTV broadcast ===")
-
-    # Replace actual file inputs with test data generators
-    video_file = "lavfi:color=c=black:s=1280x608:r=30:d=30"
-    audio_file = "lavfi:anullsrc=r=44100:cl=stereo:d=30"
-    
-    # Test data
-    test_war_info = "The Partition of India: A Nation Carved in Blood"
-    test_song_info = "Like a Prayer (1989)"
-    test_days_old = "12,345"
-    test_marquee = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    
-    war_info = test_war_info
-    song_info = test_song_info
-    days_old = test_days_old
 
 if __name__ == "__main__":
     main()
