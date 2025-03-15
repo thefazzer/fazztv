@@ -225,7 +225,9 @@ def download_video_only(url, output_file, guid=None):
         "outtmpl": output_file,
         "quiet": True,
         "overwrites": True,
-        "continuedl": False
+        "continuedl": False,
+        "cookiesfrombrowser": ("chrome",),  # Add this line to use Chrome cookies
+        "age_limit": 99  # Allow age-restricted content
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
