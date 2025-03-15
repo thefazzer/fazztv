@@ -544,77 +544,41 @@ def create_media_item_from_episode(episode):
             episode['guid'] = guid
             logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
         
-        # Create temporary files with proper extensions
+        # Create temporary file for output
         temp_dir = tempfile.gettempdir()
-        audio_path = os.path.join(temp_dir, f"madonna_audio_{int(time.time())}.aac")
-        video_path = os.path.join(temp_dir, f"madonna_video_{int(time.time())}.mp4")
         output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
         
-        # Download audio from Madonna song using GUID for caching
-        logger.debug(f"Attempting to download/retrieve audio for {episode['title']} (GUID: {guid})")
-        if not download_audio_only(episode['music_url'], audio_path, guid):
-            logger.error(f"Failed to download audio for {episode['title']}")
-            # Try an alternative URL if available
-            if 'alternative_music_url' in episode and episode['alternative_music_url']:
-                logger.info(f"Trying alternative music URL for {episode['title']}")
-                if not download_audio_only(episode['alternative_music_url'], audio_path, guid):
-                    logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
-                    return None
-            else:
-                return None
+        # Generate blank video with text overlays
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "color=c=black:s=2080x1170",  # Blank black background
+            "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",  # Silent audio
+            "-filter_complex",
+            f"drawtext=text='{episode['title']}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30," +
+            f"drawtext=text='{episode['war_title']}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90," +
+            f"drawtext=text='This song is {calculate_days_old(episode['title'])} days old today':fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160",
+            "-t", str(ELAPSED_TUNE_SECONDS),
+            "-c:v", "libx264", "-preset", "fast",
+            "-c:a", "aac",
+            output_path
+        ]
         
-        # Verify the audio file exists and has content
-        if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
-            logger.error(f"Audio file is missing or empty: {audio_path}")
-            return None
-            
-        logger.debug(f"Successfully obtained audio at {audio_path}")
-        
-        # Download video from war documentary using GUID for caching
-        war_title = episode.get('war_title', 'Unknown War Documentary')
-        war_url = episode.get('war_url', "https://www.youtube.com/watch?v=8a8fqGpHgsk")
-        
-        logger.debug(f"Attempting to download/retrieve video for {war_title} (GUID: {guid})")
-        if not download_video_only(war_url, video_path, guid):
-            logger.error(f"Failed to download video for {war_title}")
-            return None
-        
-        # Verify the video file exists and has content
-        if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
-            logger.error(f"Video file is missing or empty: {video_path}")
-            return None
-            
-        logger.debug(f"Successfully obtained video at {video_path}")
-        
-        # Combine audio and video
-        logger.debug(f"Combining audio ({audio_path}) and video ({video_path}) to {output_path}")
-        if not combine_audio_video(
-            audio_path, 
-            video_path, 
-            output_path, 
-            episode['title'], 
-            episode['war_title'], 
-            calculate_days_old( episode['title']),
-            war_url=war_url  # Pass war_url for intro audio
-        ):
-            logger.error(f"Failed to combine audio and video for {episode['title']}")
-            return None
+        subprocess.run(cmd, check=True)
         
         # Create MediaItem
         media_item = MediaItem(
             artist="Madonna",
             song=song_name,
-            url=episode['music_url'],
+            url="",  # Empty URL since we're not using real media
             taxprompt=episode['commentary'],
             length_percent=100,
             duration=ELAPSED_TUNE_SECONDS
         )
-        # Set the serialized path directly
         media_item.serialized = output_path
         return media_item
+        
     except Exception as e:
         logger.error(f"Error in create_media_item: {e}")
-        # Log the traceback for more detailed debugging
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         return None
