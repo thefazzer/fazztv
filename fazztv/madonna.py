@@ -342,7 +342,7 @@ def combine_audio_video(
 
     filter_main = [
         "color=c=black:s=200x608[black_col]",
-        "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
+        "[0:v]scale=2080:1170:force_original_aspect_ratio=decrease,setsar=1[v0]",
         "[black_col][v0]hstack[out_v]",
         # Replace the current drawtext with two separate ones - war title and safe_title
         f"[out_v]drawtext=text='{war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
@@ -365,107 +365,115 @@ def combine_audio_video(
     else:
         filter_main.append(f"[{last_output}]copy[mainOut]")
 
-    # --- EQ CHAIN => [eqOut], if disable_eq=False ---
-    # We'll produce a 2080x200 final eqOut for easy vstack with mainOut (2080 wide).
-    # Each band is ~125 wide, 200 high => total ~500 wide => we scale to 2080 wide.
-    # We'll first build the snippet; if disabled, we skip it.
-    filter_eq = []
-    filter_combine = []
+    debug_info = {
+        'stage': 'initialization',
+        'dimensions': {},
+        'filter_graph': {},
+        'stream_info': {},
+        'error_context': {}
+    }
 
-    if not disable_eq:
-        # 1) 4 freq bands => each ~25 wide + 100 pad => ~125 wide x 200 high
-        # 2) hstack=4 => ~500 wide x 200 high
-        # 3) scale that to 2080x200
-        # 4) overlay onto eq_bg_expr (2080x200) => eqOut
-        filter_eq = [
-            # Low freq
-            "[1:a]bandpass=frequency=40:width=20:width_type=h[s0];"
-            "[s0]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s1];"
-            "[s1]crop=h=ih/2:w=25:x=0:y=0[s2];"
-            "[s2]scale=h=200:w=-1[s3];"
-            "[s3]smartblur[s4];"
-            "[s4]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s5];"
-            "[s5]smartblur[s6];"
-            "[s6]split=2[s7][s8];"
-            "[s7]vflip[s9];"
-            "[s8][s9]vstack[s10];"
-            "[s10]format=rgba[s11];"
-            "[s11]pad=color=black@0:height=0:width=100:x=25:y=0[s12]",
+    def log_debug_state(stage, **kwargs):
+        """Log detailed state for LLM analysis"""
+        debug_info['stage'] = stage
+        debug_info.update(kwargs)
+        logger.debug(f"DEBUG_STATE_{stage}: {json.dumps(debug_info, indent=2)}")
 
-            # Mid freq
-            "[1:a]bandpass=frequency=155:width=95:width_type=h[s13];"
-            "[s13]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s14];"
-            "[s14]crop=h=ih/2:w=25:x=0:y=0[s15];"
-            "[s15]scale=h=200:w=-1[s16];"
-            "[s16]smartblur[s17];"
-            "[s17]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s18];"
-            "[s18]smartblur[s19];"
-            "[s19]split=2[s20][s21];"
-            "[s20]vflip[s22];"
-            "[s21][s22]vstack[s23];"
-            "[s23]format=rgba[s24];"
-            "[s24]pad=color=black@0:height=0:width=100:x=25:y=0[s25]",
+    def validate_filter_node(node_name, width, height, expected_width, expected_height):
+        """Validate filter node dimensions"""
+        valid = width == expected_width and height == expected_height
+        debug_info['filter_graph'][node_name] = {
+            'actual': f"{width}x{height}",
+            'expected': f"{expected_width}x{expected_height}",
+            'valid': valid
+        }
+        if not valid:
+            logger.error(f"DIMENSION_MISMATCH_{node_name}: Expected {expected_width}x{expected_height}, got {width}x{height}")
+        return valid
 
-            # Upper-mid freq
-            "[1:a]bandpass=frequency=375:width=125:width_type=h[s26];"
-            "[s26]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s27];"
-            "[s27]crop=h=ih/2:w=25:x=0:y=0[s28];"
-            "[s28]scale=h=200:w=-1[s29];"
-            "[s29]smartblur[s30];"
-            "[s30]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s31];"
-            "[s31]smartblur[s32];"
-            "[s32]split=2[s33][s34];"
-            "[s33]vflip[s35];"
-            "[s34][s35]vstack[s36];"
-            "[s36]format=rgba[s37];"
-            "[s37]pad=color=black@0:height=0:width=100:x=25:y=0[s38]",
+    # Constants with validation context
+    TARGET_WIDTH = 2080
+    TARGET_HEIGHT = 1170
+    MARQUEE_HEIGHT = 50
+    EQ_HEIGHT = 200
 
-            # High freq
-            "[1:a]bandpass=frequency=1250:width=750:width_type=h[s39];"
-            "[s39]showvolume=b=0:c=0xFFFFFFFF:ds=log:f=0:h=100:m=p:o=v:p=1:rate=15:s=0:t=0:v=0:w=200[s40];"
-            "[s40]crop=h=ih/2:w=25:x=0:y=0[s41];"
-            "[s41]scale=h=200:w=-1[s42];"
-            "[s42]smartblur[s43];"
-            "[s43]minterpolate=fps=30:me_mode=bidir:mi_mode=mci[s44];"
-            "[s44]smartblur[s45];"
-            "[s45]split=2[s46][s47];"
-            "[s46]vflip[s48];"
-            "[s47][s48]vstack[s49];"
-            "[s49]format=rgba[s50];"
-            "[s50]pad=color=black@0:height=0:width=100:x=25:y=0[s51]",
+    # Probe and validate all input streams
+    for idx, file in enumerate([video_file, audio_file]):
+        try:
+            probe_cmd = [
+                "ffprobe", "-v", "error",
+                "-show_entries", "stream=width,height,codec_type,pix_fmt,r_frame_rate",
+                "-of", "json", file
+            ]
+            result = subprocess.run(probe_cmd, capture_output=True, text=True)
+            stream_info = json.loads(result.stdout)
+            debug_info['stream_info'][f'input_{idx}'] = stream_info
+            log_debug_state('input_probe', file=file, stream_info=stream_info)
+        except Exception as e:
+            logger.error(f"PROBE_FAILURE: {e}")
+            debug_info['error_context']['probe_failure'] = str(e)
+            return False
 
-            # horizontally stack => ~500 wide x 200 high
-            "[s12][s25][s38][s51]hstack=inputs=4[s52]",
-            # now scale [s52] => 2080x200
-            "[s52]scale=2080:200[eqScaled]",
-            # overlay eqScaled onto eq background (which is 2080x200)
-            "[3:v][eqScaled]overlay=0:0[eqOut]"
-        ]
+    # Pre-validate filter graph components
+    filter_components = []
+    try:
+        # Initial scale
+        scale_filter = f"[0:v]scale={TARGET_WIDTH}:{TARGET_HEIGHT}:force_original_aspect_ratio=decrease,setsar=1[scaled]"
+        filter_components.append(('scale', scale_filter))
+        
+        # Marquee
+        marquee_filter = f"color=black:s={TARGET_WIDTH}x{MARQUEE_HEIGHT}[marq]"
+        filter_components.append(('marquee', marquee_filter))
+        
+        # EQ background
+        if not disable_eq:
+            eq_filter = f"color=black:s={TARGET_WIDTH}x{EQ_HEIGHT}[eq_bg]"
+            filter_components.append(('eq', eq_filter))
 
-        # vstack final => [outfinal]
-        filter_combine = [
-            "[mainOut][eqOut]vstack=inputs=2[outfinal]"
-        ]
-    else:
-        # EQ disabled => directly rename [mainOut] => [outfinal]
-        # no additional filters
-        filter_eq = []
-        filter_combine = [
-            "[mainOut]copy[outfinal]"
-        ]
+        # Validate each component
+        for name, filter_str in filter_components:
+            validate_cmd = ["ffmpeg", "-v", "error", "-filter_complex_script", "-"]
+            result = subprocess.run(validate_cmd, input=filter_str.encode(), capture_output=True)
+            debug_info['filter_graph'][f'validate_{name}'] = {
+                'filter': filter_str,
+                'valid': result.returncode == 0,
+                'error': result.stderr.decode() if result.returncode != 0 else None
+            }
+            log_debug_state('filter_validation', component=name)
 
-    filter_complex = ";".join(filter_main + filter_eq + filter_combine)
+    except Exception as e:
+        logger.error(f"FILTER_VALIDATION_FAILURE: {e}")
+        debug_info['error_context']['filter_validation'] = str(e)
+        return False
+
+    # Build and validate complete filter graph
+    try:
+        filter_complex = ";".join([f[1] for f in filter_components])
+        debug_info['filter_graph']['complete'] = filter_complex
+        log_debug_state('filter_graph_complete')
+        
+        # Validate final dimensions at each stage
+        for stage in ['main', 'marquee', 'eq']:
+            expected_width = TARGET_WIDTH
+            expected_height = TARGET_HEIGHT + MARQUEE_HEIGHT + (EQ_HEIGHT if not disable_eq else 0)
+            if not validate_filter_node(stage, expected_width, expected_height, TARGET_WIDTH, expected_height):
+                return False
+
+    except Exception as e:
+        logger.error(f"FILTER_GRAPH_ASSEMBLY_FAILURE: {e}")
+        debug_info['error_context']['filter_assembly'] = str(e)
+        return False
 
     cmd = [
         "ffmpeg", "-y",
+        "-progress", "pipe:1",
+        "-v", "verbose",
         *input_args,
         "-filter_complex", filter_complex,
         "-map", "[outfinal]",
         "-map", "1:a",
         "-c:v", "libx264", "-preset", "fast",
         "-c:a", "aac", "-b:a", "128k",
-        "-shortest", "-r", "30", "-vsync", "2",
-        "-movflags", "+faststart",
         output_file
     ]
 
@@ -473,19 +481,52 @@ def combine_audio_video(
     logger.info("FFmpeg command for manual execution:\n" + " \\\n".join(cmd))
 
     try:
-        result = subprocess.run(cmd, capture_output=True)
-        if result.returncode != 0:
-            logger.error("FFmpeg error: " + result.stderr.decode("utf-8", "ignore"))
-            return False
-        return True
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+
+        # Monitor progress with detailed state tracking
+        while True:
+            output = process.stdout.readline()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                debug_info['progress'] = output.strip()
+                log_debug_state('ffmpeg_progress')
+
+        # Capture and analyze FFmpeg output
+        stdout, stderr = process.communicate()
+        debug_info['ffmpeg_output'] = {
+            'stdout': stdout,
+            'stderr': stderr,
+            'return_code': process.returncode
+        }
+        log_debug_state('ffmpeg_complete')
+
+        # Validate output file
+        if process.returncode == 0:
+            output_probe = subprocess.run(
+                ["ffprobe", "-v", "error", "-show_entries", "stream=width,height,codec_type",
+                 "-of", "json", output_file],
+                capture_output=True, text=True
+            )
+            debug_info['output_validation'] = json.loads(output_probe.stdout)
+            log_debug_state('output_validation')
+
+        return process.returncode == 0
+
     except Exception as e:
-        logger.error(f"FFmpeg exception: {e}")
+        logger.error(f"FFMPEG_EXECUTION_FAILURE: {e}")
+        debug_info['error_context']['ffmpeg_execution'] = str(e)
         return False
+
     finally:
-        if os.path.exists(song_path):
-            os.remove(song_path)
-        if os.path.exists(war_path):
-            os.remove(war_path)
+        # Dump complete debug state for LLM analysis
+        with open(f"debug_state_{int(time.time())}.json", 'w') as f:
+            json.dump(debug_info, f, indent=2)
 
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
