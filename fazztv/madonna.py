@@ -556,7 +556,12 @@ def create_media_item_from_episode(episode):
             "-filter_complex",
             f"drawtext=text='{episode['title']}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30," +
             f"drawtext=text='{episode['war_title']}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90," +
-            f"drawtext=text='This song is {calculate_days_old(episode['title'])} days old today - so ancient Madonnas release date was closer in history to the {episode['war_title'].split(':')[0]}!':fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160",
+            f"drawtext=text='This song is {calculate_days_old(episode['title'])} days old today\n" \
+            f"- so ancient Madonnas release date was closer in history\n" \
+            f"to the {episode['war_title'].split(':')[0]}!':" \
+            "fontfile=/usr/share/fonts/truetype/dancing-script/DancingScript-Regular.ttf:" \
+            "fontsize=32:fontcolor=white:bordercolor=black:borderw=3:" \
+            "x=(w-text_w)/2:y=160:line_spacing=10",
             "-t", str(ELAPSED_TUNE_SECONDS),
             "-c:v", "libx264", "-preset", "fast",
             "-c:a", "aac",
