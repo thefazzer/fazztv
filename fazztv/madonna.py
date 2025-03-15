@@ -546,40 +546,57 @@ def create_media_item_from_episode(episode):
             episode['guid'] = guid
             logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
         
-        # Create temporary file for output
-        temp_dir = tempfile.gettempdir()
-        output_path = os.path.join(temp_dir, f"madonna_output_{int(time.time())}.mp4")
-        
-        # Generate blank video with text overlays
-        cmd = [
-            "ffmpeg", "-y",
-            "-f", "lavfi", "-i", "color=c=black:s=2080x1170",  # Blank black background
-            "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",  # Silent audio
-            "-filter_complex",
-            f"drawtext=text='{episode['title']}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30," +
-            f"drawtext=text='{episode['war_title']}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90," +
-            f"drawtext=text='This song is {calculate_days_old(episode['title'])} days old today\\n" \
-            f"- so ancient Madonnas release date was closer in history\\n" \
-            f"to the {episode['war_title'].split(':')[0]}!':" \
-            "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf:" \  # Changed to italic font
-            "fontsize=32:fontcolor=white:bordercolor=black:borderw=3:" \
-            "x=(w-text_w)/2:y=160:line_spacing=10"  # Removed invalid style=italic
-            ]
-        
-        subprocess.run(cmd, check=True)
-        
-        # Create MediaItem
-        media_item = MediaItem(
-            artist="Madonna",
-            song=song_name,
-            url="",  # Empty URL since we're not using real media
-            taxprompt=episode['commentary'],
-            length_percent=100,
-            duration=ELAPSED_TUNE_SECONDS
-        )
-        media_item.serialized = output_path
-        return media_item
-        
+            try:
+                title_text = episode['title'].replace("'", r"\\'")
+                war_text = episode['war_title'].replace("'", r"\\'")
+                war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
+                age_days = calculate_days_old(episode['title'])
+                age_text = (
+                    f"This song is {age_days} days old today\\n"
+                    f"- so ancient Madonna's release date was closer in history\\n"
+                    f"to the {war_topic}!"
+                ).replace("'", r"\\'")
+
+                filter_expr = (
+                    f"[0:v]drawtext=text='{title_text}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:"
+                    f"x=(w-text_w)/2:y=30[v1];"
+                    f"[v1]drawtext=text='{war_text}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:"
+                    f"x=(w-text_w)/2:y=90[v2];"
+                    f"[v2]drawtext=text='{age_text}':"
+                    "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf:"
+                    "fontsize=32:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160:line_spacing=10[v3];"
+                    "[v3]format=yuv420p[vout]"
+                )
+
+                cmd = [
+                    "ffmpeg", "-y",
+                    "-f", "lavfi", "-i", "color=c=black:s=2080x1170",
+                    "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                    "-filter_complex", filter_expr,
+                    "-map", "[vout]", "-map", "1:a",
+                    "-t", "10",
+                    "output.mp4"
+                ]
+
+                subprocess.run(cmd, check=True)
+
+            except Exception as e:
+                print("Error:", e)
+
+                subprocess.run(cmd, check=True)
+                
+                # Create MediaItem
+                media_item = MediaItem(
+                    artist="Madonna",
+                    song=song_name,
+                    url="",  # Empty URL since we're not using real media
+                    taxprompt=episode['commentary'],
+                    length_percent=100,
+                    duration=ELAPSED_TUNE_SECONDS
+                )
+                media_item.serialized = output_path
+                return media_item
+            
     except Exception as e:
         logger.error(f"Error in create_media_item: {e}")
         import traceback
