@@ -319,7 +319,7 @@ def combine_audio_video(
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
 
     marquee_text_expr = (
-        "color=c=black:s=1280x50,"
+        "color=c=black:s=2080x50,"
         "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
         f"textfile={war_path}:"
         "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
@@ -327,7 +327,7 @@ def combine_audio_video(
         "y=h-th-10'"
     )
 
-    eq_bg_expr = "color=black:s=1280x200"
+    eq_bg_expr = "color=black:s=2080x200"
 
     input_args = [
         "-i", video_file,
@@ -347,8 +347,8 @@ def combine_audio_video(
         # Replace the current drawtext with two separate ones - war title and safe_title
         f"[out_v]drawtext=text='{war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
         f"[war_titled]drawtext=text='{song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        f"[titled]drawtext=text={safe_title}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
-        "[2:v]scale=1280:50[marq]",
+        f"[titled]drawtext=text={new_title_text}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
+        "[2:v]scale=2080:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
 
@@ -366,8 +366,8 @@ def combine_audio_video(
         filter_main.append(f"[{last_output}]copy[mainOut]")
 
     # --- EQ CHAIN => [eqOut], if disable_eq=False ---
-    # We'll produce a 1280x200 final eqOut for easy vstack with mainOut (1280 wide).
-    # Each band is ~125 wide, 200 high => total ~500 wide => we scale to 1280 wide.
+    # We'll produce a 2080x200 final eqOut for easy vstack with mainOut (2080 wide).
+    # Each band is ~125 wide, 200 high => total ~500 wide => we scale to 2080 wide.
     # We'll first build the snippet; if disabled, we skip it.
     filter_eq = []
     filter_combine = []
@@ -375,8 +375,8 @@ def combine_audio_video(
     if not disable_eq:
         # 1) 4 freq bands => each ~25 wide + 100 pad => ~125 wide x 200 high
         # 2) hstack=4 => ~500 wide x 200 high
-        # 3) scale that to 1280x200
-        # 4) overlay onto eq_bg_expr (1280x200) => eqOut
+        # 3) scale that to 2080x200
+        # 4) overlay onto eq_bg_expr (2080x200) => eqOut
         filter_eq = [
             # Low freq
             "[1:a]bandpass=frequency=40:width=20:width_type=h[s0];"
@@ -436,9 +436,9 @@ def combine_audio_video(
 
             # horizontally stack => ~500 wide x 200 high
             "[s12][s25][s38][s51]hstack=inputs=4[s52]",
-            # now scale [s52] => 1280x200
-            "[s52]scale=1280:200[eqScaled]",
-            # overlay eqScaled onto eq background (which is 1280x200)
+            # now scale [s52] => 2080x200
+            "[s52]scale=2080:200[eqScaled]",
+            # overlay eqScaled onto eq background (which is 2080x200)
             "[3:v][eqScaled]overlay=0:0[eqOut]"
         ]
 
