@@ -128,15 +128,15 @@ class MediaSerializer:
         media_item.serialized = final_output
         return True
             
-        except Exception as e:
-            logger.error(f"Serialization error: {e}")
-            return False
-        finally:
-            # Clean up temporary files
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            if os.path.exists(marquee_path):
-                os.remove(marquee_path)
+    except Exception as e:
+        logger.error(f"Serialization error: {e}")
+        return False
+    finally:
+        # Clean up temporary files
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        if os.path.exists(marquee_path):
+            os.remove(marquee_path)
     
     def _build_ffmpeg_command(self, input_path: str, marquee_path: str, 
                      output_path: str, target_duration: float,
