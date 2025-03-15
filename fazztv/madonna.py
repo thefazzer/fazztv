@@ -311,9 +311,11 @@ def combine_audio_video(
         song_path = song_file.name
         song_file.write(song_info)
 
+    test_marquee = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et magna aliqua."
+    
     with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
         war_path = war_file.name
-        war_file.write(war_info_sanitized)
+        war_file.write(test_marquee)
 
     fztv_logo_exists = os.path.exists("fztv-logo.png")
     madmil_video_exists = os.path.exists("madonna-rotator.mp4")
@@ -330,8 +332,8 @@ def combine_audio_video(
     eq_bg_expr = "color=black:s=1280x200"
 
     input_args = [
-        "-i", video_file,
-        "-i", audio_file,
+        "-f", "lavfi", "-i", "color=c=black:s=1280x608:r=30:d=30",  # Black background
+        "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",  # Silent audio
         "-f", "lavfi", "-i", marquee_text_expr,
         "-f", "lavfi", "-i", eq_bg_expr
     ]
@@ -341,13 +343,11 @@ def combine_audio_video(
         input_args += ["-stream_loop", "-1", "-i", "madonna-rotator.mp4"]
 
     filter_main = [
-        "color=c=black:s=200x608[black_col]",
-        "[0:v]scale=1080:608:force_original_aspect_ratio=decrease,setsar=1[v0]",
-        "[black_col][v0]hstack[out_v]",
-        # Replace the current drawtext with two separate ones - war title and safe_title
-        f"[out_v]drawtext=text='{war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-        f"[war_titled]drawtext=text='{song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        f"[titled]drawtext=text={safe_title}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
+        "[0:v]setsar=1[out_v]",
+        # Replace the current drawtext with test data
+        f"[out_v]drawtext=text='{test_war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+        f"[war_titled]drawtext=text='{test_song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+        f"[titled]drawtext=text='{days_old_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf:fontsize=20:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=1280:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
@@ -618,3 +618,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+test_war_info = "World War II: The Greatest Conflict in History"
+test_song_info = "Like a Prayer (1989)"
+test_days_old = "12,345"
+    
+```
+
+
+</pre>
