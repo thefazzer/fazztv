@@ -33,6 +33,11 @@ MARQUEE_DURATION = 86400
 SCROLL_SPEED = 40
 ELAPSED_TUNE_SECONDS = 10  # Default duration for media clips in seconds
 
+
+test_war_info = "World War II: The Greatest Conflict in History"
+test_song_info = "Like a Prayer (1989)"
+test_days_old = "12,345"
+
 # Path to the JSON data file
 DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
 
@@ -249,11 +254,9 @@ def combine_audio_video(
     song_info,
     war_info,
     release_date,
-    commentary,
     disable_eq=False,
-    war_url=None,
+    war_url=None  # Add war_url parameter
 ):
-    
     """
     Combine:
       1) video_file + audio_file
@@ -349,7 +352,7 @@ def combine_audio_video(
         # Replace the current drawtext with test data
         f"[out_v]drawtext=text='{test_war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
         f"[war_titled]drawtext=text='{test_song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        f"[titled]drawtext=text='{days_old_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf:fontsize=20:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
+        f"[titled]drawtext=text='{test_days_old}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf:fontsize=20:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=1280:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
@@ -556,8 +559,7 @@ def create_media_item_from_episode(episode):
             episode['title'], 
             episode['war_title'], 
             calculate_days_old( episode['title']),
-            war_url=war_url,  # Pass war_url for intro audio
-            commentary=episode['commentary'], 
+            war_url=war_url  # Pass war_url for intro audio
         ):
             logger.error(f"Failed to combine audio and video for {episode['title']}")
             return None
@@ -621,12 +623,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-test_war_info = "World War II: The Greatest Conflict in History"
-test_song_info = "Like a Prayer (1989)"
-test_days_old = "12,345"
-    
-```
-
-
-</pre>
