@@ -563,12 +563,8 @@ def create_media_item_from_episode(episode):
             f"to the {episode['war_title'].split(':')[0]}!':" \
             "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf:" \  # Changed to italic font
             "fontsize=32:fontcolor=white:bordercolor=black:borderw=3:" \
-            "x=(w-text_w)/2:y=160:line_spacing=10",  # Removed invalid style=italic
-            "-t", str(ELAPSED_TUNE_SECONDS),
-            "-c:v", "libx264", "-preset", "fast",
-            "-c:a", "aac",
-            output_path
-        ]
+            "x=(w-text_w)/2:y=160:line_spacing=10"  # Removed invalid style=italic
+            ]
         
         subprocess.run(cmd, check=True)
         
