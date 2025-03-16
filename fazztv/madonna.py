@@ -30,8 +30,10 @@ LOG_FILE = "madonna_broadcast.log"
 BASE_RES = "640x360"
 FADE_LENGTH = 3
 MARQUEE_DURATION = 86400
-SCROLL_SPEED = 40
-ELAPSED_TUNE_SECONDS = 10  # Default duration for media clips in seconds
+SCROLL_SPEED = 65
+ELAPSED_TUNE_SECONDS = 60  # Default duration for media clips in seconds
+
+DEFAULT_VIDEO = "madonna-rotator.mp4"
 
 # Path to the JSON data file
 DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
@@ -227,7 +229,6 @@ def download_video_only(url, output_file, guid=None):
         "quiet": True,
         "overwrites": True,
         "continuedl": False,
-        "cookiesfrombrowser": ("chrome",),  # Add this line to use Chrome cookies
         "age_limit": 99  # Allow age-restricted content
     }
     try:
@@ -245,230 +246,246 @@ def download_video_only(url, output_file, guid=None):
         logger.error(f"Error downloading video: {e}")
         return False
 
+def cleanup_environment():
+    """Prepare environment without purging cached files."""
+    # Clear pycache if in dev mode.
+    if DEV_MODE:
+        pycache_dir = os.path.join(os.path.dirname(__file__), "__pycache__")
+        if os.path.exists(pycache_dir):
+            shutil.rmtree(pycache_dir)
+            logger.info("Cleared __pycache__ directory")
+    # Ensure temp directory exists (do not purge it to enable caching).
+    os.makedirs(TEMP_DIR, exist_ok=True)
+    logger.info(f"Using temp directory: {TEMP_DIR}")
+
+
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
-
     try:
-        # Extract song name from title
+        # Extract song name from title.
         song_match = re.match(r"^(.*?)\s*\(", episode['title'])
         song_name = song_match.group(1) if song_match else "Unknown Song"
 
-        # Get episode GUID
+        # Ensure GUID exists.
         guid = episode.get('guid')
         if not guid:
             guid = str(uuid.uuid4())
             episode['guid'] = guid
             logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
 
-        try:
-            title_text = episode['title'].replace("'", r"\\'")
-            war_text = episode['war_title'].replace("'", r"\\'")
-            war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
-            commentary = episode['commentary'].split(':')[0].replace("'", r"\\'")
-            age_days = '{:,}'.format(calculate_days_old(episode['title']))
-            age_text = f"{song_name} is {age_days} days old-so ancient its release date was closer in history to the {war_topic} than to today!"
+        # Prepare overlay texts.
+        title_text = episode['title'].replace("'", r"\\'")
+        war_text = episode['war_title'].replace("'", r"\\'")
+        war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
+        commentary = episode['commentary'].split(':')[0].replace("'", r"\\'")
+        age_days = '{:,}'.format(calculate_days_old(episode['title']))
+        age_text1 = (f"Madonnas {song_name} is {age_days} days old today -")
+        age_text2 = (f"so ancient its release date was closer in history to the {war_topic}!")
 
-            # Check if we have a real video
-            # For example, see if "madonna-rotator.mp4" exists:
+        # Get file paths from episode data.
+        video_file = episode.get("video_file", "").strip()
+        audio_file = episode.get("audio_file", "").strip()
+        
+        fztv_logo_exists = os.path.exists("fztv-logo.png")
 
-            DEFAULT_VIDEO = "madonna-rotator.mp4"
+        # Build input_args with fixed ordering:
+        # 0: Black background; 1: Audio; 2: Main video; 3: Marquee; 4: Optional logo.
+        input_args = []
+        # (0) Black background.
+        input_args.extend(["-f", "lavfi", "-i", "color=c=black:s=2080x1170"])
+        # (1) Audio: use provided file if exists; else silent audio.
+        if audio_file:
+            input_args.extend(["-i", audio_file])
+        else:
+            input_args.extend(["-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo"])
+        # (2) Video: use provided file if exists; else default if available; else dummy.
+        if video_file:
+            input_args.extend(["-i", video_file])
+        elif os.path.exists(DEFAULT_VIDEO):
+            input_args.extend(["-i", DEFAULT_VIDEO])
+        else:
+            input_args.extend(["-f", "lavfi", "-i", "nullsrc=s=640x480:d=10:r=30"])
+        # (3) Marquee input.
+        marquee_text = (
+            "color=c=black:s=2080x50,"
+            "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+            "text='" + commentary + "':"
+            "fontsize=36:fontcolor=white:bordercolor=black:borderw=3:"
+            "x=w-mod(40*t\\,w+text_w):"
+            "y=h-th-10"
+        )
+        input_args.extend(["-f", "lavfi", "-i", marquee_text])
+        # (4) Optional logo.
+        if fztv_logo_exists:
+            input_args.extend(["-i", "fztv-logo.png"])
 
-            video_exists = os.path.exists(DEFAULT_VIDEO)
-            main_video = DEFAULT_VIDEO
-            fztv_logo_exists = os.path.exists("fztv-logo.png")
+        # Build filter_complex.
+        # Input mapping: [0:v]=background, [1:a]=audio, [2:v]=main video, [3:v]=marquee, [4:v]=logo.
+        filter_main = [
+            # Combine background and main video.
+            "[0:v]scale=2080:1170[bg];[2:v]scale=2080:1170[vmain];[bg][vmain]overlay=0:0[base]",
+            # War and title text overlays.
+            f"[base]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+            "fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+            f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+            "fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+            # Example overlay: a did-you-know lightbulb.
+            "movie=didyouknow-lightbulb.png[bulb]",
+            "[bulb]scale=95:95[scaled_bulb]",
+            "[titled][scaled_bulb]overlay=(W/2)-20:175[v2_with_bulb]",
+            # Age text overlay.
+            f"[v2_with_bulb]drawtext=text='{age_text1}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+            "fontsize=28:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=280[titledbylined]",
+            f"[titledbylined]drawtext=text='{age_text2}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+            "fontsize=28:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=330[titledbylined]",
+            # Marquee overlay.
+            "[3:v]scale=2080:50[marq]",
+            "[titledbylined][marq]overlay=0:main_h-overlay_h-10[with_marq]"
+        ]
+        if fztv_logo_exists:
+            filter_main.append("[4:v]scale=250:250[logo]")
+            filter_main.append("[with_marq][logo]overlay=200:0[outfinal]")
+        else:
+            filter_main.append("[with_marq]copy[outfinal]")
+        filter_complex = ";".join(filter_main)
 
-            # Build input args
-            input_args = [
-                # 0: black background
-                "-f", "lavfi", "-i", "color=c=black:s=2080x1170",
-                # 1: silent audio
-                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-            ]
+        output_file = os.path.join(TEMP_DIR, f"{guid}_output.mp4")
+        cmd = [
+            "ffmpeg", "-y",
+            *input_args,
+            "-filter_complex", filter_complex,
+            "-r", "10",
+            "-map", "[outfinal]",
+            "-map", "1:a",
+            "-c:v", "h264_nvenc", "-preset", "fast",
+            "-c:a", "aac", "-b:a", "128k",
+            "-t", f"{ELAPSED_TUNE_SECONDS}",
+            output_file
+        ]
 
-            # 2: main video placeholder
-            if video_exists:
-                input_args.extend(["-i", main_video])
-            else:
-                # Dummy video if no real file
-                input_args.extend(["-f", "lavfi", "-i", "nullsrc=s=640x480:d=10:r=30"])
+        subprocess.run(cmd, check=True)
 
-            # 3: marquee
-            marquee_text = (
-                "color=c=black:s=2080x50,"
-                "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                "text='" + commentary + "':"
-                "fontsize=36:fontcolor=white:bordercolor=black:borderw=3:"
-                "x=w-mod(40*t\\,w+text_w):"
-                "y=h-th-10"
-            )
-            input_args.extend(["-f", "lavfi", "-i", marquee_text])
-
-            # 4: logo (optional)
-            if fztv_logo_exists:
-                input_args.extend(["-i", "fztv-logo.png"])
-
-            # Build filter chain
-            filter_main = [
-                # Scale black background and main video, overlay them
-                "[0:v]scale=2080:1170[bg];[2:v]scale=2080:1170[vmain];"
-                "[bg][vmain]overlay=0:0[base]",
-
-                # Add war text
-                f"[base]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                "fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-
-                # Add title text
-                f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                "fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-
-                # Optional 'did you know' overlay
-                "movie=didyouknow-lightbulb.png[bulb]",
-                "[bulb]scale=95:95[scaled_bulb]",
-                "[titled][scaled_bulb]overlay=1000:120[v2_with_bulb]",
-
-                # Add age text
-                f"[v2_with_bulb]drawtext=text='{age_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                "fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=230[titledbylined]",
-
-                # Marquee
-                "[3:v]scale=2080:50[marq]",
-                "[titledbylined][marq]overlay=0:main_h-overlay_h-10[with_marq]",
-            ]
-
-            # If we have a logo, overlay it last
-            if fztv_logo_exists:
-                filter_main.append("[4:v]scale=200:200[logo]")
-                filter_main.append("[with_marq][logo]overlay=50:0[outfinal]")
-            else:
-                filter_main.append("[with_marq]copy[outfinal]")
-
-            filter_complex = ";".join(filter_main)
-
-            output_file = os.path.join(TEMP_DIR, f"{guid}_output.mp4")
-            cmd = [
-                "ffmpeg", "-y",
-                *input_args,
-                "-filter_complex", filter_complex,
-                "-r", "10",  # set frame rate to 10 fps
-                "-map", "[outfinal]",
-                "-map", "1:a",
-                "-c:v", "h264_nvenc", "-preset", "fast",
-                "-c:a", "aac", "-b:a", "128k",
-                "-t", "10",
-                output_file
-            ]
-
-            subprocess.run(cmd, check=True)
-
-            # Create MediaItem
-            media_item = MediaItem(
-                artist="Madonna",
-                song=song_name,
-                url="",
-                taxprompt=episode['commentary'],
-                length_percent=100,
-                duration=ELAPSED_TUNE_SECONDS
-            )
-            media_item.serialized = output_file
-            return media_item
-
-        except Exception as e:
-            logger.error(f"Error in ffmpeg processing: {e}")
-            return None
+        media_item = MediaItem(
+            artist="Madonna",
+            song=song_name,
+            url="",
+            taxprompt=episode['commentary'],
+            length_percent=100,
+            duration=ELAPSED_TUNE_SECONDS
+        )
+        media_item.serialized = output_file
+        return media_item
 
     except Exception as e:
-        logger.error(f"Error in create_media_item: {e}")
+        logger.error(f"Error in create_media_item_from_episode: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         return None
 
-
-def cleanup_environment():
-    """Clean up environment before running"""
-    # Clear pycache
-    if DEV_MODE:
-        pycache_dir = os.path.join(os.path.dirname(__file__), "__pycache__")
-        if os.path.exists(pycache_dir):
-            shutil.rmtree(pycache_dir)
-            logger.info("Cleared __pycache__ directory")
-    
-    # Ensure temp directory exists and is clean
-    if os.path.exists(TEMP_DIR):
-        shutil.rmtree(TEMP_DIR)
-    os.makedirs(TEMP_DIR, exist_ok=True)
-    logger.info(f"Initialized temp directory: {TEMP_DIR}")
-
-def log_run_details(guids):
-    """Log details about the current run"""
-    details = {
-        "dev_mode": DEV_MODE,
-        "guid_count": len(guids),
-        "guids": guids,
-        "caching_enabled": not DEV_MODE,
-        "temp_dir": TEMP_DIR,
-        "using_real_video": os.path.exists("madonna-rotator.mp4")
-    }
-    
-    logger.info("=== Run Configuration ===")
-    for key, value in details.items():
-        logger.info(f"{key}: {value}")
-        print(f"{key}: {value}")
-    logger.info("======================")
-
 def main():
+    
+    import tempfile
+    import time
     parser = argparse.ArgumentParser(description='Madonna Military History FazzTV broadcast')
     parser.add_argument('--guids', nargs='*', help='List of GUIDs to process', 
-                       default=[DEFAULT_GUID])
-    parser.add_argument('--dev', action='store_true', help='Run in development mode',
-                       default=True)
+                        default=["40a441fd-4ce8-49b2-82c4-356f8f13b8c5"])
+    parser.add_argument('--dev', action='store_true', help='Run in development mode', default=False)
     args = parser.parse_args()
-    
+
     global DEV_MODE
     DEV_MODE = args.dev
-    
-    # Initialize environment
+
+    # Initialize environment (now reusing TEMP_DIR).
     cleanup_environment()
-    log_run_details(args.guids)
-    
+
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
-    
-    # Load data from JSON
+
+    # Load episode data.
     data = load_madonna_data()
-    
-    # Filter episodes by provided GUIDs
-    episodes = [ep for ep in data.get('episodes', []) 
-               if ep.get('guid') in args.guids]
-    
+    episodes = data.get('episodes')
+    #= [ep for ep in data.get('episodes', []) if ep.get('guid') in args.guids]
     if not episodes:
         logger.error("No matching episodes found for provided GUIDs")
         sys.exit(1)
-        
-    # Create broadcaster
-    rtmp_url = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}" if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test"
+
+
+    # Create broadcaster.
+    rtmp_url = (f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}"
+                if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test")
     broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
-    
-    # Create media items from filtered episodes
+
     media_items = []
     for episode in episodes:
+        # Ensure GUID exists.
+        guid = episode.get('guid')
+        if not guid:
+            guid = str(uuid.uuid4())
+            episode['guid'] = guid
+            logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
+        temp_dir = os.path.join(tempfile.gettempdir(), "fazztv")
+        # Build temporary file paths.
+        audio_path = os.path.join(temp_dir, f"madonna_audio_{guid}.aac")
+        video_path = os.path.join(temp_dir, f"madonna_video_{guid}.mp4")
+
+        # Process audio: if missing, attempt download and cache by GUID.
+        if not episode.get("audio_file", "").strip():
+            logger.debug(f"Attempting to download/retrieve audio for {episode['title']} (GUID: {guid})")
+            if not download_audio_only(episode['music_url'], audio_path, guid):
+                logger.error(f"Failed to download audio for {episode['title']}")
+                if episode.get('alternative_music_url'):
+                    logger.info(f"Trying alternative music URL for {episode['title']}")
+                    if not download_audio_only(episode['alternative_music_url'], audio_path, guid):
+                        logger.error(f"Failed to download audio from alternative URL for {episode['title']}")
+                        continue
+                else:
+                    continue
+            if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
+                logger.error(f"Audio file is missing or empty: {audio_path}")
+                continue
+            logger.debug(f"Successfully obtained audio at {audio_path}")
+            episode["audio_file"] = audio_path
+
+        # Process video: if missing, try to download using 'video_url' (if provided),
+        # else use default video file.
+        if not episode.get("video_file", "").strip():
+            if episode.get("video_url", "").strip():
+                logger.debug(f"Attempting to download/retrieve video for {episode['title']} (GUID: {guid})")
+                if not download_video_only(episode['video_url'], video_path, guid):
+                    logger.error(f"Failed to download video for {episode['title']}")
+                    if os.path.exists(DEFAULT_VIDEO):
+                        episode["video_file"] = DEFAULT_VIDEO
+                    else:
+                        continue
+                else:
+                    if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
+                        logger.error(f"Video file is missing or empty: {video_path}")
+                        continue
+                    logger.debug(f"Successfully obtained video at {video_path}")
+                    episode["video_file"] = video_path
+            elif os.path.exists(DEFAULT_VIDEO):
+                episode["video_file"] = DEFAULT_VIDEO
+            else:
+                # Leave as empty so that create_media_item_from_episode uses a dummy.
+                episode["video_file"] = ""
+
         media_item = create_media_item_from_episode(episode)
         if media_item:
             media_items.append(media_item)
-    
+
     logger.info(f"Created {len(media_items)} media items")
-    
-    # Broadcast the media items
+
+    # Broadcast media items.
     results = []
     for item in media_items:
         success = broadcaster.broadcast_item(item)
         results.append((item, success))
-        
-        # Clean up the serialized file after broadcasting
-        if os.path.exists(item.serialized):
-            os.remove(item.serialized)
-    
+        #if os.path.exists(item.serialized):
+        #   os.remove(item.serialized)
+
     logger.info(f"Broadcast {sum(1 for _, success in results if success)} media items successfully")
     logger.info("=== Finished Madonna Military History FazzTV broadcast ===")
+
 
 if __name__ == "__main__":
     main()
