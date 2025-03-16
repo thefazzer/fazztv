@@ -350,7 +350,10 @@ def combine_audio_video(
         # Replace the current drawtext with two separate ones - war title and safe_title
         f"[out_v]drawtext=text='{war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
         f"[war_titled]drawtext=text='{song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        f"[titled]drawtext=text={new_title_text}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
+        "movie=didyouknow-lightbulb.png[bulb]",
+        "[bulb]scale=75:75[scaled_bulb]",
+        "[titled][scaled_bulb]overlay=(w/2)+140:130[v2_with_bulb]",
+        f"[v2_with_bulb]drawtext=text='{new_title_text}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
         "[2:v]scale=2080:50[marq]",
         "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
     ]
@@ -552,41 +555,81 @@ def create_media_item_from_episode(episode):
             war_text = episode['war_title'].replace("'", r"\\'")
             war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
             age_days = '{:,}'.format(calculate_days_old(episode['title']))
-    
             age_text = f"{song_name} is {age_days} days old-so ancient its release date was closer in history to the {war_topic} than to today!"
-        
-            filter_expr = (
-                # Load the lightbulb image first
-                "movie=didyouknow-lightbulb.png[bulb];"
-                "[bulb]scale=75:75[scaled_bulb];"
-                # Then do the text overlays
-                f"[0:v]drawtext=text='{title_text}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:"
-                f"x=(w-text_w)/2:y=30[v1];"
-                f"[v1]drawtext=text='{war_text}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:"
-                f"x=(w-text_w)/2:y=90[v2];"
-                # Add the lightbulb overlay
-                "[v2][scaled_bulb]overlay=(w/2)+140:130[v2_with_bulb];"
-                # Add the age text
-                f"[v2_with_bulb]drawtext=text='{age_text}':"
-                "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf:"
-                "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160:line_spacing=10[v3];"
-                "[v3]format=yuv420p[vout]"
-            )
-            
-            cmd = [
-                "ffmpeg", "-y",
-                "-f", "lavfi", "-i", "color=c=black:s=2080x1170",
-                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-                "-filter_complex", filter_expr,
-                "-map", "[vout]", "-map", "1:a",
-                "-t", "10",
-                "output.mp4"
+
+            # Create temporary file for war info
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
+                war_path = war_file.name
+                war_file.write(war_text)
+
+            # Check for logo and rotator
+            fztv_logo_exists = os.path.exists("fztv-logo.png")
+            madmil_video_exists = os.path.exists("madonna-rotator.mp4")
+
+            # Build input arguments
+            input_args = [
+                "-f", "lavfi", "-i", "color=c=black:s=2080x1170",  # Black background
+                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",  # Silent audio
             ]
 
-            subprocess.run(cmd, check=True)
+            if fztv_logo_exists:
+                input_args.extend(["-i", "fztv-logo.png"])
+            if madmil_video_exists:
+                input_args.extend(["-stream_loop", "-1", "-i", "madonna-rotator.mp4"])
 
-        except Exception as e:
-            print("Error:", e)
+            # Build filter complex
+            filter_main = [
+                "color=c=black:s=200x608[black_col]",
+                "[0:v]scale=2080:1170:force_original_aspect_ratio=decrease,setsar=1[v0]",
+                "[black_col][v0]hstack[out_v]",
+                f"[out_v]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+                f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+                f"[titled]drawtext=text='{age_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]"
+            ]
+
+            # Add marquee
+            marquee_text = (
+                "color=c=black:s=2080x50,"
+                "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+                f"textfile={war_path}:"
+                "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
+                "x=w - mod(40*t\\, w+text_w):"
+                "y=h-th-10'"
+            )
+            input_args.extend(["-f", "lavfi", "-i", marquee_text])
+            filter_main.extend([
+                "[2:v]scale=2080:50[marq]",
+                "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
+            ])
+
+            # Add logo and rotator if they exist
+            next_input = 3
+            last_output = "outv"
+            if fztv_logo_exists:
+                filter_main.append(f"[{next_input}:v]scale=120:120[logosize]")
+                filter_main.append(f"[{last_output}][logosize]overlay=20:20[logo1]")
+                last_output = "logo1"
+                next_input += 1
+            if madmil_video_exists:
+                filter_main.append(f"[{next_input}:v]scale=150:150,setpts=PTS-STARTPTS[madmilvid]")
+                filter_main.append(f"[{last_output}][madmilvid]overlay=10:h-160[outfinal]")
+            else:
+                filter_main.append(f"[{last_output}]copy[outfinal]")
+
+            filter_complex = ";".join(filter_main)
+
+            output_file = os.path.join(TEMP_DIR, f"{guid}_output.mp4")
+            cmd = [
+                "ffmpeg", "-y",
+                *input_args,
+                "-filter_complex", filter_complex,
+                "-map", "[outfinal]",
+                "-map", "1:a",
+                "-c:v", "libx264", "-preset", "fast",
+                "-c:a", "aac", "-b:a", "128k",
+                "-t", "10",
+                output_file
+            ]
 
             subprocess.run(cmd, check=True)
             
@@ -594,19 +637,24 @@ def create_media_item_from_episode(episode):
             media_item = MediaItem(
                 artist="Madonna",
                 song=song_name,
-                url="",  # Empty URL since we're not using real media
+                url="",
                 taxprompt=episode['commentary'],
                 length_percent=100,
                 duration=ELAPSED_TUNE_SECONDS
             )
-            media_item.serialized = TEMP_DIR
+            media_item.serialized = output_file
             return media_item
-        
+
+        except Exception as e:
+            logger.error(f"Error in ffmpeg processing: {e}")
+            return None
+            
     except Exception as e:
         logger.error(f"Error in create_media_item: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         return None
+        
 
 def cleanup_environment():
     """Clean up environment before running"""
