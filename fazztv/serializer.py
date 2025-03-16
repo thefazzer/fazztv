@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import json
 import random
+import uuid
 from typing import List, Optional, Tuple
 from loguru import logger
 from fazztv.models import MediaItem
@@ -16,6 +17,8 @@ class MediaSerializer:
         self.marquee_duration = marquee_duration
         self.scroll_speed = scroll_speed
         self.logo_path = logo_path if logo_path and os.path.exists(logo_path) else None
+        self.temp_dir = os.path.join("/tmp", "fazztv")
+        os.makedirs(self.temp_dir, exist_ok=True)
 
     def download_video(self, media_item: MediaItem, output_filename: str) -> bool:
         logger.debug(f"Downloading {media_item.url} => {output_filename}")
@@ -62,7 +65,9 @@ class MediaSerializer:
                 original_duration = self.get_video_duration(media_item.source_path)
                 target_duration = original_duration * (media_item.length_percent / 100.0)
 
-            final_output = output_file if output_file else tempfile.NamedTemporaryFile(suffix='.mp4', delete=False).name
+            if not output_file:
+                output_file = os.path.join(self.temp_dir, f"output_{uuid.uuid4()}.mp4")
+            final_output = output_file
 
             show_title = ""
             show_byline = ""
@@ -71,8 +76,8 @@ class MediaSerializer:
                 show_title = show.get("title", "")
                 show_byline = show.get("byline", "")
 
-            temp_path = media_item.source_path
-            marquee_path = tempfile.NamedTemporaryFile(delete=False).name
+            temp_path = os.path.join(self.temp_dir, f"temp_{uuid.uuid4()}.mp4")
+            marquee_path = os.path.join(self.temp_dir, f"marquee_{uuid.uuid4()}.txt")
 
             cmd = self._build_ffmpeg_command(
                 temp_path,
