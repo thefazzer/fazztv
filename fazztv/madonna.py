@@ -1,6 +1,3 @@
-import argparse
-import shutil
-import sys
 from datetime import date, datetime
 import random
 import time
@@ -9,9 +6,12 @@ import requests
 from loguru import logger
 import json
 import subprocess
+import tempfile
 from typing import List, Optional, Tuple
 import re
 import uuid
+import shutil
+
 from fazztv.models import MediaItem
 from fazztv.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
@@ -37,9 +37,8 @@ ELAPSED_TUNE_SECONDS = 10  # Default duration for media clips in seconds
 DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
 
 # Cache directory for downloaded media files
-TEMP_DIR = os.path.join("/tmp", "fazztv")
-DEV_MODE = True  # Default to dev mode
-DEFAULT_GUID = "e8f7a12b-3c1d-4f3a-9e8d-2b6c7a8d9e0f"
+CACHE_DIR = os.path.join("/tmp", "fazztv")
+os.makedirs(CACHE_DIR, exist_ok=True)
 
 logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 
@@ -104,7 +103,7 @@ def download_audio_only(url, output_file, guid=None):
     """Download only the audio from a YouTube video."""
     # Check if cached file exists
     if guid:
-        cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
+        cached_file = os.path.join(CACHE_DIR, f"{guid}_audio.aac")
         if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
             logger.info(f"Using cached audio file for GUID {guid}")
             shutil.copy(cached_file, output_file)
@@ -166,7 +165,7 @@ def download_audio_only(url, output_file, guid=None):
             
             # Cache the file if guid is provided
             if guid:
-                cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
+                cached_file = os.path.join(CACHE_DIR, f"{guid}_audio.aac")
                 logger.debug(f"Caching audio file to {cached_file}")
                 shutil.copy(output_file, cached_file)
                 
@@ -187,7 +186,7 @@ def download_audio_only(url, output_file, guid=None):
                     
                     # Cache the file if guid is provided
                     if guid:
-                        cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
+                        cached_file = os.path.join(CACHE_DIR, f"{guid}_audio.aac")
                         logger.debug(f"Caching audio file to {cached_file}")
                         shutil.copy(output_file, cached_file)
                         
@@ -201,18 +200,29 @@ def download_audio_only(url, output_file, guid=None):
         return False
 
 def calculate_days_old(song_info: str) -> int:
-        date_match = re.search(r'- ([A-Za-z]+ \d{1,2} \d{4})$', song_info)
-        if date_match:
-            reference_date = datetime.strptime(date_match.group(1), '%B %d %Y').date()
-            days_old = (date.today() - reference_date).days
-            return days_old
-        return 0
+    today = date.today()
+    madonna_year = 1983  # Madonna's first album release year
+    
+    # Extract month and day from song_info
+    date_match = re.search(r'- ([A-Za-z]+) (\d{1,2}) \d{4}$', song_info)
+    if date_match:
+        month_str = date_match.group(1)
+        day = int(date_match.group(2))
+        
+        # Convert month name to number
+        month = datetime.strptime(month_str, '%B').month
+        
+        # Create reference date using Madonna's year but war event's month/day
+        reference_date = date(madonna_year, month, day)
+        days_old = (today - reference_date).days
+        return days_old
+    return 0
 
 def download_video_only(url, output_file, guid=None):
     """Download only the video from a YouTube video."""
     # Check if cached file exists
     if guid:
-        cached_file = os.path.join(TEMP_DIR, f"{guid}_video.mp4")
+        cached_file = os.path.join(CACHE_DIR, f"{guid}_video.mp4")
         if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
             logger.info(f"Using cached video file for GUID {guid}")
             shutil.copy(cached_file, output_file)
@@ -236,7 +246,7 @@ def download_video_only(url, output_file, guid=None):
         
         # Cache the file if guid is provided and download was successful
         if guid and os.path.exists(output_file) and os.path.getsize(output_file) > 0:
-            cached_file = os.path.join(TEMP_DIR, f"{guid}_video.mp4")
+            cached_file = os.path.join(CACHE_DIR, f"{guid}_video.mp4")
             logger.debug(f"Caching video file to {cached_file}")
             shutil.copy(output_file, cached_file)
             
@@ -547,126 +557,81 @@ def create_media_item_from_episode(episode):
             episode['guid'] = guid
             logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
         
-        try:
-            title_text = episode['title'].replace("'", r"\\'")
-            war_text = episode['war_title'].replace("'", r"\\'")
-            war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
-            age_days = '{:,}'.format(calculate_days_old(episode['title']))
-    
-            age_text = f"{song_name} is {age_days} days old-so ancient its release date was closer in history to the {war_topic} than to today!"
-        
-            filter_expr = (
-                f"[0:v]drawtext=text='{title_text}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:"
-                f"x=(w-text_w)/2:y=30[v1];"
-                f"[v1]drawtext=text='{war_text}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:"
-                f"x=(w-text_w)/2:y=90[v2];"
-                f"[v2]drawtext=text='{age_text}':"
-                "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf:"
-                "fontsize=20:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160:line_spacing=10[v3];"
-                "[v3]format=yuv420p[vout]"
-            )
+            try:
+                title_text = episode['title'].replace("'", r"\\'")
+                war_text = episode['war_title'].replace("'", r"\\'")
+                war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
+                age_days = calculate_days_old(episode['title'])
+                age_text = (
+                    f"This song is {age_days} days old today\\n"
+                    f"- so ancient Madonna's release date was closer in history\\n"
+                    f"to the {war_topic}!"
+                ).replace("'", r"\\'")
 
-            cmd = [
-                "ffmpeg", "-y",
-                "-f", "lavfi", "-i", "color=c=black:s=2080x1170",
-                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
-                "-filter_complex", filter_expr,
-                "-map", "[vout]", "-map", "1:a",
-                "-t", "10",
-                "output.mp4"
-            ]
+                filter_expr = (
+                    f"[0:v]drawtext=text='{title_text}':fontsize=50:fontcolor=red:bordercolor=black:borderw=4:"
+                    f"x=(w-text_w)/2:y=30[v1];"
+                    f"[v1]drawtext=text='{war_text}':fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:"
+                    f"x=(w-text_w)/2:y=90[v2];"
+                    f"[v2]drawtext=text='{age_text}':"
+                    "fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf:"
+                    "fontsize=32:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160:line_spacing=10[v3];"
+                    "[v3]format=yuv420p[vout]"
+                )
 
-            subprocess.run(cmd, check=True)
+                cmd = [
+                    "ffmpeg", "-y",
+                    "-f", "lavfi", "-i", "color=c=black:s=2080x1170",
+                    "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+                    "-filter_complex", filter_expr,
+                    "-map", "[vout]", "-map", "1:a",
+                    "-t", "10",
+                    "output.mp4"
+                ]
 
-        except Exception as e:
-            print("Error:", e)
+                subprocess.run(cmd, check=True)
 
-            subprocess.run(cmd, check=True)
+            except Exception as e:
+                print("Error:", e)
+
+                subprocess.run(cmd, check=True)
+                
+                # Create MediaItem
+                media_item = MediaItem(
+                    artist="Madonna",
+                    song=song_name,
+                    url="",  # Empty URL since we're not using real media
+                    taxprompt=episode['commentary'],
+                    length_percent=100,
+                    duration=ELAPSED_TUNE_SECONDS
+                )
+                media_item.serialized = output_path
+                return media_item
             
-            # Create MediaItem
-            media_item = MediaItem(
-                artist="Madonna",
-                song=song_name,
-                url="",  # Empty URL since we're not using real media
-                taxprompt=episode['commentary'],
-                length_percent=100,
-                duration=ELAPSED_TUNE_SECONDS
-            )
-            media_item.serialized = TEMP_DIR
-            return media_item
-        
     except Exception as e:
         logger.error(f"Error in create_media_item: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         return None
 
-def cleanup_environment():
-    """Clean up environment before running"""
-    # Clear pycache
-    if DEV_MODE:
-        pycache_dir = os.path.join(os.path.dirname(__file__), "__pycache__")
-        if os.path.exists(pycache_dir):
-            shutil.rmtree(pycache_dir)
-            logger.info("Cleared __pycache__ directory")
-    
-    # Ensure temp directory exists and is clean
-    if os.path.exists(TEMP_DIR):
-        shutil.rmtree(TEMP_DIR)
-    os.makedirs(TEMP_DIR, exist_ok=True)
-    logger.info(f"Initialized temp directory: {TEMP_DIR}")
-
-def log_run_details(guids):
-    """Log details about the current run"""
-    details = {
-        "dev_mode": DEV_MODE,
-        "guid_count": len(guids),
-        "guids": guids,
-        "caching_enabled": not DEV_MODE,
-        "temp_dir": TEMP_DIR,
-        "using_real_video": os.path.exists("madonna-rotator.mp4")
-    }
-    
-    logger.info("=== Run Configuration ===")
-    for key, value in details.items():
-        logger.info(f"{key}: {value}")
-        print(f"{key}: {value}")
-    logger.info("======================")
-
 def main():
-    parser = argparse.ArgumentParser(description='Madonna Military History FazzTV broadcast')
-    parser.add_argument('--guids', nargs='*', help='List of GUIDs to process', 
-                       default=[DEFAULT_GUID])
-    parser.add_argument('--dev', action='store_true', help='Run in development mode',
-                       default=True)
-    args = parser.parse_args()
-    
-    global DEV_MODE
-    DEV_MODE = args.dev
-    
-    # Initialize environment
-    cleanup_environment()
-    log_run_details(args.guids)
-    
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
     
     # Load data from JSON
     data = load_madonna_data()
     
-    # Filter episodes by provided GUIDs
-    episodes = [ep for ep in data.get('episodes', []) 
-               if ep.get('guid') in args.guids]
-    
-    if not episodes:
-        logger.error("No matching episodes found for provided GUIDs")
-        sys.exit(1)
-        
     # Create broadcaster
     rtmp_url = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}" if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test"
     broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
     
-    # Create media items from filtered episodes
+    # Create a collection of media items
     media_items = []
+    
+    # Shuffle episodes
+    episodes = data.get('episodes', [])
+    random.shuffle(episodes)
+    
+    # Create media items from episodes
     for episode in episodes:
         media_item = create_media_item_from_episode(episode)
         if media_item:
