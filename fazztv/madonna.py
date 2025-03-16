@@ -1,4 +1,4 @@
-import argparse
+import argparse 
 import shutil
 import sys
 from datetime import date, datetime
@@ -245,295 +245,6 @@ def download_video_only(url, output_file, guid=None):
         logger.error(f"Error downloading video: {e}")
         return False
 
-def combine_audio_video(
-    audio_file,
-    video_file,
-    output_file,
-    song_info,
-    war_info,
-    release_date,
-    disable_eq=False,
-    war_url=None  # Add war_url parameter
-):
-    """
-    Combine:
-      1) video_file + audio_file
-      2) scrolling marquee at bottom
-      3) a graphic equalizer “footer” from the snippet (if disable_eq=False)
-      4) The title replaced by:
-         “This song is X days old today - so ancient Madonnas release date was closer in history to the {war_title_part} !”
-         where war_title_part is everything before the first colon in war_info.
-
-    Parameters:
-      audio_file (str): Path to input audio
-      video_file (str): Path to input video
-      output_file (str): Path to output combined file
-      song_info (str): Text for the byline
-      war_info (str): Text for marquee
-      release_date (str): Possibly "YYYY-MM-DD", else ignored
-      disable_eq (bool): If True, skip the graphic EQ entirely (default True).
-      war_url (str): URL of the war documentary (for intro audio)
-    """
-    import datetime
-    import subprocess
-    import tempfile
-    import os
-    import logging
-    import re
-
-    logger = logging.getLogger(__name__)
-
-    today = datetime.date.today()
-    from datetime import datetime
-    days_old = 0
-
-    def sanitize_for_drawtext(s: str) -> str:
-        if not s:
-            return ""
-        s = s.replace('\n', ' ').replace('\r', ' ')
-        s = s.replace(';', ' ').replace("'", "\\'").replace(':', ' ').replace(',', ' ')
-        s = re.sub(r'[\\](?![\'[\]=,@])', '', s)
-        return s
-
-    
-    war_info_sanitized = sanitize_for_drawtext(war_info)
-
-    days_old = release_date
-
-    war_title_part = war_info.split(":", 1)[0].strip()
-    
-    new_title_text = (
-        f"This song is {days_old} days old today and so ancient  "
-        f"Madonnas release date was closer in history to {war_info} !"
-    )
-    safe_title = new_title_text.replace("'", "\\'")
-
-    logger.debug(f"Combining {audio_file} + {video_file} => {output_file}")
-
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as song_file:
-        song_path = song_file.name
-        song_file.write(song_info)
-
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
-        war_path = war_file.name
-        war_file.write(war_info_sanitized)
-
-    fztv_logo_exists = os.path.exists("fztv-logo.png")
-    madmil_video_exists = os.path.exists("madonna-rotator.mp4")
-
-    marquee_text_expr = (
-        "color=c=black:s=2080x50,"
-        "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        f"textfile={war_path}:"
-        "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
-        "x=w - mod(40*t\\, w+text_w):"
-        "y=h-th-10'"
-    )
-
-    eq_bg_expr = "color=black:s=2080x200"
-
-    input_args = [
-        "-i", video_file,
-        "-i", audio_file,
-        "-f", "lavfi", "-i", marquee_text_expr,
-        "-f", "lavfi", "-i", eq_bg_expr
-    ]
-    if fztv_logo_exists:
-        input_args += ["-i", "fztv-logo.png"]
-    if madmil_video_exists:
-        input_args += ["-stream_loop", "-1", "-i", "madonna-rotator.mp4"]
-
-    filter_main = [
-        "color=c=black:s=200x608[black_col]",
-        "[0:v]scale=2080:1170:force_original_aspect_ratio=decrease,setsar=1[v0]",
-        "[black_col][v0]hstack[out_v]",
-        # Replace the current drawtext with two separate ones - war title and safe_title
-        f"[out_v]drawtext=text='{war_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-        f"[war_titled]drawtext=text='{song_info}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        "movie=didyouknow-lightbulb.png[bulb]",
-        "[bulb]scale=75:75[scaled_bulb]",
-        "[titled][scaled_bulb]overlay=(w/2)+140:130[v2_with_bulb]",
-        f"[v2_with_bulb]drawtext=text='{new_title_text}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]",
-        "[2:v]scale=2080:50[marq]",
-        "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
-    ]
-
-    next_input = 4
-    last_output = "outv"
-    if fztv_logo_exists:
-        filter_main.append(f"[{next_input}:v]scale=120:120[logosize]")
-        filter_main.append(f"[{last_output}][logosize]overlay=20:20[logo1]")
-        last_output = "logo1"
-        next_input += 1
-    if madmil_video_exists:
-        filter_main.append(f"[{next_input}:v]scale=150:150,setpts=PTS-STARTPTS[madmilvid]")
-        filter_main.append(f"[{last_output}][madmilvid]overlay=10:h-160[mainOut]")
-    else:
-        filter_main.append(f"[{last_output}]copy[mainOut]")
-
-    debug_info = {
-        'stage': 'initialization',
-        'dimensions': {},
-        'filter_graph': {},
-        'stream_info': {},
-        'error_context': {}
-    }
-
-    def log_debug_state(stage, **kwargs):
-        """Log detailed state for LLM analysis"""
-        debug_info['stage'] = stage
-        debug_info.update(kwargs)
-        logger.debug(f"DEBUG_STATE_{stage}: {json.dumps(debug_info, indent=2)}")
-
-    def validate_filter_node(node_name, width, height, expected_width, expected_height):
-        """Validate filter node dimensions"""
-        valid = width == expected_width and height == expected_height
-        debug_info['filter_graph'][node_name] = {
-            'actual': f"{width}x{height}",
-            'expected': f"{expected_width}x{expected_height}",
-            'valid': valid
-        }
-        if not valid:
-            logger.error(f"DIMENSION_MISMATCH_{node_name}: Expected {expected_width}x{expected_height}, got {width}x{height}")
-        return valid
-
-    # Constants with validation context
-    TARGET_WIDTH = 2080
-    TARGET_HEIGHT = 1170
-    MARQUEE_HEIGHT = 50
-    EQ_HEIGHT = 200
-
-    # Probe and validate all input streams
-    for idx, file in enumerate([video_file, audio_file]):
-        try:
-            probe_cmd = [
-                "ffprobe", "-v", "error",
-                "-show_entries", "stream=width,height,codec_type,pix_fmt,r_frame_rate",
-                "-of", "json", file
-            ]
-            result = subprocess.run(probe_cmd, capture_output=True, text=True)
-            stream_info = json.loads(result.stdout)
-            debug_info['stream_info'][f'input_{idx}'] = stream_info
-            log_debug_state('input_probe', file=file, stream_info=stream_info)
-        except Exception as e:
-            logger.error(f"PROBE_FAILURE: {e}")
-            debug_info['error_context']['probe_failure'] = str(e)
-            return False
-
-    # Pre-validate filter graph components
-    filter_components = []
-    try:
-        # Initial scale
-        scale_filter = f"[0:v]scale={TARGET_WIDTH}:{TARGET_HEIGHT}:force_original_aspect_ratio=decrease,setsar=1[scaled]"
-        filter_components.append(('scale', scale_filter))
-        
-        # Marquee
-        marquee_filter = f"color=black:s={TARGET_WIDTH}x{MARQUEE_HEIGHT}[marq]"
-        filter_components.append(('marquee', marquee_filter))
-        
-        # EQ background
-        if not disable_eq:
-            eq_filter = f"color=black:s={TARGET_WIDTH}x{EQ_HEIGHT}[eq_bg]"
-            filter_components.append(('eq', eq_filter))
-
-        # Validate each component
-        for name, filter_str in filter_components:
-            validate_cmd = ["ffmpeg", "-v", "error", "-filter_complex_script", "-"]
-            result = subprocess.run(validate_cmd, input=filter_str.encode(), capture_output=True)
-            debug_info['filter_graph'][f'validate_{name}'] = {
-                'filter': filter_str,
-                'valid': result.returncode == 0,
-                'error': result.stderr.decode() if result.returncode != 0 else None
-            }
-            log_debug_state('filter_validation', component=name)
-
-    except Exception as e:
-        logger.error(f"FILTER_VALIDATION_FAILURE: {e}")
-        debug_info['error_context']['filter_validation'] = str(e)
-        return False
-
-    # Build and validate complete filter graph
-    try:
-        filter_complex = ";".join([f[1] for f in filter_components])
-        debug_info['filter_graph']['complete'] = filter_complex
-        log_debug_state('filter_graph_complete')
-        
-        # Validate final dimensions at each stage
-        for stage in ['main', 'marquee', 'eq']:
-            expected_width = TARGET_WIDTH
-            expected_height = TARGET_HEIGHT + MARQUEE_HEIGHT + (EQ_HEIGHT if not disable_eq else 0)
-            if not validate_filter_node(stage, expected_width, expected_height, TARGET_WIDTH, expected_height):
-                return False
-
-    except Exception as e:
-        logger.error(f"FILTER_GRAPH_ASSEMBLY_FAILURE: {e}")
-        debug_info['error_context']['filter_assembly'] = str(e)
-        return False
-
-    cmd = [
-        "ffmpeg", "-y",
-        "-progress", "pipe:1",
-        "-v", "verbose",
-        *input_args,
-        "-filter_complex", filter_complex,
-        "-map", "[outfinal]",
-        "-map", "1:a",
-        "-c:v", "libx264", "-preset", "fast",
-        "-c:a", "aac", "-b:a", "128k",
-        output_file
-    ]
-
-    logger.debug("FFmpeg cmd: " + " ".join(cmd))
-    logger.info("FFmpeg command for manual execution:\n" + " \\\n".join(cmd))
-
-    try:
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True
-        )
-
-        # Monitor progress with detailed state tracking
-        while True:
-            output = process.stdout.readline()
-            if output == '' and process.poll() is not None:
-                break
-            if output:
-                debug_info['progress'] = output.strip()
-                log_debug_state('ffmpeg_progress')
-
-        # Capture and analyze FFmpeg output
-        stdout, stderr = process.communicate()
-        debug_info['ffmpeg_output'] = {
-            'stdout': stdout,
-            'stderr': stderr,
-            'return_code': process.returncode
-        }
-        log_debug_state('ffmpeg_complete')
-
-        # Validate output file
-        if process.returncode == 0:
-            output_probe = subprocess.run(
-                ["ffprobe", "-v", "error", "-show_entries", "stream=width,height,codec_type",
-                 "-of", "json", output_file],
-                capture_output=True, text=True
-            )
-            debug_info['output_validation'] = json.loads(output_probe.stdout)
-            log_debug_state('output_validation')
-
-        return process.returncode == 0
-
-    except Exception as e:
-        logger.error(f"FFMPEG_EXECUTION_FAILURE: {e}")
-        debug_info['error_context']['ffmpeg_execution'] = str(e)
-        return False
-
-    finally:
-        # Dump complete debug state for LLM analysis
-        with open(f"debug_state_{int(time.time())}.json", 'w') as f:
-            json.dump(debug_info, f, indent=2)
-
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
@@ -550,72 +261,60 @@ def create_media_item_from_episode(episode):
             episode['guid'] = guid
             logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
         
+
+        
         try:
             title_text = episode['title'].replace("'", r"\\'")
             war_text = episode['war_title'].replace("'", r"\\'")
             war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
+            commentary = episode['commentary'].split(':')[0].replace("'", r"\\'")
             age_days = '{:,}'.format(calculate_days_old(episode['title']))
             age_text = f"{song_name} is {age_days} days old-so ancient its release date was closer in history to the {war_topic} than to today!"
 
-            # Create temporary file for war info
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as war_file:
-                war_path = war_file.name
-                war_file.write(war_text)
-
-            # Check for logo and rotator
+            # Check for logo
             fztv_logo_exists = os.path.exists("fztv-logo.png")
-            madmil_video_exists = os.path.exists("madonna-rotator.mp4")
 
             # Build input arguments
             input_args = [
                 "-f", "lavfi", "-i", "color=c=black:s=2080x1170",  # Black background
                 "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",  # Silent audio
             ]
-
-            if fztv_logo_exists:
-                input_args.extend(["-i", "fztv-logo.png"])
-            if madmil_video_exists:
-                input_args.extend(["-stream_loop", "-1", "-i", "madonna-rotator.mp4"])
-
-            # Build filter complex
-            filter_main = [
-                "color=c=black:s=200x608[black_col]",
-                "[0:v]scale=2080:1170:force_original_aspect_ratio=decrease,setsar=1[v0]",
-                "[black_col][v0]hstack[out_v]",
-                f"[out_v]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-                f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-                f"[titled]drawtext=text='{age_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]"
-            ]
-
-            # Add marquee
+             # Add marquee
             marquee_text = (
                 "color=c=black:s=2080x50,"
                 "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                f"textfile={war_path}:"
-                "fontsize=24:fontcolor=white:bordercolor=black:borderw=3:"
+                f"text={commentary}:"
+                "fontsize=36:fontcolor=white:bordercolor=black:borderw=3:"
                 "x=w - mod(40*t\\, w+text_w):"
                 "y=h-th-10'"
             )
+            
+            filter_main = [
+                "color=c=black:s=2080x1170[black_col];[3:v]scale=2080:1170:force_original_aspect_ratio=decrease,setsar=1[v0];[black_col][v0]hstack[out_v]",
+                f"[out_v]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+                f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+                 "movie=didyouknow-lightbulb.png[bulb]",
+                "[bulb]scale=95:95[scaled_bulb]",
+                "[titled][scaled_bulb]overlay=(w/2)+650:120[v2_with_bulb]",
+                f"[v2_with_bulb]drawtext=text='{age_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]"            
+            ]
+
             input_args.extend(["-f", "lavfi", "-i", marquee_text])
             filter_main.extend([
                 "[2:v]scale=2080:50[marq]",
                 "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
             ])
 
-            # Add logo and rotator if they exist
+            if fztv_logo_exists:
+                input_args.extend(["-i", "fztv-logo.png"])
+                
             next_input = 3
             last_output = "outv"
-            if fztv_logo_exists:
-                filter_main.append(f"[{next_input}:v]scale=120:120[logosize]")
-                filter_main.append(f"[{last_output}][logosize]overlay=20:20[logo1]")
-                last_output = "logo1"
-                next_input += 1
-            if madmil_video_exists:
-                filter_main.append(f"[{next_input}:v]scale=150:150,setpts=PTS-STARTPTS[madmilvid]")
-                filter_main.append(f"[{last_output}][madmilvid]overlay=10:h-160[outfinal]")
-            else:
-                filter_main.append(f"[{last_output}]copy[outfinal]")
 
+            if fztv_logo_exists:
+                filter_main.append(f"[{next_input}:v]scale=250:250,setpts=PTS-STARTPTS[fztvlogo]")
+                filter_main.append(f"[{last_output}][fztvlogo]overlay=200:0[outfinal]")
+            
             filter_complex = ";".join(filter_main)
 
             output_file = os.path.join(TEMP_DIR, f"{guid}_output.mp4")
@@ -623,9 +322,11 @@ def create_media_item_from_episode(episode):
                 "ffmpeg", "-y",
                 *input_args,
                 "-filter_complex", filter_complex,
+                "-r", "10",  # set frame rate to 10 fps
                 "-map", "[outfinal]",
                 "-map", "1:a",
-                "-c:v", "libx264", "-preset", "fast",
+                #"-c:v", "libx264", "-preset", "fast",
+                "-c:v", "h264_nvenc", "-preset", "fast",
                 "-c:a", "aac", "-b:a", "128k",
                 "-t", "10",
                 output_file
