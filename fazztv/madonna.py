@@ -248,21 +248,19 @@ def download_video_only(url, output_file, guid=None):
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
-    
+
     try:
         # Extract song name from title
         song_match = re.match(r"^(.*?)\s*\(", episode['title'])
         song_name = song_match.group(1) if song_match else "Unknown Song"
-        
+
         # Get episode GUID
         guid = episode.get('guid')
         if not guid:
             guid = str(uuid.uuid4())
             episode['guid'] = guid
             logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
-        
 
-        
         try:
             title_text = episode['title'].replace("'", r"\\'")
             war_text = episode['war_title'].replace("'", r"\\'")
@@ -271,50 +269,80 @@ def create_media_item_from_episode(episode):
             age_days = '{:,}'.format(calculate_days_old(episode['title']))
             age_text = f"{song_name} is {age_days} days old-so ancient its release date was closer in history to the {war_topic} than to today!"
 
-            # Check for logo
+            # Check if we have a real video
+            # For example, see if "madonna-rotator.mp4" exists:
+
+            DEFAULT_VIDEO = "madonna-rotator.mp4"
+
+            video_exists = os.path.exists(DEFAULT_VIDEO)
+            main_video = DEFAULT_VIDEO
             fztv_logo_exists = os.path.exists("fztv-logo.png")
 
-            # Build input arguments
+            # Build input args
             input_args = [
-                "-f", "lavfi", "-i", "color=c=black:s=2080x1170",  # Black background
-                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",  # Silent audio
+                # 0: black background
+                "-f", "lavfi", "-i", "color=c=black:s=2080x1170",
+                # 1: silent audio
+                "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
             ]
-             # Add marquee
+
+            # 2: main video placeholder
+            if video_exists:
+                input_args.extend(["-i", main_video])
+            else:
+                # Dummy video if no real file
+                input_args.extend(["-f", "lavfi", "-i", "nullsrc=s=640x480:d=10:r=30"])
+
+            # 3: marquee
             marquee_text = (
                 "color=c=black:s=2080x50,"
-                "drawtext='fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-                f"text={commentary}:"
+                "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+                "text='" + commentary + "':"
                 "fontsize=36:fontcolor=white:bordercolor=black:borderw=3:"
-                "x=w - mod(40*t\\, w+text_w):"
-                "y=h-th-10'"
+                "x=w-mod(40*t\\,w+text_w):"
+                "y=h-th-10"
             )
-            
-            filter_main = [
-                "color=c=black:s=2080x1170[black_col];[3:v]scale=2080:1170:force_original_aspect_ratio=decrease,setsar=1[v0];[black_col][v0]hstack[out_v]",
-                f"[out_v]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-                f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-                 "movie=didyouknow-lightbulb.png[bulb]",
-                "[bulb]scale=95:95[scaled_bulb]",
-                "[titled][scaled_bulb]overlay=(w/2)+650:120[v2_with_bulb]",
-                f"[v2_with_bulb]drawtext=text='{age_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=160[titledbylined]"            
-            ]
-
             input_args.extend(["-f", "lavfi", "-i", marquee_text])
-            filter_main.extend([
-                "[2:v]scale=2080:50[marq]",
-                "[titledbylined][marq]overlay=0:main_h-overlay_h-10[outv]"
-            ])
 
+            # 4: logo (optional)
             if fztv_logo_exists:
                 input_args.extend(["-i", "fztv-logo.png"])
-                
-            next_input = 3
-            last_output = "outv"
 
+            # Build filter chain
+            filter_main = [
+                # Scale black background and main video, overlay them
+                "[0:v]scale=2080:1170[bg];[2:v]scale=2080:1170[vmain];"
+                "[bg][vmain]overlay=0:0[base]",
+
+                # Add war text
+                f"[base]drawtext=text='{war_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+                "fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
+
+                # Add title text
+                f"[war_titled]drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+                "fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
+
+                # Optional 'did you know' overlay
+                "movie=didyouknow-lightbulb.png[bulb]",
+                "[bulb]scale=95:95[scaled_bulb]",
+                "[titled][scaled_bulb]overlay=1000:120[v2_with_bulb]",
+
+                # Add age text
+                f"[v2_with_bulb]drawtext=text='{age_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
+                "fontsize=26:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=230[titledbylined]",
+
+                # Marquee
+                "[3:v]scale=2080:50[marq]",
+                "[titledbylined][marq]overlay=0:main_h-overlay_h-10[with_marq]",
+            ]
+
+            # If we have a logo, overlay it last
             if fztv_logo_exists:
-                filter_main.append(f"[{next_input}:v]scale=250:250,setpts=PTS-STARTPTS[fztvlogo]")
-                filter_main.append(f"[{last_output}][fztvlogo]overlay=200:0[outfinal]")
-            
+                filter_main.append("[4:v]scale=200:200[logo]")
+                filter_main.append("[with_marq][logo]overlay=50:0[outfinal]")
+            else:
+                filter_main.append("[with_marq]copy[outfinal]")
+
             filter_complex = ";".join(filter_main)
 
             output_file = os.path.join(TEMP_DIR, f"{guid}_output.mp4")
@@ -325,7 +353,6 @@ def create_media_item_from_episode(episode):
                 "-r", "10",  # set frame rate to 10 fps
                 "-map", "[outfinal]",
                 "-map", "1:a",
-                #"-c:v", "libx264", "-preset", "fast",
                 "-c:v", "h264_nvenc", "-preset", "fast",
                 "-c:a", "aac", "-b:a", "128k",
                 "-t", "10",
@@ -333,7 +360,7 @@ def create_media_item_from_episode(episode):
             ]
 
             subprocess.run(cmd, check=True)
-            
+
             # Create MediaItem
             media_item = MediaItem(
                 artist="Madonna",
@@ -349,13 +376,13 @@ def create_media_item_from_episode(episode):
         except Exception as e:
             logger.error(f"Error in ffmpeg processing: {e}")
             return None
-            
+
     except Exception as e:
         logger.error(f"Error in create_media_item: {e}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
         return None
-        
+
 
 def cleanup_environment():
     """Clean up environment before running"""
