@@ -1,216 +1,323 @@
+"""
+FazzTV Main Entry Point
+
+Orchestrates the video broadcasting pipeline with modular components.
+"""
+
 import random
-import time
-import os
-import openai
+import argparse
+from typing import List, Optional
 from loguru import logger
-import requests
 
 from fazztv.models import MediaItem
 from fazztv.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
-from dotenv import load_dotenv
+from fazztv.config.settings import Settings
+from fazztv.api.openrouter import OpenRouterClient
+from fazztv.api.youtube import YouTubeSearchClient
+from fazztv.data.shows import FTV_SHOWS
+from fazztv.data.artists import SINGERS
 
-# Load environment variables from the .env file
-load_dotenv()
 
-# Access variables
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-# ---------------------------------------------------------------------------
-#                           CONFIGURATION
-# ---------------------------------------------------------------------------
-OPENAI_API_KEY = "sk-"
-STREAM_KEY = None
-SEARCH_LIMIT = 5
-LOG_FILE = "broadcast.log"
-
-BASE_RES = "640x360"
-FADE_LENGTH = 3
-MARQUEE_DURATION = 86400
-SCROLL_SPEED = 40
-
-openai.api_key = OPENAI_API_KEY
-
-# 20 Singers
-SINGERS = sorted([
-     "Lauryn Hill", "Shakira", 
-     "Toni Braxton", "Willie Nelson", "Lil Wayne",
-    "Fat Joe", "Ja Rule", "DMX", "R. Kelly", "Dionne Warwick",
-    "Ozzy Osbourne", "Lionel Richie", "Iggy Azalea", "Flo Rida", "Akon",
-    "Ron Isley", "Sean Kingston", "Nas", "MC Hammer", "Chris Tucker"
-])
-
-ftv_shows = [
-    {"title": "Tax Evasion Nation", "byline": "A deep dive into the biggest tax scandals in music."},
-    {"title": "Audit This!", "byline": "When the IRS comes knocking, these artists start rocking."},
-    {"title": "Cash Under the Mattress", "byline": "Where did all the money go? Hidden assets and shady deals."},
-    {"title": "Behind Bars & Behind the Music", "byline": "The true crime stories of tax-dodging musicians."},
-    {"title": "IRS Unplugged", "byline": "Famous cases where the taxman turned off the money tap."},
-    {"title": "Fraud Files: The Remix", "byline": "A look at artists who remixed their income statements."},
-    {"title": "Return to Sender", "byline": "Tax returns gone wrong and the consequences."},
-    {"title": "Deduction Destruction", "byline": "When creative accounting turns criminal."},
-    {"title": "Offshore & On Tour", "byline": "Rockstars, shell companies, and secret bank accounts."},
-    {"title": "Taxman’s Greatest Hits", "byline": "A countdown of the most notorious tax-dodging musicians."},
-    {"title": "Hide Yo Money, Hide Yo Taxes", "byline": "When the IRS slides into your DMs with a subpoena."},
-    {"title": "W2 Hell & Back", "byline": "Musicians who faked their income until the feds came knocking."},
-    {"title": "Death & Taxes (But Mostly Taxes)", "byline": "Because even rockstars can’t escape the taxman."},
-    {"title": "Straight Outta Cayman", "byline": "The offshore accounts that almost worked."},
-    {"title": "No Refund, No Peace", "byline": "When dodging the IRS goes horribly wrong."},
-    {"title": "Mo’ Money, Mo’ Problems: IRS Edition", "byline": "The richest, dumbest tax evaders in music."},
-    {"title": "Audit Me If You Can", "byline": "A reality show where celebs try (and fail) to dodge taxes."},
-    {"title": "Filing Single, Ready to Flee", "byline": "When tax fraudsters ghost the government."},
-    {"title": "The Write-Offs", "byline": "Musicians who wrote off EVERYTHING… until they got caught."},
-    {"title": "99 Problems & The IRS Is One", "byline": "Because Jay-Z warned us, but they didn’t listen."}
-]
-
-logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
-
-# ---------------------------------------------------------------------------
-#                       HELPER FUNCTIONS
-# ---------------------------------------------------------------------------
-
-def safe_get_tax_info(singer):
-    logger.debug(f"Requesting tax info for {singer} via OpenAI...")
-    try:
-        facts = get_tax_info(singer)
-        logger.debug(f"Successfully got tax info for {singer}")
-        return facts
-    except Exception as e:
-        logger.error(f"OpenAI error for {singer}: {e}")
-        return "Tax info unavailable (OpenAI quota exceeded)."
-
-def get_tax_info(singer):
-    url = "https://openrouter.ai/api/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "<YOUR_SITE_URL>",  # Optional
-        "X-Title": "<YOUR_SITE_NAME>",  # Optional
-    }
+class FazzTVApplication:
+    """Main application class for FazzTV broadcasting system."""
     
-    data = {
-        "model": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
-        "messages": [
-            {
-                "role": "user",
-                "content": (
-                    f"Provide a concise summary of {singer}'s tax problems, including key dates, "
-                    "fines, amounts, or relevant penalties."
-                )
-            }
-        ],
-    }
+    def __init__(self, settings: Optional[Settings] = None):
+        """
+        Initialize the FazzTV application.
+        
+        Args:
+            settings: Optional settings instance (creates default if not provided)
+        """
+        self.settings = settings or Settings()
+        self._setup_logging()
+        self._initialize_services()
     
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        response.raise_for_status()  # Raises an error for HTTP errors
-        result = response.json()
-
-        # Ensure the expected structure exists before accessing
-        if "choices" in result and result["choices"]:
-            message_content = result["choices"][0].get("message", {}).get("content", "")
-            if message_content:
-                logger.info(f"Tax info for {singer}: {message_content[:100]}...")  # Log first 100 chars
-                return message_content
-            else:
-                logger.error(f"No content found in response for {singer}")
-                return "Tax info unavailable"
-        else:
-            logger.error(f"Unexpected API response structure: {result}")
-            return "Tax info unavailable"
-
-    except requests.exceptions.RequestException as e:
-        logger.error(f"API request failed: {e}")
-        return "Tax info unavailable"
-
-def get_random_song_url(singer):
-    logger.debug(f"Searching random official music video for {singer}...")
-    import yt_dlp
-    query = f"{singer} official music video"
-    ydl_opts = {
-        "quiet": True,
-        "default_search": "ytsearch",
-        "noplaylist": True,
-        "max_downloads": SEARCH_LIMIT,
-        "nopart": True,
-        "no_resume": True,
-        "fragment_retries": 999
-    }
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch{SEARCH_LIMIT}:{query}", download=False)
-            vids = info.get("entries", [])
-            if not vids:
-                logger.error(f"No videos for {singer}")
-                return None, None
-            pick = random.choice(vids)
-            logger.info(f"Selected for {singer}: {pick['title']} ({pick['webpage_url']})")
-            return pick["webpage_url"], pick["title"]
-    except Exception as e:
-        logger.error(f"Error searching {singer}: {e}")
-        return None, None
-
-def create_media_item(artist, length_percent=10):
-    """Create a MediaItem for the given artist."""
-    url, song = get_random_song_url(artist)
-    if not url or not song:
-        logger.error(f"Could not get URL or song title for {artist}")
-        return None
-    
-    taxprompt = safe_get_tax_info(artist)
-    
-    try:
-        media_item = MediaItem(
-            artist=artist,
-            song=song,
-            url=url,
-            taxprompt=taxprompt,
-            length_percent=length_percent
+    def _setup_logging(self):
+        """Configure logging based on settings."""
+        logger.add(
+            self.settings.log_file,
+            rotation=self.settings.log_max_size,
+            level=self.settings.log_level
         )
-        return media_item
-    except ValueError as e:
-        logger.error(f"Error creating MediaItem for {artist}: {e}")
-        return None
-
-def main():
-    logger.info("=== Starting structured FazzTV broadcast ===")
     
-    # Create serializer and broadcaster
-    serializer = MediaSerializer(
-        base_res=BASE_RES,
-        fade_length=FADE_LENGTH,
-        marquee_duration=MARQUEE_DURATION,
-        scroll_speed=SCROLL_SPEED,
-        logo_path="fztv-logo.png"
+    def _initialize_services(self):
+        """Initialize all service dependencies."""
+        # API Clients
+        self.api_client = OpenRouterClient(self.settings.openrouter_api_key)
+        self.youtube_client = YouTubeSearchClient(self.settings.search_limit)
+        
+        # Media Processing
+        self.serializer = MediaSerializer(
+            base_res=self.settings.base_resolution,
+            fade_length=self.settings.fade_length,
+            marquee_duration=self.settings.marquee_duration,
+            scroll_speed=self.settings.scroll_speed,
+            logo_path="fztv-logo.png" if self.settings.enable_logo else None
+        )
+        
+        # Broadcasting
+        self.broadcaster = RTMPBroadcaster(rtmp_url=self.settings.rtmp_url)
+    
+    def create_media_item(
+        self,
+        artist: str,
+        length_percent: int = 10
+    ) -> Optional[MediaItem]:
+        """
+        Create a MediaItem for the given artist.
+        
+        Args:
+            artist: The artist name
+            length_percent: Percentage of original media to use
+            
+        Returns:
+            MediaItem instance or None if creation failed
+        """
+        # Search for music video
+        result = self.youtube_client.search_music_video(artist)
+        if not result:
+            logger.error(f"Could not find music video for {artist}")
+            return None
+        
+        url, song = result
+        
+        # Get tax information
+        taxprompt = self._get_safe_tax_info(artist)
+        
+        try:
+            media_item = MediaItem(
+                artist=artist,
+                song=song,
+                url=url,
+                taxprompt=taxprompt,
+                length_percent=length_percent
+            )
+            return media_item
+        except ValueError as e:
+            logger.error(f"Error creating MediaItem for {artist}: {e}")
+            return None
+    
+    def _get_safe_tax_info(self, artist: str) -> str:
+        """
+        Safely get tax information for an artist.
+        
+        Args:
+            artist: The artist name
+            
+        Returns:
+            Tax information string or error message
+        """
+        logger.debug(f"Requesting tax info for {artist}...")
+        try:
+            return self.api_client.get_tax_info(artist)
+        except Exception as e:
+            logger.error(f"Error getting tax info for {artist}: {e}")
+            return "Tax information unavailable."
+    
+    def create_media_collection(
+        self,
+        artists: List[str],
+        randomize_length: bool = True
+    ) -> List[MediaItem]:
+        """
+        Create a collection of media items for multiple artists.
+        
+        Args:
+            artists: List of artist names
+            randomize_length: Whether to randomize clip lengths
+            
+        Returns:
+            List of successfully created MediaItem instances
+        """
+        media_items = []
+        
+        for artist in artists:
+            length_percent = random.randint(50, 100) if randomize_length else 100
+            media_item = self.create_media_item(artist, length_percent)
+            
+            if media_item:
+                media_items.append(media_item)
+                logger.info(f"Created media item for {artist}")
+            else:
+                logger.warning(f"Failed to create media item for {artist}")
+        
+        logger.info(f"Created {len(media_items)}/{len(artists)} media items")
+        return media_items
+    
+    def serialize_collection(
+        self,
+        media_items: List[MediaItem],
+        include_shows: bool = True
+    ) -> List[MediaItem]:
+        """
+        Serialize a collection of media items.
+        
+        Args:
+            media_items: List of MediaItem instances to serialize
+            include_shows: Whether to include show information
+            
+        Returns:
+            List of successfully serialized MediaItem instances
+        """
+        serialized_items = []
+        shows = FTV_SHOWS if include_shows else None
+        
+        for item in media_items:
+            if self.serializer.serialize_media_item(item, ftv_shows=shows):
+                serialized_items.append(item)
+                logger.info(f"Serialized media item for {item.artist}")
+            else:
+                logger.warning(f"Failed to serialize media item for {item.artist}")
+        
+        logger.info(f"Serialized {len(serialized_items)}/{len(media_items)} media items")
+        return serialized_items
+    
+    def broadcast_collection(
+        self,
+        media_items: List[MediaItem],
+        filter_func=None
+    ) -> List[tuple]:
+        """
+        Broadcast a collection of media items.
+        
+        Args:
+            media_items: List of MediaItem instances to broadcast
+            filter_func: Optional filter function for items
+            
+        Returns:
+            List of (MediaItem, success) tuples
+        """
+        if filter_func is None:
+            filter_func = lambda item: True  # Accept all items by default
+        
+        results = self.broadcaster.broadcast_filtered_collection(media_items, filter_func)
+        
+        successful = sum(1 for _, success in results if success)
+        logger.info(f"Successfully broadcast {successful}/{len(results)} media items")
+        
+        return results
+    
+    def run(self, artists: Optional[List[str]] = None):
+        """
+        Run the full broadcast pipeline.
+        
+        Args:
+            artists: Optional list of artists (uses default if not provided)
+        """
+        logger.info("=== Starting FazzTV broadcast ===")
+        logger.info(f"Mode: {'Production' if self.settings.is_production() else 'Development'}")
+        
+        # Use provided artists or default list
+        artists = artists or SINGERS
+        
+        # Create media collection
+        media_items = self.create_media_collection(artists)
+        
+        if not media_items:
+            logger.error("No media items created, aborting broadcast")
+            return
+        
+        # Serialize media items
+        serialized_items = self.serialize_collection(media_items)
+        
+        if not serialized_items:
+            logger.error("No media items serialized, aborting broadcast")
+            return
+        
+        # Broadcast media items
+        self.broadcast_collection(serialized_items)
+        
+        logger.info("=== Finished FazzTV broadcast ===")
+
+
+def create_parser() -> argparse.ArgumentParser:
+    """
+    Create command-line argument parser.
+    
+    Returns:
+        Configured ArgumentParser instance
+    """
+    parser = argparse.ArgumentParser(
+        description="FazzTV - Automated Video Broadcasting System",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     
-    rtmp_url = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}" if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test"
-    broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
+    parser.add_argument(
+        "--artists",
+        nargs="+",
+        help="List of artists to broadcast (uses default if not specified)"
+    )
     
-    # Create a collection of media items
-    media_items = []
-    for singer in SINGERS:
-        media_item = create_media_item(singer, length_percent=random.randint(50, 100))
-        if media_item:
-            media_items.append(media_item)
+    parser.add_argument(
+        "--stream-key",
+        help="YouTube stream key for live broadcasting"
+    )
     
-    logger.info(f"Created {len(media_items)} media items")
+    parser.add_argument(
+        "--env-file",
+        help="Path to environment file (defaults to .env)"
+    )
     
-    # Serialize the media items with show information
-    serialized_items = []
-    for item in media_items:
-        if serializer.serialize_media_item(item, ftv_shows=ftv_shows):
-            serialized_items.append(item)
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="INFO",
+        help="Logging level"
+    )
     
-    logger.info(f"Serialized {len(serialized_items)} media items")
+    parser.add_argument(
+        "--test-mode",
+        action="store_true",
+        help="Run in test mode (local RTMP server)"
+    )
     
-    # Broadcast the media items with a filter
-    # Example filter: only artists with 'i' in their name
-    filter_func = lambda item: True
+    parser.add_argument(
+        "--no-logo",
+        action="store_true",
+        help="Disable logo overlay"
+    )
     
-    results = broadcaster.broadcast_filtered_collection(serialized_items, filter_func)
+    parser.add_argument(
+        "--cache-dir",
+        help="Directory for caching downloaded media"
+    )
     
-    logger.info(f"Broadcast {len(results)} media items")
-    logger.info("=== Finished FazzTV broadcast ===")
+    return parser
+
+
+def main():
+    """Main entry point for the application."""
+    parser = create_parser()
+    args = parser.parse_args()
+    
+    # Create settings with command-line overrides
+    settings = Settings(env_file=args.env_file)
+    
+    # Apply command-line overrides
+    if args.stream_key:
+        settings.stream_key = args.stream_key
+        settings.rtmp_url = settings._build_rtmp_url()
+    
+    if args.log_level:
+        settings.log_level = args.log_level
+    
+    if args.test_mode:
+        settings.stream_key = None
+        settings.rtmp_url = "rtmp://127.0.0.1:1935/live/test"
+    
+    if args.no_logo:
+        settings.enable_logo = False
+    
+    if args.cache_dir:
+        from pathlib import Path
+        settings.cache_dir = Path(args.cache_dir)
+        settings.cache_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create and run application
+    app = FazzTVApplication(settings)
+    app.run(artists=args.artists)
+
 
 if __name__ == "__main__":
     main()
