@@ -22843,3 +22843,600 @@ subprocess.CalledProcessError: Command '['ffmpeg', '-y', '-f', 'lavfi', '-i', 'c
 2025-03-16 15:17:14.326 | INFO     | __main__:main:470 - Broadcast 1 media items successfully
 2025-03-16 15:17:14.326 | INFO     | __main__:main:471 - === Finished Madonna Military History FazzTV broadcast ===
 2025-03-16 15:17:14.326 | INFO     | __main__:main:471 - === Finished Madonna Military History FazzTV broadcast ===
+2025-09-11 09:21:30.355 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test Artist - Test Song is not serialized
+2025-09-11 09:21:30.358 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test - Song is not serialized
+2025-09-11 09:21:30.389 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.389 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:30.392 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.392 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: FFmpeg error
+2025-09-11 09:21:30.394 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.394 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:85 - Broadcasting timeout for Test Artist - Test Song
+2025-09-11 09:21:30.397 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.397 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 1 - Song 1
+2025-09-11 09:21:30.399 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:21:30.400 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.400 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:30.400 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.402 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:21:30.402 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.403 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:30.403 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 2 successful, 1 failed
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.405 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:30.405 | WARNING  | fazztv.broadcasting.rtmp:broadcast_collection:130 - Stopping broadcast due to failure
+2025-09-11 09:21:30.405 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:21:30.407 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 2 items
+2025-09-11 09:21:30.407 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/2: Artist 0 - Song 0
+2025-09-11 09:21:30.408 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.408 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:30.408 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/2: Artist 1 - Song 1
+2025-09-11 09:21:30.408 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.408 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:30.408 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:21:30.410 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 1 items
+2025-09-11 09:21:30.411 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/1: Artist - Song
+2025-09-11 09:21:30.411 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist - Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.411 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:21:30.411 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 1 failed
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 3 items after filtering from 5 total
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 2 - Song 2
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 3 - Song 3
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 3 - Song 3 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 3 - Song 3
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 4 - Song 4
+2025-09-11 09:21:30.413 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 4 - Song 4 to rtmp://test.server/live/stream
+2025-09-11 09:21:30.414 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 4 - Song 4
+2025-09-11 09:21:30.414 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:21:30.416 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 0 items after filtering from 3 total
+2025-09-11 09:21:30.416 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 0 items
+2025-09-11 09:21:30.416 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 0 failed
+2025-09-11 09:21:30.417 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:30.417 | INFO     | fazztv.broadcasting.rtmp:test_connection:198 - RTMP connection test successful
+2025-09-11 09:21:30.426 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:30.426 | ERROR    | fazztv.broadcasting.rtmp:test_connection:201 - RTMP connection test failed: Connection refused
+2025-09-11 09:21:30.428 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:30.428 | ERROR    | fazztv.broadcasting.rtmp:test_connection:205 - RTMP connection test timed out
+2025-09-11 09:21:30.429 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:30.429 | ERROR    | fazztv.broadcasting.rtmp:test_connection:208 - RTMP connection test error: Network error
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.433 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:30.433 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:30.434 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:30.435 | INFO     | fazztv.broadcasting.rtmp:reset_stats:237 - Broadcasting statistics reset
+2025-09-11 09:21:30.442 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-1/test_serialize_successful0/Test Artist - Test Song.mp4
+2025-09-11 09:21:30.442 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.442 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.568 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-1/test_serialize_successful0/temp_audio.aac
+2025-09-11 09:21:30.573 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:21:30.576 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-11 09:21:30.576 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.576 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Failed to download audio for Test Artist - Test Song
+2025-09-11 09:21:30.579 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-1/test_serialize_video_download_0/Test Artist - Test Song.mp4
+2025-09-11 09:21:30.579 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.579 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.580 | WARNING  | fazztv.broadcasting.serializer:serialize_media_item:77 - Using default video due to download failure
+2025-09-11 09:21:30.609 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-1/test_serialize_video_download_0/temp_audio.aac
+2025-09-11 09:21:30.610 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_serialize_video_download_0/temp_audio.aac
+2025-09-11 09:21:30.610 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_serialize_video_download_0/default.mp4
+2025-09-11 09:21:30.610 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:21:30.613 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Artist - Song to /tmp/pytest-of-faz/pytest-1/test_serialize_with_trim0/Artist - Song.mp4
+2025-09-11 09:21:30.613 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/test
+2025-09-11 09:21:30.613 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/test
+2025-09-11 09:21:30.614 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Artist - Song
+2025-09-11 09:21:30.617 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-1/test_serialize_with_show_info0/Test Artist - Test Song.mp4
+2025-09-11 09:21:30.617 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.617 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.647 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-1/test_serialize_with_show_info0/temp_audio.aac
+2025-09-11 09:21:30.647 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_serialize_with_show_info0/temp_audio.aac
+2025-09-11 09:21:30.647 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_serialize_with_show_info0/temp_video.mp4
+2025-09-11 09:21:30.647 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:21:30.651 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-11 09:21:30.651 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.651 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:30.681 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-1/test_serialize_video_processin0/temp_audio.aac
+2025-09-11 09:21:30.681 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_serialize_video_processin0/temp_audio.aac
+2025-09-11 09:21:30.681 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_serialize_video_processin0/temp_video.mp4
+2025-09-11 09:21:30.681 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Video processing failed for Test Artist - Test Song
+2025-09-11 09:21:30.684 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 3/3 items
+2025-09-11 09:21:30.686 | WARNING  | fazztv.broadcasting.serializer:serialize_collection:152 - Failed to serialize Artist1 - Song1
+2025-09-11 09:21:30.686 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/3 items
+2025-09-11 09:21:30.687 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/2 items
+2025-09-11 09:21:30.690 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 1/1 items
+2025-09-11 09:21:30.691 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 0/0 items
+2025-09-11 09:21:31.149 | INFO     | fazztv.broadcasting.serializer:_create_default_video:228 - Created default video at /tmp/pytest-of-faz/pytest-1/test_create_default_video_succ0/default.mp4
+2025-09-11 09:21:31.153 | ERROR    | fazztv.broadcasting.serializer:_create_default_video:231 - Failed to create default video: Command 'ffmpeg' returned non-zero exit status 1.
+2025-09-11 09:21:31.155 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 3 serialized files
+2025-09-11 09:21:31.157 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-11 09:21:31.159 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-11 09:21:31.418 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:31.459 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:31.469 | INFO     | fazztv.tests:start:37 - Dummy RTMP server started on 127.0.0.1:1935
+2025-09-11 09:21:31.469 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:31.496 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-1/test_safe_delete_file0/test.txt
+2025-09-11 09:21:31.497 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-1/test_safe_delete_directory0/test_dir
+2025-09-11 09:21:31.499 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-1/test_safe_delete_nonexistent0/does_not_exist
+2025-09-11 09:21:31.503 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-1/test_safe_delete_nested_direct0/nested
+2025-09-11 09:21:31.516 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-1/test_copy_file_success0/source.txt to /tmp/pytest-of-faz/pytest-1/test_copy_file_success0/dest.txt
+2025-09-11 09:21:31.518 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-1/test_copy_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-1/test_copy_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:21:31.520 | WARNING  | fazztv.utils.file:copy_file:97 - Destination already exists: /tmp/pytest-of-faz/pytest-1/test_copy_file_exists_no_overw0/dest.txt
+2025-09-11 09:21:31.521 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-1/test_copy_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-1/test_copy_file_exists_with_ove0/dest.txt
+2025-09-11 09:21:31.526 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-1/test_copy_preserves_metadata0/source.txt to /tmp/pytest-of-faz/pytest-1/test_copy_preserves_metadata0/dest.txt
+2025-09-11 09:21:31.529 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-1/test_move_file_success0/source.txt to /tmp/pytest-of-faz/pytest-1/test_move_file_success0/dest.txt
+2025-09-11 09:21:31.531 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-1/test_move_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-1/test_move_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:21:31.533 | WARNING  | fazztv.utils.file:move_file:125 - Destination already exists: /tmp/pytest-of-faz/pytest-1/test_move_file_exists_no_overw0/dest.txt
+2025-09-11 09:21:31.535 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-1/test_move_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-1/test_move_file_exists_with_ove0/dest.txt
+2025-09-11 09:21:31.558 | WARNING  | fazztv.utils.file:find_files:156 - Directory does not exist: /tmp/pytest-of-faz/pytest-1/test_find_files_nonexistent_di0/does_not_exist
+2025-09-11 09:21:31.566 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_deletes0/old.txt
+2025-09-11 09:21:31.566 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_deletes0
+2025-09-11 09:21:31.568 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_pattern0/old.txt
+2025-09-11 09:21:31.568 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_pattern0
+2025-09-11 09:21:31.571 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 7 days from /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_ignores0
+2025-09-11 09:21:31.573 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_boundar0/file1.txt
+2025-09-11 09:21:31.573 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-1/test_cleanup_old_files_boundar0
+2025-09-11 09:21:39.634 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test Artist - Test Song is not serialized
+2025-09-11 09:21:39.636 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test - Song is not serialized
+2025-09-11 09:21:39.667 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.668 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:39.670 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.670 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: FFmpeg error
+2025-09-11 09:21:39.672 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.672 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:85 - Broadcasting timeout for Test Artist - Test Song
+2025-09-11 09:21:39.675 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.675 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 1 - Song 1
+2025-09-11 09:21:39.677 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:21:39.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:39.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.680 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:39.680 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:21:39.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:39.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 2 successful, 1 failed
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.683 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:39.683 | WARNING  | fazztv.broadcasting.rtmp:broadcast_collection:130 - Stopping broadcast due to failure
+2025-09-11 09:21:39.683 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:21:39.685 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 2 items
+2025-09-11 09:21:39.685 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/2: Artist 0 - Song 0
+2025-09-11 09:21:39.685 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.686 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:39.686 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/2: Artist 1 - Song 1
+2025-09-11 09:21:39.686 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.686 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:39.686 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:21:39.688 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 1 items
+2025-09-11 09:21:39.688 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/1: Artist - Song
+2025-09-11 09:21:39.688 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist - Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.688 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:21:39.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 1 failed
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 3 items after filtering from 5 total
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 2 - Song 2
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 3 - Song 3
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 3 - Song 3 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 3 - Song 3
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 4 - Song 4
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 4 - Song 4 to rtmp://test.server/live/stream
+2025-09-11 09:21:39.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 4 - Song 4
+2025-09-11 09:21:39.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:21:39.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 0 items after filtering from 3 total
+2025-09-11 09:21:39.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 0 items
+2025-09-11 09:21:39.694 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 0 failed
+2025-09-11 09:21:39.695 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:39.695 | INFO     | fazztv.broadcasting.rtmp:test_connection:198 - RTMP connection test successful
+2025-09-11 09:21:39.704 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:39.704 | ERROR    | fazztv.broadcasting.rtmp:test_connection:201 - RTMP connection test failed: Connection refused
+2025-09-11 09:21:39.705 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:39.705 | ERROR    | fazztv.broadcasting.rtmp:test_connection:205 - RTMP connection test timed out
+2025-09-11 09:21:39.707 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:39.707 | ERROR    | fazztv.broadcasting.rtmp:test_connection:208 - RTMP connection test error: Network error
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.711 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:39.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:39.711 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:39.713 | INFO     | fazztv.broadcasting.rtmp:reset_stats:237 - Broadcasting statistics reset
+2025-09-11 09:21:39.921 | INFO     | fazztv.tests:start:37 - Dummy RTMP server started on 127.0.0.1:1935
+2025-09-11 09:21:39.921 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:39.947 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-2/test_safe_delete_file0/test.txt
+2025-09-11 09:21:39.949 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-2/test_safe_delete_directory0/test_dir
+2025-09-11 09:21:39.951 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-2/test_safe_delete_nonexistent0/does_not_exist
+2025-09-11 09:21:39.954 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-2/test_safe_delete_nested_direct0/nested
+2025-09-11 09:21:39.968 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-2/test_copy_file_success0/source.txt to /tmp/pytest-of-faz/pytest-2/test_copy_file_success0/dest.txt
+2025-09-11 09:21:39.969 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-2/test_copy_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-2/test_copy_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:21:39.971 | WARNING  | fazztv.utils.file:copy_file:97 - Destination already exists: /tmp/pytest-of-faz/pytest-2/test_copy_file_exists_no_overw0/dest.txt
+2025-09-11 09:21:39.972 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-2/test_copy_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-2/test_copy_file_exists_with_ove0/dest.txt
+2025-09-11 09:21:39.976 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-2/test_copy_preserves_metadata0/source.txt to /tmp/pytest-of-faz/pytest-2/test_copy_preserves_metadata0/dest.txt
+2025-09-11 09:21:39.978 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-2/test_move_file_success0/source.txt to /tmp/pytest-of-faz/pytest-2/test_move_file_success0/dest.txt
+2025-09-11 09:21:39.979 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-2/test_move_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-2/test_move_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:21:39.981 | WARNING  | fazztv.utils.file:move_file:125 - Destination already exists: /tmp/pytest-of-faz/pytest-2/test_move_file_exists_no_overw0/dest.txt
+2025-09-11 09:21:39.982 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-2/test_move_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-2/test_move_file_exists_with_ove0/dest.txt
+2025-09-11 09:21:40.002 | WARNING  | fazztv.utils.file:find_files:156 - Directory does not exist: /tmp/pytest-of-faz/pytest-2/test_find_files_nonexistent_di0/does_not_exist
+2025-09-11 09:21:40.009 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_deletes0/old.txt
+2025-09-11 09:21:40.009 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_deletes0
+2025-09-11 09:21:40.011 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_pattern0/old.txt
+2025-09-11 09:21:40.011 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_pattern0
+2025-09-11 09:21:40.014 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 7 days from /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_ignores0
+2025-09-11 09:21:40.015 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_boundar0/file1.txt
+2025-09-11 09:21:40.015 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-2/test_cleanup_old_files_boundar0
+2025-09-11 09:21:45.680 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test Artist - Test Song is not serialized
+2025-09-11 09:21:45.681 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test - Song is not serialized
+2025-09-11 09:21:45.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:45.685 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.685 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: FFmpeg error
+2025-09-11 09:21:45.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.687 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:85 - Broadcasting timeout for Test Artist - Test Song
+2025-09-11 09:21:45.688 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.688 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:21:45.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:45.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:45.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 1 - Song 1
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:45.690 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:21:45.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:45.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:45.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:45.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:45.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.692 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:45.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:21:45.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:45.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 2 successful, 1 failed
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.693 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:45.693 | WARNING  | fazztv.broadcasting.rtmp:broadcast_collection:130 - Stopping broadcast due to failure
+2025-09-11 09:21:45.693 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 2 items
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/2: Artist 0 - Song 0
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/2: Artist 1 - Song 1
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.695 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:45.695 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:21:45.696 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 1 items
+2025-09-11 09:21:45.696 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/1: Artist - Song
+2025-09-11 09:21:45.697 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist - Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.697 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:21:45.697 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 1 failed
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 3 items after filtering from 5 total
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 2 - Song 2
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 3 - Song 3
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 3 - Song 3 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 3 - Song 3
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 4 - Song 4
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 4 - Song 4 to rtmp://test.server/live/stream
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 4 - Song 4
+2025-09-11 09:21:45.698 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:21:45.700 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 0 items after filtering from 3 total
+2025-09-11 09:21:45.700 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 0 items
+2025-09-11 09:21:45.700 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 0 failed
+2025-09-11 09:21:45.701 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:45.701 | INFO     | fazztv.broadcasting.rtmp:test_connection:198 - RTMP connection test successful
+2025-09-11 09:21:45.702 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:45.702 | ERROR    | fazztv.broadcasting.rtmp:test_connection:201 - RTMP connection test failed: Connection refused
+2025-09-11 09:21:45.703 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:45.703 | ERROR    | fazztv.broadcasting.rtmp:test_connection:205 - RTMP connection test timed out
+2025-09-11 09:21:45.704 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:21:45.704 | ERROR    | fazztv.broadcasting.rtmp:test_connection:208 - RTMP connection test error: Network error
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.706 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:21:45.706 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:21:45.706 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:21:45.707 | INFO     | fazztv.broadcasting.rtmp:reset_stats:237 - Broadcasting statistics reset
+2025-09-11 09:21:45.711 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-3/test_serialize_successful0/Test Artist - Test Song.mp4
+2025-09-11 09:21:45.711 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.711 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.742 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-3/test_serialize_successful0/temp_audio.aac
+2025-09-11 09:21:45.744 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:21:45.746 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-11 09:21:45.746 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.746 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Failed to download audio for Test Artist - Test Song
+2025-09-11 09:21:45.747 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-3/test_serialize_video_download_0/Test Artist - Test Song.mp4
+2025-09-11 09:21:45.747 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.748 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.748 | WARNING  | fazztv.broadcasting.serializer:serialize_media_item:77 - Using default video due to download failure
+2025-09-11 09:21:45.779 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-3/test_serialize_video_download_0/temp_audio.aac
+2025-09-11 09:21:45.779 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_serialize_video_download_0/temp_audio.aac
+2025-09-11 09:21:45.779 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_serialize_video_download_0/default.mp4
+2025-09-11 09:21:45.779 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:21:45.782 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Artist - Song to /tmp/pytest-of-faz/pytest-3/test_serialize_with_trim0/Artist - Song.mp4
+2025-09-11 09:21:45.782 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/test
+2025-09-11 09:21:45.782 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/test
+2025-09-11 09:21:45.782 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Artist - Song
+2025-09-11 09:21:45.784 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-3/test_serialize_with_show_info0/Test Artist - Test Song.mp4
+2025-09-11 09:21:45.785 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.785 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.816 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-3/test_serialize_with_show_info0/temp_audio.aac
+2025-09-11 09:21:45.817 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_serialize_with_show_info0/temp_audio.aac
+2025-09-11 09:21:45.817 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_serialize_with_show_info0/temp_video.mp4
+2025-09-11 09:21:45.817 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:21:45.819 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-11 09:21:45.819 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.819 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:21:45.848 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-3/test_serialize_video_processin0/temp_audio.aac
+2025-09-11 09:21:45.848 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_serialize_video_processin0/temp_audio.aac
+2025-09-11 09:21:45.848 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_serialize_video_processin0/temp_video.mp4
+2025-09-11 09:21:45.849 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Video processing failed for Test Artist - Test Song
+2025-09-11 09:21:45.850 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 3/3 items
+2025-09-11 09:21:45.851 | WARNING  | fazztv.broadcasting.serializer:serialize_collection:152 - Failed to serialize Artist1 - Song1
+2025-09-11 09:21:45.851 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/3 items
+2025-09-11 09:21:45.852 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/2 items
+2025-09-11 09:21:45.854 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 1/1 items
+2025-09-11 09:21:45.855 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 0/0 items
+2025-09-11 09:21:45.865 | INFO     | fazztv.broadcasting.serializer:_create_default_video:228 - Created default video at /tmp/pytest-of-faz/pytest-3/test_create_default_video_succ0/default.mp4
+2025-09-11 09:21:45.866 | ERROR    | fazztv.broadcasting.serializer:_create_default_video:231 - Failed to create default video: Command 'ffmpeg' returned non-zero exit status 1.
+2025-09-11 09:21:45.869 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 3 serialized files
+2025-09-11 09:21:45.870 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-11 09:21:45.871 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-11 09:21:45.994 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:46.025 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:46.027 | INFO     | fazztv.tests:start:37 - Dummy RTMP server started on 127.0.0.1:1935
+2025-09-11 09:21:46.027 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:21:46.034 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-3/test_safe_delete_file0/test.txt
+2025-09-11 09:21:46.035 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-3/test_safe_delete_directory0/test_dir
+2025-09-11 09:21:46.036 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-3/test_safe_delete_nonexistent0/does_not_exist
+2025-09-11 09:21:46.038 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-3/test_safe_delete_nested_direct0/nested
+2025-09-11 09:21:46.046 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-3/test_copy_file_success0/source.txt to /tmp/pytest-of-faz/pytest-3/test_copy_file_success0/dest.txt
+2025-09-11 09:21:46.047 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-3/test_copy_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-3/test_copy_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:21:46.048 | WARNING  | fazztv.utils.file:copy_file:97 - Destination already exists: /tmp/pytest-of-faz/pytest-3/test_copy_file_exists_no_overw0/dest.txt
+2025-09-11 09:21:46.049 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-3/test_copy_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-3/test_copy_file_exists_with_ove0/dest.txt
+2025-09-11 09:21:46.052 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-3/test_copy_preserves_metadata0/source.txt to /tmp/pytest-of-faz/pytest-3/test_copy_preserves_metadata0/dest.txt
+2025-09-11 09:21:46.053 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-3/test_move_file_success0/source.txt to /tmp/pytest-of-faz/pytest-3/test_move_file_success0/dest.txt
+2025-09-11 09:21:46.055 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-3/test_move_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-3/test_move_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:21:46.056 | WARNING  | fazztv.utils.file:move_file:125 - Destination already exists: /tmp/pytest-of-faz/pytest-3/test_move_file_exists_no_overw0/dest.txt
+2025-09-11 09:21:46.057 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-3/test_move_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-3/test_move_file_exists_with_ove0/dest.txt
+2025-09-11 09:21:46.064 | WARNING  | fazztv.utils.file:find_files:156 - Directory does not exist: /tmp/pytest-of-faz/pytest-3/test_find_files_nonexistent_di0/does_not_exist
+2025-09-11 09:21:46.068 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_deletes0/old.txt
+2025-09-11 09:21:46.068 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_deletes0
+2025-09-11 09:21:46.069 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_pattern0/old.txt
+2025-09-11 09:21:46.069 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_pattern0
+2025-09-11 09:21:46.071 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 7 days from /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_ignores0
+2025-09-11 09:21:46.072 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_boundar0/file1.txt
+2025-09-11 09:21:46.072 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-3/test_cleanup_old_files_boundar0
+2025-09-11 09:24:25.277 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-5/test_file_operations_workflow0/test_workflow/source.txt to /tmp/pytest-of-faz/pytest-5/test_file_operations_workflow0/test_workflow/dest.txt
+2025-09-11 09:24:25.277 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-5/test_file_operations_workflow0/test_workflow/dest.txt to /tmp/pytest-of-faz/pytest-5/test_file_operations_workflow0/test_workflow/moved.txt
+2025-09-11 09:24:25.278 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-5/test_file_operations_workflow0/test_workflow
+2025-09-11 09:24:31.606 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-6/test_file_operations_workflow0/test_workflow/source.txt to /tmp/pytest-of-faz/pytest-6/test_file_operations_workflow0/test_workflow/dest.txt
+2025-09-11 09:24:31.606 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-6/test_file_operations_workflow0/test_workflow/dest.txt to /tmp/pytest-of-faz/pytest-6/test_file_operations_workflow0/test_workflow/moved.txt
+2025-09-11 09:24:31.606 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-6/test_file_operations_workflow0/test_workflow
+2025-09-11 09:25:00.581 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-8/test_file_operations_workflow0/test_workflow/source.txt to /tmp/pytest-of-faz/pytest-8/test_file_operations_workflow0/test_workflow/dest.txt
+2025-09-11 09:25:00.581 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-8/test_file_operations_workflow0/test_workflow/dest.txt to /tmp/pytest-of-faz/pytest-8/test_file_operations_workflow0/test_workflow/moved.txt
+2025-09-11 09:25:00.582 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-8/test_file_operations_workflow0/test_workflow
+2025-09-11 09:25:00.630 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /nonexistent/path/file.txt
+2025-09-11 09:25:00.630 | ERROR    | fazztv.utils.file:copy_file:107 - Error copying file: [Errno 2] No such file or directory: '/nonexistent/path/file.txt'
+2025-09-11 09:25:00.630 | ERROR    | fazztv.utils.file:move_file:135 - Error moving file: [Errno 2] No such file or directory: '/nonexistent/path/file.txt'
+2025-09-11 09:25:00.649 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test Artist - Test Song is not serialized
+2025-09-11 09:25:00.651 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test - Song is not serialized
+2025-09-11 09:25:00.668 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.669 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:25:00.671 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.671 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: FFmpeg error
+2025-09-11 09:25:00.673 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.673 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:85 - Broadcasting timeout for Test Artist - Test Song
+2025-09-11 09:25:00.676 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.676 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 1 - Song 1
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:25:00.678 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:25:00.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:25:00.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:25:00.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:25:00.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:25:00.681 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.681 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:25:00.682 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-11 09:25:00.682 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.682 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:25:00.682 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 2 successful, 1 failed
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.684 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:25:00.684 | WARNING  | fazztv.broadcasting.rtmp:broadcast_collection:130 - Stopping broadcast due to failure
+2025-09-11 09:25:00.684 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 2 items
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/2: Artist 0 - Song 0
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/2: Artist 1 - Song 1
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.687 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:25:00.687 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-11 09:25:00.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 1 items
+2025-09-11 09:25:00.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/1: Artist - Song
+2025-09-11 09:25:00.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist - Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.689 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-11 09:25:00.689 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 1 failed
+2025-09-11 09:25:00.691 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 3 items after filtering from 5 total
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 2 - Song 2
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 3 - Song 3
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 3 - Song 3 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 3 - Song 3
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 4 - Song 4
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 4 - Song 4 to rtmp://test.server/live/stream
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 4 - Song 4
+2025-09-11 09:25:00.692 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-11 09:25:00.694 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 0 items after filtering from 3 total
+2025-09-11 09:25:00.694 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 0 items
+2025-09-11 09:25:00.694 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 0 failed
+2025-09-11 09:25:00.696 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:25:00.696 | INFO     | fazztv.broadcasting.rtmp:test_connection:198 - RTMP connection test successful
+2025-09-11 09:25:00.705 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:25:00.705 | ERROR    | fazztv.broadcasting.rtmp:test_connection:201 - RTMP connection test failed: Connection refused
+2025-09-11 09:25:00.706 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:25:00.706 | ERROR    | fazztv.broadcasting.rtmp:test_connection:205 - RTMP connection test timed out
+2025-09-11 09:25:00.708 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-11 09:25:00.708 | ERROR    | fazztv.broadcasting.rtmp:test_connection:208 - RTMP connection test error: Network error
+2025-09-11 09:25:00.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:25:00.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:25:00.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.711 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:25:00.711 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.712 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-11 09:25:00.712 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-11 09:25:00.712 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-11 09:25:00.713 | INFO     | fazztv.broadcasting.rtmp:reset_stats:237 - Broadcasting statistics reset
+2025-09-11 09:25:00.719 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-8/test_serialize_successful0/Test Artist - Test Song.mp4
+2025-09-11 09:25:00.719 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.720 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.750 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-8/test_serialize_successful0/temp_audio.aac
+2025-09-11 09:25:00.750 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:25:00.753 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-11 09:25:00.753 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.753 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Failed to download audio for Test Artist - Test Song
+2025-09-11 09:25:00.756 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-8/test_serialize_video_download_0/Test Artist - Test Song.mp4
+2025-09-11 09:25:00.757 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.757 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.757 | WARNING  | fazztv.broadcasting.serializer:serialize_media_item:77 - Using default video due to download failure
+2025-09-11 09:25:00.788 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-8/test_serialize_video_download_0/temp_audio.aac
+2025-09-11 09:25:00.788 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_serialize_video_download_0/temp_audio.aac
+2025-09-11 09:25:00.788 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_serialize_video_download_0/default.mp4
+2025-09-11 09:25:00.788 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:25:00.792 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Artist - Song to /tmp/pytest-of-faz/pytest-8/test_serialize_with_trim0/Artist - Song.mp4
+2025-09-11 09:25:00.792 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/test
+2025-09-11 09:25:00.792 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/test
+2025-09-11 09:25:00.792 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Artist - Song
+2025-09-11 09:25:00.796 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-8/test_serialize_with_show_info0/Test Artist - Test Song.mp4
+2025-09-11 09:25:00.796 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.796 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.825 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-8/test_serialize_with_show_info0/temp_audio.aac
+2025-09-11 09:25:00.825 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_serialize_with_show_info0/temp_audio.aac
+2025-09-11 09:25:00.825 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_serialize_with_show_info0/temp_video.mp4
+2025-09-11 09:25:00.826 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-11 09:25:00.829 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-11 09:25:00.829 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.829 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-11 09:25:00.860 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-8/test_serialize_video_processin0/temp_audio.aac
+2025-09-11 09:25:00.861 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_serialize_video_processin0/temp_audio.aac
+2025-09-11 09:25:00.861 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_serialize_video_processin0/temp_video.mp4
+2025-09-11 09:25:00.861 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Video processing failed for Test Artist - Test Song
+2025-09-11 09:25:00.863 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 3/3 items
+2025-09-11 09:25:00.865 | WARNING  | fazztv.broadcasting.serializer:serialize_collection:152 - Failed to serialize Artist1 - Song1
+2025-09-11 09:25:00.865 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/3 items
+2025-09-11 09:25:00.867 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/2 items
+2025-09-11 09:25:00.869 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 1/1 items
+2025-09-11 09:25:00.871 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 0/0 items
+2025-09-11 09:25:01.320 | INFO     | fazztv.broadcasting.serializer:_create_default_video:228 - Created default video at /tmp/pytest-of-faz/pytest-8/test_create_default_video_succ0/default.mp4
+2025-09-11 09:25:01.324 | ERROR    | fazztv.broadcasting.serializer:_create_default_video:231 - Failed to create default video: Command 'ffmpeg' returned non-zero exit status 1.
+2025-09-11 09:25:01.327 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 3 serialized files
+2025-09-11 09:25:01.329 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-11 09:25:01.331 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-11 09:25:01.569 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:25:01.612 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:25:01.623 | INFO     | fazztv.tests:start:37 - Dummy RTMP server started on 127.0.0.1:1935
+2025-09-11 09:25:01.623 | ERROR    | fazztv.serializer:serialize_media_item:101 - Serialization error: 'MediaItem' object has no attribute 'source_path'
+2025-09-11 09:25:01.653 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-8/test_safe_delete_file0/test.txt
+2025-09-11 09:25:01.654 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-8/test_safe_delete_directory0/test_dir
+2025-09-11 09:25:01.656 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-8/test_safe_delete_nonexistent0/does_not_exist
+2025-09-11 09:25:01.660 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-8/test_safe_delete_nested_direct0/nested
+2025-09-11 09:25:01.673 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-8/test_copy_file_success0/source.txt to /tmp/pytest-of-faz/pytest-8/test_copy_file_success0/dest.txt
+2025-09-11 09:25:01.675 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-8/test_copy_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-8/test_copy_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:25:01.676 | WARNING  | fazztv.utils.file:copy_file:97 - Destination already exists: /tmp/pytest-of-faz/pytest-8/test_copy_file_exists_no_overw0/dest.txt
+2025-09-11 09:25:01.678 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-8/test_copy_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-8/test_copy_file_exists_with_ove0/dest.txt
+2025-09-11 09:25:01.682 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-8/test_copy_preserves_metadata0/source.txt to /tmp/pytest-of-faz/pytest-8/test_copy_preserves_metadata0/dest.txt
+2025-09-11 09:25:01.683 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-8/test_move_file_success0/source.txt to /tmp/pytest-of-faz/pytest-8/test_move_file_success0/dest.txt
+2025-09-11 09:25:01.685 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-8/test_move_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-8/test_move_file_to_new_director0/new_dir/dest.txt
+2025-09-11 09:25:01.687 | WARNING  | fazztv.utils.file:move_file:125 - Destination already exists: /tmp/pytest-of-faz/pytest-8/test_move_file_exists_no_overw0/dest.txt
+2025-09-11 09:25:01.688 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-8/test_move_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-8/test_move_file_exists_with_ove0/dest.txt
+2025-09-11 09:25:01.698 | WARNING  | fazztv.utils.file:find_files:156 - Directory does not exist: /tmp/pytest-of-faz/pytest-8/test_find_files_nonexistent_di0/does_not_exist
+2025-09-11 09:25:01.706 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_deletes0/old.txt
+2025-09-11 09:25:01.706 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_deletes0
+2025-09-11 09:25:01.708 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_pattern0/old.txt
+2025-09-11 09:25:01.708 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_pattern0
+2025-09-11 09:25:01.712 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 7 days from /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_ignores0
+2025-09-11 09:25:01.714 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_boundar0/file1.txt
+2025-09-11 09:25:01.714 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-8/test_cleanup_old_files_boundar0
