@@ -284,7 +284,7 @@ class TestConcurrency:
         """Test cache manager with concurrent access."""
         import threading
         
-        cache_mgr = DataCache(temp_project_dir / "cache")
+        cache_mgr = DataCache()
         results = []
         
         def write_cache(key, value):
@@ -387,12 +387,12 @@ class TestPerformance:
         assert total_size > 0
         
         # Test cleanup
-        deleted = file_utils.cleanup_old_files(many_files_dir, days_old=0, pattern="*.txt")
+        deleted = file_utils.cleanup_old_files(many_files_dir, days_old=1, pattern="*.txt")
         assert deleted == 0  # Files are too new
     
     def test_cache_performance(self, temp_project_dir):
         """Test cache performance with many entries."""
-        cache_mgr = DataCache(temp_project_dir / "cache")
+        cache_mgr = DataCache()
         
         # Write many cache entries
         for i in range(100):
