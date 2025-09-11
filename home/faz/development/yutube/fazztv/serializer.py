@@ -1,10 +1,17 @@
-def serialize_media_item(self, media_item: MediaItem, output_file: Optional[str] = None) -> bool:
+import random
+import os
+import subprocess
+from typing import List, Optional
+
+def serialize_media_item(self, media_item: MediaItem, output_file: Optional[str] = None,
+                        ftv_shows: Optional[List[dict]] = None) -> bool:
     """
     Serialize a media item to a file or memory buffer.
     
     Args:
         media_item: The MediaItem to serialize
         output_file: Optional output file path. If None, serializes to a temporary file.
+        ftv_shows: Optional list of show dictionaries with title and byline
         
     Returns:
         bool: True if serialization was successful
@@ -37,8 +44,25 @@ def serialize_media_item(self, media_item: MediaItem, output_file: Optional[str]
         # Determine output path
         final_output = output_file if output_file else tempfile.NamedTemporaryFile(suffix='.mp4', delete=False).name
         
-        # Prepare FFmpeg command
-        cmd = self._build_ffmpeg_command(temp_path, marquee_path, final_output, target_duration)
+        # Select a random show if ftv_shows is provided
+        show_title = ""
+        show_byline = ""
+        if ftv_shows and len(ftv_shows) > 0:
+            show = random.choice(ftv_shows)
+            show_title = show.get("title", "")
+            show_byline = show.get("byline", "")
+        
+        # Prepare FFmpeg command with artist, song, and show information
+        cmd = self._build_ffmpeg_command(
+            temp_path, 
+            marquee_path, 
+            final_output, 
+            target_duration,
+            artist=media_item.artist,
+            song=media_item.song,
+            show_title=show_title,
+            show_byline=show_byline
+        )
         
         # Add the -t parameter to limit the output duration
         cmd.insert(-1, "-t")
