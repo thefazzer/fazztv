@@ -19,6 +19,13 @@ def temp_dir():
     shutil.rmtree(temp_dir, ignore_errors=True)
 
 @pytest.fixture
+def temp_project_dir():
+    """Create a temporary project directory for test files."""
+    temp_dir = Path(tempfile.mkdtemp())
+    yield temp_dir
+    shutil.rmtree(temp_dir, ignore_errors=True)
+
+@pytest.fixture
 def mock_ffmpeg():
     """Mock ffmpeg command."""
     with patch('subprocess.run') as mock_run:

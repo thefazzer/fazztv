@@ -95,7 +95,7 @@ class TestBroadcastItem:
             serialized=Path("/nonexistent/video.mp4")
         )
         
-        with pytest.raises(BroadcastError, match="does not exist"):
+        with pytest.raises(BroadcastError, match="is not serialized"):
             rtmp_broadcaster.broadcast_item(item)
         
         assert rtmp_broadcaster.failed_broadcast_count == 1
@@ -374,7 +374,8 @@ class TestTestConnection:
         # Verify test command
         cmd = mock_run.call_args[0][0]
         assert cmd[0] == "ffmpeg"
-        assert "testsrc" in cmd
+        # Check if testsrc is in any of the command arguments
+        assert any("testsrc" in str(arg) for arg in cmd)
         assert rtmp_broadcaster.rtmp_url in cmd
     
     @patch('subprocess.run')

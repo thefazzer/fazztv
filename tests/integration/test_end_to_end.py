@@ -166,7 +166,7 @@ class TestEndToEndWorkflow:
     
     def test_cache_workflow(self, temp_project_dir):
         """Test caching workflow."""
-        cache_mgr = DataCache(temp_project_dir / "cache")
+        cache_mgr = DataCache()
         
         # Test setting cache
         test_data = {"key": "value", "number": 42}

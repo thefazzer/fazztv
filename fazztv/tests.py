@@ -8,9 +8,9 @@ from typing import List, Optional
 import subprocess
 from loguru import logger
 
-from fazztv.models import MediaItem
-from fazztv.serializer import MediaSerializer
-from fazztv.broadcaster import RTMPBroadcaster
+from fazztv.models import MediaItem, ValidationError
+from fazztv.broadcasting.serializer import MediaSerializer
+from fazztv.broadcasting.rtmp import RTMPBroadcaster
 
 class DummyRTMPServer:
     """A simple dummy RTMP server for testing."""
@@ -98,7 +98,7 @@ class TestMediaItem(unittest.TestCase):
         self.assertEqual(default_item.length_percent, 100)
         
         # Invalid artist
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             MediaItem(
                 artist="",
                 song="Doo Wop (That Thing)",
@@ -107,7 +107,7 @@ class TestMediaItem(unittest.TestCase):
             )
         
         # Invalid song
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             MediaItem(
                 artist="Lauryn Hill",
                 song="",
@@ -116,7 +116,7 @@ class TestMediaItem(unittest.TestCase):
             )
         
         # Invalid URL
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             MediaItem(
                 artist="Lauryn Hill",
                 song="Doo Wop (That Thing)",
