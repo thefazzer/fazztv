@@ -15,6 +15,7 @@ import uuid
 from fazztv.models import MediaItem
 from fazztv.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
+from fazztv.utils.ascii_art import print_banner
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
@@ -395,6 +396,9 @@ def main():
 
     global DEV_MODE
     DEV_MODE = args.dev
+
+    # Display City Driver banner
+    print_banner('full')
 
     # Initialize environment (now reusing TEMP_DIR).
     cleanup_environment()
