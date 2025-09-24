@@ -1,0 +1,12 @@
+# Linode API Token (get from https://cloud.linode.com/profile/tokens)
+linode_api_token = "your-linode-api-token-here"
+
+# Root password for instances (use a strong password)
+root_password = "strong-password-here"
+
+# Your SSH public key (contents of ~/.ssh/id_rsa.pub)
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC... your-key-here"
+
+# Region (optional - defaults to us-east)
+# Available regions: us-east, us-west, eu-central, ap-south, etc.
+region = "us-east"
