@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  fazztv:
+    build: .
+    container_name: fazztv-app
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - STREAM_KEY=${STREAM_KEY}
+      - DATA_DIR=/app/data
+      - CACHE_DIR=/app/cache
+      - LOG_DIR=/app/logs
+      - BASE_RESOLUTION=${BASE_RESOLUTION:-1280x720}
+      - FPS=${FPS:-30}
+      - ENABLE_EQUALIZER=${ENABLE_EQUALIZER:-false}
+      - ENABLE_CACHING=${ENABLE_CACHING:-true}
+      - ENABLE_LOGO=${ENABLE_LOGO:-true}
+    volumes:
+      - ./data:/app/data
+      - ./cache:/app/cache
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - fazztv-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: fazztv-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - fazztv
+    networks:
+      - fazztv-network
+    restart: unless-stopped
+
+networks:
+  fazztv-network:
+    driver: bridge
+
+volumes:
+  fazztv-data:
+  fazztv-cache:
+  fazztv-logs:
