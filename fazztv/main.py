@@ -17,6 +17,7 @@ from fazztv.api.openrouter import OpenRouterClient
 from fazztv.api.youtube import YouTubeSearchClient
 from fazztv.data.shows import FTV_SHOWS
 from fazztv.data.artists import SINGERS
+from fazztv.utils.ascii_art import print_banner
 
 
 class FazzTVApplication:
@@ -25,11 +26,12 @@ class FazzTVApplication:
     def __init__(self, settings: Optional[Settings] = None):
         """
         Initialize the FazzTV application.
-        
+
         Args:
             settings: Optional settings instance (creates default if not provided)
         """
         self.settings = settings or Settings()
+        print_banner('full')  # Display City Driver banner on startup
         self._setup_logging()
         self._initialize_services()
     
