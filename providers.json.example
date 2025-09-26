@@ -1,0 +1,50 @@
+{
+  "providers": [
+    {
+      "name": "openrouter",
+      "type": "openrouter",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "default_model": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
+      "timeout": 30,
+      "capabilities": [
+        "text_generation",
+        "chat",
+        "code_generation",
+        "translation",
+        "summarization"
+      ]
+    },
+    {
+      "name": "openai",
+      "type": "openai",
+      "api_key_env": "OPENAI_API_KEY",
+      "default_model": "gpt-3.5-turbo",
+      "timeout": 30,
+      "capabilities": [
+        "text_generation",
+        "chat",
+        "code_generation",
+        "translation",
+        "summarization",
+        "embedding",
+        "moderation"
+      ]
+    },
+    {
+      "name": "ollama",
+      "type": "ollama",
+      "base_url": "http://localhost:11434",
+      "default_model": "llama2",
+      "timeout": 60,
+      "capabilities": [
+        "text_generation",
+        "chat",
+        "code_generation"
+      ]
+    }
+  ],
+  "manager": {
+    "fallback_enabled": true,
+    "load_balancing": false
+  }
+}

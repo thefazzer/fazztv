@@ -1,0 +1,11 @@
+{
+  "thefazzer/fazztv": {
+    "name": "fazztv",
+    "owner": "thefazzer",
+    "url": "https://github.com/thefazzer/fazztv",
+    "description": "FazzTV Broadcasting System",
+    "is_private": false,
+    "default_branch": "main",
+    "local_path": null
+  }
+}
