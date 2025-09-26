@@ -68,7 +68,13 @@ if [ "$ENVIRONMENT" == "test" ]; then
 
         # Clone or update repository
         if [ -d ".git" ]; then
-            git pull origin test
+            # Use git-fetch-with-retry for better error handling
+            if [ -f "/opt/fazztv/scripts/utils/git-fetch-with-retry.sh" ]; then
+                /opt/fazztv/scripts/utils/git-fetch-with-retry.sh --remote origin --branch test
+                git merge origin/test
+            else
+                git pull origin test
+            fi
         else
             git clone -b test https://github.com/thefazzer/fazztv.git .
         fi
@@ -145,7 +151,13 @@ elif [ "$ENVIRONMENT" == "production" ]; then
 
         # Clone or update repository
         if [ -d ".git" ]; then
-            git pull origin main
+            # Use git-fetch-with-retry for better error handling
+            if [ -f "/opt/fazztv-staging/scripts/utils/git-fetch-with-retry.sh" ]; then
+                /opt/fazztv-staging/scripts/utils/git-fetch-with-retry.sh --remote origin --branch main
+                git merge origin/main
+            else
+                git pull origin main
+            fi
         else
             git clone https://github.com/thefazzer/fazztv.git .
         fi
