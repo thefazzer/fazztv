@@ -200,21 +200,18 @@ class TestCachedDownloader:
 
     def test_get_cached_file_exists(self, cached_downloader, temp_cache_dir):
         """Test getting an existing cached file."""
-        cache_key = "test_key"
-        cached_file = temp_cache_dir / f"{cache_key}.mp4"
+        # The cache key needs to match what _get_cached_file expects
+        # Based on the implementation, it expects the key to be a filename
+        cache_key = "test_key.mp4"
+        cached_file = temp_cache_dir / cache_key
         cached_file.write_text("cached")
 
-        # Create recent metadata
-        metadata_file = temp_cache_dir / f"{cache_key}.json"
-        metadata = {"timestamp": datetime.now().isoformat()}
-
-        with patch('fazztv.downloaders.cache.json.load', return_value=metadata):
-            with patch('builtins.open', mock_open()):
-                result = cached_downloader._get_cached_file(cache_key)
+        # Mock settings to enable caching
+        with patch.object(cached_downloader.settings, 'enable_caching', True):
+            result = cached_downloader._get_cached_file(cache_key)
 
         # For recent files, should return the path
-        # Note: actual implementation might differ
-        assert result is not None or result == cached_file
+        assert result == cached_file
 
     def test_cache_file(self, cached_downloader, temp_cache_dir):
         """Test caching a file."""
@@ -231,22 +228,26 @@ class TestCachedDownloader:
 
     def test_clean_old_cache(self, cached_downloader, temp_cache_dir):
         """Test cleaning old cache files."""
+        import os
+        import time
+
         # Create old and new files
         old_file = temp_cache_dir / "old.mp4"
-        old_file.touch()
-        old_file_time = datetime.now() - timedelta(days=8)
+        old_file.write_text("old content")
+        # Set old file's modification time to 8 days ago
+        old_time = time.time() - (8 * 24 * 60 * 60)
+        os.utime(old_file, (old_time, old_time))
 
         new_file = temp_cache_dir / "new.mp4"
-        new_file.touch()
+        new_file.write_text("new content")
+        # Keep new file's time as current
 
-        # Mock file ages
-        with patch('fazztv.downloaders.cache.datetime') as mock_datetime:
-            mock_datetime.now.return_value = datetime.now()
-            mock_datetime.fromtimestamp.side_effect = [old_file_time, datetime.now()]
+        # Clear cache with default expiry (7 days)
+        cached_downloader.clear_cache()
 
-            cached_downloader.clean_old_cache()
-
-        # Implementation specific - adjust based on actual method
+        # Old file should be removed, new file should remain
+        assert not old_file.exists()
+        assert new_file.exists()
 
     def test_get_cache_stats(self, cached_downloader, temp_cache_dir):
         """Test getting cache statistics."""
@@ -255,24 +256,31 @@ class TestCachedDownloader:
             file = temp_cache_dir / f"file{i}.mp4"
             file.write_text("x" * 1000)  # 1KB each
 
-        stats = cached_downloader.get_cache_stats()
+        # The actual method is get_cache_size, not get_cache_stats
+        size = cached_downloader.get_cache_size()
 
-        # Verify stats structure
-        assert isinstance(stats, dict)
-        # Implementation specific - adjust based on actual return value
+        # Verify size is correct (3 files * 1000 bytes each)
+        assert size == 3000
 
     def test_clear_cache(self, cached_downloader, temp_cache_dir):
         """Test clearing the cache."""
-        # Create cache files
+        # Create cache files with old timestamps
+        import os
+        import time
+
         for i in range(3):
             file = temp_cache_dir / f"file{i}.mp4"
             file.write_text("content")
+            # Set file modification time to 8 days ago
+            old_time = time.time() - (8 * 24 * 60 * 60)
+            os.utime(file, (old_time, old_time))
 
+        # Clear cache with default expiry (7 days)
         cached_downloader.clear_cache()
 
-        # Cache directory should still exist but be empty (or nearly empty)
+        # Cache directory should still exist but be empty
         assert temp_cache_dir.exists()
-        # Files should be removed (except maybe index files)
+        # Files should be removed since they're older than 7 days
         remaining_files = list(temp_cache_dir.glob("*.mp4"))
         assert len(remaining_files) == 0
 
