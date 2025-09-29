@@ -13,7 +13,7 @@ from typing import List, Optional, Tuple
 import re
 import uuid
 from fazztv.models import MediaItem
-from fazztv.serializer import MediaSerializer
+from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.utils.ascii_art import print_banner
 from dotenv import load_dotenv
@@ -103,33 +103,37 @@ def get_madonna_song_url(song_name):
         logger.error(f"Error searching Madonna - {song_name}: {e}")
         return None
 
-def download_audio_only(url, output_file, guid=None):
-    """Download only the audio from a YouTube video."""
-    # Check if cached file exists
-    if guid:
-        cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
-        if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
-            logger.info(f"Using cached audio file for GUID {guid}")
-            shutil.copy(cached_file, output_file)
-            return True
-    
-    logger.debug(f"Downloading audio from {url} to {output_file}")
-    import yt_dlp
-    
-    # Get the directory path and ensure it exists
+def _get_cached_audio(guid, output_file):
+    """Check for and use cached audio file if available."""
+    if not guid:
+        return False
+    cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
+    if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
+        logger.info(f"Using cached audio file for GUID {guid}")
+        shutil.copy(cached_file, output_file)
+        return True
+    return False
+
+def _cache_audio_file(output_file, guid):
+    """Cache audio file for future use."""
+    if not guid:
+        return
+    cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
+    logger.debug(f"Caching audio file to {cached_file}")
+    shutil.copy(output_file, cached_file)
+
+def _prepare_output_directory(output_file):
+    """Ensure output directory exists."""
     output_dir = os.path.dirname(output_file)
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
-    # Create a base output without any extension
-    base_output = os.path.splitext(output_file)[0]
-    if base_output.endswith('.aac'):
-        base_output = base_output[:-4]  # Remove .aac if it's still there
-    
-    yt_dlp_opts = {
+
+def _get_yt_dlp_audio_opts(base_output):
+    """Get yt-dlp options for audio download."""
+    return {
         "format": "bestaudio/best",
         "max_duration": ELAPSED_TUNE_SECONDS,
-        "outtmpl": f"{base_output}.%(ext)s",  # Let yt-dlp handle the extension
+        "outtmpl": f"{base_output}.%(ext)s",
         "quiet": False,
         "verbose": True,
         "overwrites": True,
@@ -140,65 +144,82 @@ def download_audio_only(url, output_file, guid=None):
             "preferredquality": "192",
         }]
     }
-    
+
+def _find_downloaded_audio_file(base_output):
+    """Find the audio file created by yt-dlp."""
+    possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.aac.mp4', '.mp3']
+
+    # Try standard extensions
+    for ext in possible_extensions:
+        potential_file = f"{base_output}{ext}"
+        if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
+            logger.debug(f"Found audio file: {potential_file} ({os.path.getsize(potential_file)} bytes)")
+            return potential_file
+
+    # Try directory search if standard approach fails
+    dir_path = os.path.dirname(base_output)
+    base_name = os.path.basename(base_output)
+    logger.debug(f"Searching directory {dir_path} for files starting with {base_name}")
+
+    for file in os.listdir(dir_path):
+        if file.startswith(base_name) and os.path.getsize(os.path.join(dir_path, file)) > 0:
+            found_file = os.path.join(dir_path, file)
+            logger.debug(f"Found alternative audio file: {found_file}")
+            return found_file
+
+    return None
+
+def _move_audio_to_output(found_file, output_file):
+    """Move downloaded audio file to expected location."""
+    if found_file != output_file:
+        logger.debug(f"Renaming {found_file} to {output_file}")
+        if os.path.exists(output_file):
+            os.remove(output_file)
+        os.rename(found_file, output_file)
+
+def download_audio_only(url, output_file, guid=None):
+    """Download only the audio from a YouTube video."""
+    # Try to use cached version
+    if _get_cached_audio(guid, output_file):
+        return True
+
+    logger.debug(f"Downloading audio from {url} to {output_file}")
+    import yt_dlp
+
+    # Prepare output directory
+    _prepare_output_directory(output_file)
+
+    # Create base output path without extension
+    base_output = os.path.splitext(output_file)[0]
+    if base_output.endswith('.aac'):
+        base_output = base_output[:-4]
+
+    # Get yt-dlp options
+    yt_dlp_opts = _get_yt_dlp_audio_opts(base_output)
+
     try:
+        # Download audio
         with yt_dlp.YoutubeDL(yt_dlp_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             if not info:
                 logger.error(f"No information extracted for URL: {url}")
                 return False
-        
-        # Check for possible file extensions that yt-dlp might have created
-        possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.aac.mp4', '.mp3']
-        found_file = None
-        
-        for ext in possible_extensions:
-            potential_file = f"{base_output}{ext}"
-            if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
-                found_file = potential_file
-                logger.debug(f"Found audio file: {found_file} ({os.path.getsize(found_file)} bytes)")
-                break
-        
-        if found_file:
-            # Rename to the expected output file
-            if found_file != output_file:
-                logger.debug(f"Renaming {found_file} to {output_file}")
-                if os.path.exists(output_file):
-                    os.remove(output_file)
-                os.rename(found_file, output_file)
-            
-            # Cache the file if guid is provided
-            if guid:
-                cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
-                logger.debug(f"Caching audio file to {cached_file}")
-                shutil.copy(output_file, cached_file)
-                
-            return True
-        else:
-            # Try a more aggressive search in the directory
-            dir_path = os.path.dirname(base_output)
-            base_name = os.path.basename(base_output)
-            logger.debug(f"Searching directory {dir_path} for files starting with {base_name}")
-            
-            for file in os.listdir(dir_path):
-                if file.startswith(os.path.basename(base_name)) and os.path.getsize(os.path.join(dir_path, file)) > 0:
-                    found_file = os.path.join(dir_path, file)
-                    logger.debug(f"Found alternative audio file: {found_file}")
-                    if os.path.exists(output_file):
-                        os.remove(output_file)
-                    os.rename(found_file, output_file)
-                    
-                    # Cache the file if guid is provided
-                    if guid:
-                        cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
-                        logger.debug(f"Caching audio file to {cached_file}")
-                        shutil.copy(output_file, cached_file)
-                        
-                    return True
-            
-            logger.error(f"No valid audio file found for {base_output} with any expected extension")
+
+        # Find the downloaded file
+        found_file = _find_downloaded_audio_file(base_output)
+
+        if not found_file:
+            logger.error(f"No valid audio file found for {base_output}")
             return False
-            
+
+        # Move to expected location
+        _move_audio_to_output(found_file, output_file)
+
+        # Cache for future use
+        _cache_audio_file(output_file, guid)
+
+        return True
+
     except Exception as e:
         logger.error(f"Error downloading audio: {e}")
         return False

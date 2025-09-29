@@ -10,7 +10,7 @@ from typing import List, Optional
 from loguru import logger
 
 from fazztv.models import MediaItem
-from fazztv.serializer import MediaSerializer
+from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.config.settings import Settings
 from fazztv.api.openrouter import OpenRouterClient

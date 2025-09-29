@@ -30,14 +30,15 @@ def safe_subprocess_run(
         Tuple of (return_code, stdout, stderr)
     """
     try:
+        # Convert string commands to list for safer execution
         if isinstance(cmd, str):
-            shell = True
-        else:
-            shell = False
+            import shlex
+            cmd = shlex.split(cmd)
+            logger.warning("String command converted to list for safer execution")
 
         result = subprocess.run(
             cmd,
-            shell=shell,
+            shell=False,  # Always use shell=False for security
             capture_output=capture_output,
             text=True,
             timeout=timeout,

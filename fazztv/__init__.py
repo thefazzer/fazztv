@@ -17,7 +17,7 @@ __author__ = "FazzTV Development Team"
 
 from fazztv.models import MediaItem
 from fazztv.broadcaster import RTMPBroadcaster
-from fazztv.serializer import MediaSerializer
+from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.config.settings import Settings
 
 __all__ = [
