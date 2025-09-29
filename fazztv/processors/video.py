@@ -110,7 +110,7 @@ class VideoProcessor:
             
             # Execute FFmpeg
             logger.debug(f"FFmpeg command: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             
             if result.returncode != 0:
                 logger.error(f"FFmpeg error: {result.stderr.decode('utf-8', 'ignore')}")
@@ -180,7 +180,7 @@ class VideoProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Fade effect error: {e}")
@@ -222,7 +222,7 @@ class VideoProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Scale video error: {e}")
@@ -266,7 +266,7 @@ class VideoProcessor:
         ])
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Extract clip error: {e}")
@@ -381,7 +381,7 @@ class VideoProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=constants.SUBPROCESS_TIMEOUT)
             if result.returncode == 0:
                 return float(result.stdout.strip())
         except Exception as e:

@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 from dataclasses import dataclass, field
 
-from fazztv.models.exceptions import ValidationError
+from fazztv.exceptions import ValidationError
 
 
 @dataclass

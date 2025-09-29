@@ -16,6 +16,7 @@ from fazztv.models import MediaItem
 from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.utils.ascii_art import print_banner
+from fazztv.config import constants
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
@@ -25,14 +26,14 @@ load_dotenv()
 #                           CONFIGURATION
 # ---------------------------------------------------------------------------
 STREAM_KEY = None
-SEARCH_LIMIT = 5
+SEARCH_LIMIT = constants.SEARCH_LIMIT
 LOG_FILE = "madonna_broadcast.log"
 
-BASE_RES = "640x360"
-FADE_LENGTH = 3
-MARQUEE_DURATION = 86400
-SCROLL_SPEED = 65
-ELAPSED_TUNE_SECONDS = 60  # Default duration for media clips in seconds
+BASE_RES = constants.BASE_RESOLUTION
+FADE_LENGTH = constants.DEFAULT_FADE_LENGTH
+MARQUEE_DURATION = constants.MARQUEE_DURATION
+SCROLL_SPEED = constants.SCROLL_SPEED
+ELAPSED_TUNE_SECONDS = constants.ELAPSED_TUNE_SECONDS
 
 DEFAULT_VIDEO = "madonna-rotator.mp4"
 
@@ -413,7 +414,7 @@ def create_media_item_from_episode(episode):
             output_file
         ]
 
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, timeout=constants.FFMPEG_TIMEOUT)
 
         media_item = MediaItem(
             artist="Madonna",

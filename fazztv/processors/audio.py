@@ -38,7 +38,7 @@ class AudioProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Audio normalization error: {e}")
@@ -92,7 +92,7 @@ class AudioProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Audio fade error: {e}")
@@ -147,7 +147,7 @@ class AudioProcessor:
         ])
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Audio mixing error: {e}")
@@ -192,7 +192,7 @@ class AudioProcessor:
         ])
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Audio segment extraction error: {e}")
@@ -232,7 +232,7 @@ class AudioProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             return result.returncode == 0
         except Exception as e:
             logger.error(f"Audio effects error: {e}")
@@ -249,7 +249,7 @@ class AudioProcessor:
         ]
         
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=constants.SUBPROCESS_TIMEOUT)
             if result.returncode == 0:
                 return float(result.stdout.strip())
         except Exception as e:

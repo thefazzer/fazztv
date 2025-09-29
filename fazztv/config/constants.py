@@ -11,7 +11,7 @@ AUDIO_BITRATE = "128k"
 
 # Marquee Settings
 MARQUEE_DURATION = 86400  # 24 hours in seconds
-SCROLL_SPEED = 40
+SCROLL_SPEED = 65
 
 # Download Settings
 SEARCH_LIMIT = 5
@@ -31,7 +31,7 @@ LOG_LEVEL = "DEBUG"
 
 # Media Duration
 DEFAULT_MEDIA_DURATION = 10  # seconds
-ELAPSED_TUNE_SECONDS = 10  # Default duration for media clips
+ELAPSED_TUNE_SECONDS = 60  # Default duration for media clips in seconds
 
 # File Extensions
 AUDIO_EXTENSIONS = ['.aac', '.m4a', '.mp3', '.wav']
@@ -62,3 +62,7 @@ YOUTUBE_RTMP_BASE = "rtmp://a.rtmp.youtube.com/live2/"
 # API Settings
 API_TIMEOUT = 30  # seconds
 API_MAX_RETRIES = 3
+
+# Subprocess Settings
+SUBPROCESS_TIMEOUT = 120  # seconds (2 minutes default)
+FFMPEG_TIMEOUT = 300  # seconds (5 minutes for FFmpeg operations)

@@ -1,7 +1,7 @@
 """Unit tests for custom exceptions."""
 
 import pytest
-from fazztv.models.exceptions import (
+from fazztv.exceptions import (
     FazzTVException,
     ConfigurationError,
     DownloadError,

@@ -4,7 +4,7 @@ from typing import Optional
 from pathlib import Path
 from dataclasses import dataclass
 
-from fazztv.models.exceptions import ValidationError
+from fazztv.exceptions import ValidationError
 
 
 @dataclass

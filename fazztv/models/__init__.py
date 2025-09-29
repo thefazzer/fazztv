@@ -2,7 +2,7 @@
 
 from fazztv.models.media_item import MediaItem
 from fazztv.models.episode import Episode
-from fazztv.models.exceptions import (
+from fazztv.exceptions import (
     FazzTVException,
     ConfigurationError,
     DownloadError,

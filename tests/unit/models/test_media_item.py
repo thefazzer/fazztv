@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 from fazztv.models.media_item import MediaItem
-from fazztv.models.exceptions import ValidationError
+from fazztv.exceptions import ValidationError
 
 
 class TestMediaItemCreation:

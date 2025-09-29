@@ -5,6 +5,7 @@ from typing import List, Optional, Callable, Tuple
 from loguru import logger
 
 from fazztv.models import MediaItem
+from fazztv.config import constants
 
 class RTMPBroadcaster:
     """Handles broadcasting of serialized MediaItems to RTMP endpoints."""
@@ -47,7 +48,7 @@ class RTMPBroadcaster:
         
         logger.debug(f"Broadcasting {media_item} to {self.rtmp_url}")
         try:
-            result = subprocess.run(cmd, capture_output=True)
+            result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
             if result.returncode != 0:
                 logger.error(f"Broadcasting error: {result.stderr.decode('utf-8', 'ignore')}")
                 return False

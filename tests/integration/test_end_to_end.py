@@ -218,7 +218,7 @@ class TestErrorHandling:
     
     def test_media_item_validation_errors(self):
         """Test MediaItem validation error handling."""
-        from fazztv.models.exceptions import ValidationError
+        from fazztv.exceptions import ValidationError
         
         # Test invalid length_percent
         with pytest.raises(ValidationError):
@@ -241,7 +241,7 @@ class TestErrorHandling:
     
     def test_episode_validation_errors(self):
         """Test Episode validation error handling."""
-        from fazztv.models.exceptions import ValidationError
+        from fazztv.exceptions import ValidationError
         
         # Test invalid URL
         with pytest.raises(ValidationError):
