@@ -92,8 +92,10 @@ def safe_json_loads(json_str: str, default: Any = None) -> Any:
     Returns:
         Parsed data or default value on error
     """
+    if json_str is None or json_str == "":
+        return default
     try:
         return json.loads(json_str)
     except (json.JSONDecodeError, TypeError) as e:
         logger.error(f"Error parsing JSON: {e}")
-        return default if default is not None else {}
+        return default

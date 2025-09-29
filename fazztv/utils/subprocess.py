@@ -2,7 +2,8 @@
 import subprocess
 import logging
 import shlex
-from typing import Optional, List, Union, Tuple
+import sys
+from typing import Optional, List, Union, Any
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -14,8 +15,9 @@ def safe_subprocess_run(
     check: bool = False,
     capture_output: bool = True,
     cwd: Optional[Path] = None,
-    env: Optional[dict] = None
-) -> Tuple[int, str, str]:
+    env: Optional[dict] = None,
+    input: Optional[str] = None
+) -> Optional[subprocess.CompletedProcess]:
     """
     Safely execute a subprocess command with proper error handling.
 
@@ -26,9 +28,10 @@ def safe_subprocess_run(
         capture_output: Whether to capture stdout and stderr
         cwd: Working directory for the command
         env: Environment variables
+        input: Input to pass to the subprocess
 
     Returns:
-        Tuple of (return_code, stdout, stderr)
+        CompletedProcess object or None on error
     """
     try:
         # Convert string commands to list for safer execution
@@ -36,38 +39,34 @@ def safe_subprocess_run(
             cmd = shlex.split(cmd)
             logger.warning("String command converted to list for safer execution")
 
-        result = subprocess.run(
-            cmd,
-            shell=False,  # Always use shell=False for security
-            capture_output=capture_output,
-            text=True,
-            timeout=timeout,
-            check=check,
-            cwd=cwd,
-            env=env
-        )
+        kwargs: dict[str, Any] = {
+            "capture_output": capture_output,
+            "text": True,
+            "check": check,
+            "timeout": timeout
+        }
 
-        return result.returncode, result.stdout, result.stderr
+        if cwd is not None:
+            kwargs["cwd"] = cwd
+        if env is not None:
+            kwargs["env"] = env
+        if input is not None:
+            kwargs["input"] = input
+
+        result = subprocess.run(cmd, **kwargs)
+        return result
 
     except subprocess.TimeoutExpired as e:
         logger.error(f"Command timed out after {timeout} seconds: {cmd}")
-        if e.stdout:
-            logger.debug(f"Partial stdout: {e.stdout.decode('utf-8', errors='ignore')}")
-        if e.stderr:
-            logger.debug(f"Partial stderr: {e.stderr.decode('utf-8', errors='ignore')}")
-        raise
+        return None
 
     except subprocess.CalledProcessError as e:
         logger.error(f"Command failed with exit code {e.returncode}: {cmd}")
-        if e.stdout:
-            logger.debug(f"Stdout: {e.stdout}")
-        if e.stderr:
-            logger.debug(f"Stderr: {e.stderr}")
-        raise
+        return None
 
     except Exception as e:
         logger.error(f"Unexpected error running command: {cmd}, Error: {e}")
-        raise
+        return None
 
 
 def check_command_available(command: str) -> bool:
@@ -81,16 +80,18 @@ def check_command_available(command: str) -> bool:
         True if command is available, False otherwise
     """
     try:
-        returncode, _, _ = safe_subprocess_run(
-            ["which", command],
+        # Use 'where' on Windows, 'which' on Unix-like systems
+        check_cmd = "where" if sys.platform == "win32" else "which"
+        result = safe_subprocess_run(
+            [check_cmd, command],
             capture_output=True
         )
-        return returncode == 0
+        return result is not None and result.returncode == 0
     except Exception:
         return False
 
 
-def escape_ffmpeg_text(text: str) -> str:
+def escape_ffmpeg_text(text: Optional[str]) -> str:
     """
     Escape text for use in FFmpeg filter expressions.
 
@@ -100,12 +101,20 @@ def escape_ffmpeg_text(text: str) -> str:
     Returns:
         Escaped text safe for FFmpeg filters
     """
+    if text is None:
+        return ""
+
     # FFmpeg filter text needs special character escaping
     text = text.replace("\\", "\\\\")
     text = text.replace("'", "\\'")
+    text = text.replace('"', '\\\"')
     text = text.replace(":", "\\:")
     text = text.replace(",", "\\,")
     text = text.replace("[", "\\[")
     text = text.replace("]", "\\]")
     text = text.replace("=", "\\=")
+    text = text.replace("%", "\\%")
+    text = text.replace("$", "\\$")
+    text = text.replace("\n", "\\n")
+    text = text.replace("\r", "\\r")
     return text
