@@ -1,12 +1,9 @@
 """Comprehensive unit tests for VideoProcessor."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
-import subprocess
+from unittest.mock import Mock, patch
 
 from fazztv.processors.video import VideoProcessor
-from fazztv.config import constants
 
 
 class TestVideoProcessor:

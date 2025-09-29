@@ -1,14 +1,9 @@
 """Comprehensive unit tests for logging utilities."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock, call
-import logging
-from pathlib import Path
 
 from fazztv.utils.logging import (
     setup_logging, get_logger, log_exception, log_performance, LogContext, create_audit_logger
 )
-from loguru import logger
 
 
 class TestLoggingUtils:

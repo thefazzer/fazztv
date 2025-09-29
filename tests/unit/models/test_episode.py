@@ -3,7 +3,7 @@
 import pytest
 import uuid
 from datetime import datetime, date
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from fazztv.models.episode import Episode
 from fazztv.exceptions import ValidationError

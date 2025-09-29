@@ -3,7 +3,7 @@
 import pytest
 import os
 from pathlib import Path
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch
 
 from fazztv.config.settings import Settings
 from fazztv.config import constants

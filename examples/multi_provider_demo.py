@@ -18,7 +18,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from fazztv.providers import (
     get_provider_manager,
-    ProviderConfigLoader,
     ModelCapability
 )
 
@@ -195,7 +194,7 @@ def demo_list_models():
         for model in provider_models[:3]:  # Show first 3 models
             print(f"  - {model.name}")
             if model.free_tier:
-                print(f"    (FREE)")
+                print("    (FREE)")
 
 
 def main():

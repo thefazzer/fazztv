@@ -1,13 +1,9 @@
 """Comprehensive unit tests for AudioProcessor."""
 
 import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, call
-import subprocess
-import shutil
+from unittest.mock import Mock, patch
 
 from fazztv.processors.audio import AudioProcessor
-from fazztv.config import constants
 
 
 class TestAudioProcessor:

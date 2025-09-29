@@ -1,8 +1,5 @@
 """Unit tests for models module."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
 
 # Import will be adjusted based on actual module
 try:

@@ -1,7 +1,5 @@
 """Tests for provider manager."""
 
-import pytest
-from unittest.mock import Mock, MagicMock, patch
 from fazztv.providers import (
     ProviderManager,
     ProviderRegistry,

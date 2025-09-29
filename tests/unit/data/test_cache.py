@@ -1,9 +1,6 @@
 """Comprehensive unit tests for cache module."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock, mock_open
-from pathlib import Path
-import json
 import time
 
 from fazztv.data.cache import DataCache

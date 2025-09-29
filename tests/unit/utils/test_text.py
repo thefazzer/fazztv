@@ -1,8 +1,5 @@
 """Comprehensive unit tests for text utilities."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-import re
 
 from fazztv.utils.text import (
     sanitize_for_ffmpeg, extract_title_parts, truncate_text,

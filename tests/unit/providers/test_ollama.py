@@ -1,6 +1,6 @@
 """Tests for Ollama provider."""
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from fazztv.providers.ollama import OllamaProvider
 from fazztv.providers.base import ProviderConfig
 from fazztv.exceptions import APIError as ProviderError

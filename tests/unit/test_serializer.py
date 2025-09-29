@@ -1,7 +1,6 @@
 """Unit tests for MediaSerializer module."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from pathlib import Path
 from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.models import MediaItem

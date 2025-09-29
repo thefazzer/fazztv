@@ -2,7 +2,6 @@
 
 import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 from fazztv.models.media_item import MediaItem
 from fazztv.exceptions import ValidationError

@@ -2,13 +2,16 @@
 Factory patterns for creating FazzTV objects.
 """
 
-from typing import Optional, Dict, Any
+from typing import TYPE_CHECKING, Optional, Dict, Any
 from pathlib import Path
 from loguru import logger
 
 from fazztv.models import MediaItem
 from fazztv.config.settings import Settings
 from fazztv.config import constants
+
+if TYPE_CHECKING:
+    from fazztv.main import FazzTVApplication
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.api.openrouter import OpenRouterClient

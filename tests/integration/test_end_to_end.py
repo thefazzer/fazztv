@@ -1,9 +1,8 @@
 """End-to-end integration tests for FazzTV broadcasting system."""
 
 import pytest
-import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 import os
 
 from fazztv.models import MediaItem

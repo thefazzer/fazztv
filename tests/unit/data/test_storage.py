@@ -1,11 +1,7 @@
 """Comprehensive unit tests for storage module."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock, mock_open
-from pathlib import Path
-import shutil
 import json
-import pickle
 
 from fazztv.data.storage import DataStorage
 

@@ -1,9 +1,8 @@
 """Comprehensive unit tests for overlay module."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import Mock, patch
 from pathlib import Path
-from abc import ABC
 
 from fazztv.processors.overlay import (
     Overlay, TextOverlay, ImageOverlay, VideoOverlay, OverlayManager

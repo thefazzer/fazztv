@@ -1,7 +1,6 @@
 """Comprehensive unit tests for EqualizerGenerator."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 
 from fazztv.processors.equalizer import EqualizerGenerator
 

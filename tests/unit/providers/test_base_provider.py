@@ -1,7 +1,6 @@
 """Tests for base provider functionality."""
 
 import pytest
-from unittest.mock import Mock, patch
 from fazztv.providers import (
     BaseProvider,
     ProviderConfig,

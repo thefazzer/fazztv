@@ -1,9 +1,8 @@
 """Unit tests for media serializer module."""
 
 import pytest
-import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, call
+from unittest.mock import Mock, patch
 import subprocess
 
 from fazztv.broadcasting.serializer import MediaSerializer

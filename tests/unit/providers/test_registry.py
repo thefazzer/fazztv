@@ -1,7 +1,6 @@
 """Tests for provider registry."""
 
 import pytest
-from unittest.mock import Mock, MagicMock
 from fazztv.providers import (
     ProviderRegistry,
     BaseProvider,

@@ -1,3 +1,12 @@
+import os
+import tempfile
+import subprocess
+from typing import Optional
+from loguru import logger
+
+# Assuming MediaItem is defined elsewhere
+from fazztv.models import MediaItem
+
 def serialize_media_item(self, media_item: MediaItem, output_file: Optional[str] = None) -> bool:
     """
     Serialize a media item to a file or memory buffer.

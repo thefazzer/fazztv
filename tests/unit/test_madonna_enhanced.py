@@ -1,22 +1,16 @@
 """Enhanced test suite for madonna.py module."""
 
 import unittest
-from unittest.mock import MagicMock, patch, mock_open, call
-import json
-import tempfile
-from pathlib import Path
+from unittest.mock import MagicMock, patch, mock_open
 from datetime import datetime
-import uuid
 import sys
 
-import sys
 sys.path.insert(0, "/home/faz/development/HollowCityDriver/.city-driver-worktrees/faz-wt-20250929-2726425")
 
 from fazztv.madonna import (
     load_madonna_data,
     get_madonna_song_url,
     download_audio_only,
-    download_video_only,
     calculate_days_old,
     cleanup_environment,
     build_ffmpeg_filter,

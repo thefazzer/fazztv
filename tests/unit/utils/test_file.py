@@ -1,12 +1,10 @@
 """Unit tests for file utilities module."""
 
-import pytest
 import os
-import shutil
 import tempfile
 from pathlib import Path
 from datetime import datetime, timedelta
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch
 
 from fazztv.utils.file import (
     ensure_directory,

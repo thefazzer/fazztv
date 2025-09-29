@@ -1,8 +1,6 @@
 """Comprehensive unit tests for loader module."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock, mock_open
-from pathlib import Path
 import json
 
 from fazztv.data.loader import DataLoader

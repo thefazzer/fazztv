@@ -1,15 +1,12 @@
 """Comprehensive unit tests for datetime utilities."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime, timedelta, timezone
-import time
+from datetime import timedelta
 
 from fazztv.utils.datetime import (
     calculate_days_old, parse_date, format_date, get_time_ago,
     add_business_days, is_weekend, get_date_range
 )
-from datetime import date, datetime, timedelta
+from datetime import date
 
 
 class TestDateTimeUtils:

@@ -1,9 +1,8 @@
 """Tests for OpenAI provider."""
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from fazztv.providers.openai import OpenAIProvider
 from fazztv.providers.base import ProviderConfig
-from fazztv.exceptions import APIError as ProviderError
 
 
 class TestOpenAIProvider:

@@ -1,8 +1,6 @@
 """Comprehensive unit tests for madonna module."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
+from unittest.mock import patch
 
 from fazztv.madonna import *
 
