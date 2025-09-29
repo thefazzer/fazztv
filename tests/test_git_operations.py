@@ -63,7 +63,6 @@ def test_git_operations():
         print(f"✗ Test failed with error: {e}")
         return 1
 
-    return 0
 
 
 if __name__ == "__main__":
