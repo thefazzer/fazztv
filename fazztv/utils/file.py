@@ -224,20 +224,101 @@ def cleanup_old_files(
 def get_directory_size(directory: Path) -> int:
     """
     Get total size of all files in directory.
-    
+
     Args:
         directory: Directory path
-        
+
     Returns:
         Total size in bytes
     """
     total_size = 0
-    
+
     if not directory.exists():
         return 0
-    
+
     for file_path in directory.rglob("*"):
         if file_path.is_file():
             total_size += file_path.stat().st_size
-    
+
     return total_size
+
+
+def find_downloaded_file(base_path: str, extensions: Optional[List[str]] = None) -> Optional[Path]:
+    """
+    Find a downloaded file with any of the given extensions.
+
+    Args:
+        base_path: Base path without extension
+        extensions: List of extensions to check (without dot)
+
+    Returns:
+        Path to the found file, or None if not found
+    """
+    if extensions is None:
+        extensions = ['mp3', 'm4a', 'mp4', 'webm', 'opus', 'mkv', 'avi']
+
+    base = Path(base_path)
+
+    # Check with each extension
+    for ext in extensions:
+        file_path = base.with_suffix(f'.{ext}')
+        if file_path.exists():
+            logger.debug(f"Found file: {file_path}")
+            return file_path
+
+    # Check if base path itself exists (might have extension already)
+    if base.exists() and base.is_file():
+        logger.debug(f"Found file: {base}")
+        return base
+
+    # Try to find files with similar names in the same directory
+    if base.parent.exists():
+        pattern = f"{base.stem}.*"
+        for file_path in base.parent.glob(pattern):
+            if file_path.is_file() and file_path.suffix[1:] in extensions:
+                logger.debug(f"Found file with pattern: {file_path}")
+                return file_path
+
+    logger.warning(f"No file found for base path: {base_path}")
+    return None
+
+
+def safe_file_copy(source: Path, destination: Path, overwrite: bool = False) -> bool:
+    """
+    Safely copy a file with error handling.
+
+    Args:
+        source: Source file path
+        destination: Destination file path
+        overwrite: Whether to overwrite if destination exists
+
+    Returns:
+        True if copied successfully, False otherwise
+    """
+    return copy_file(source, destination, overwrite)
+
+
+def safe_file_delete(path: Path) -> bool:
+    """
+    Safely delete a file with error handling.
+
+    Args:
+        path: File path to delete
+
+    Returns:
+        True if deleted successfully, False otherwise
+    """
+    return safe_delete(path)
+
+
+def safe_mkdir(path: Path) -> Path:
+    """
+    Safely create a directory with error handling.
+
+    Args:
+        path: Directory path to create
+
+    Returns:
+        The path object
+    """
+    return ensure_directory(path)

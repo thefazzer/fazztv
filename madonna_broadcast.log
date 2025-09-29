@@ -76790,3 +76790,859 @@ ValueError: Test error
 2025-09-11 11:08:14.835 | DEBUG    | fazztv.utils.logging:log_performance:100 - fast_func completed in 0.50s
 2025-09-11 11:08:14.835 | WARNING  | fazztv.utils.logging:log_performance:98 - slow_func took 2.00s (threshold: 1.0s)
 2025-09-11 11:08:14.842 | INFO     | utils.test_logging:test_create_audit_logger:62 - Audit message
+2025-09-29 17:52:38.454 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-14/test_file_operations_workflow0/test_workflow/source.txt to /tmp/pytest-of-faz/pytest-14/test_file_operations_workflow0/test_workflow/dest.txt
+2025-09-29 17:52:38.455 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-14/test_file_operations_workflow0/test_workflow/dest.txt to /tmp/pytest-of-faz/pytest-14/test_file_operations_workflow0/test_workflow/moved.txt
+2025-09-29 17:52:38.456 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-14/test_file_operations_workflow0/test_workflow
+2025-09-29 17:52:38.470 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: test_key (TTL: 3600s)
+2025-09-29 17:52:38.470 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: test_key
+2025-09-29 17:52:38.470 | DEBUG    | fazztv.data.cache:delete:78 - Deleted cache key: test_key
+2025-09-29 17:52:38.490 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /nonexistent/path/file.txt
+2025-09-29 17:52:38.490 | ERROR    | fazztv.utils.file:copy_file:107 - Error copying file: [Errno 2] No such file or directory: '/nonexistent/path/file.txt'
+2025-09-29 17:52:38.490 | ERROR    | fazztv.utils.file:move_file:135 - Error moving file: [Errno 2] No such file or directory: '/nonexistent/path/file.txt'
+2025-09-29 17:52:38.494 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_0 (TTL: 3600s)
+2025-09-29 17:52:38.494 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_1 (TTL: 3600s)
+2025-09-29 17:52:38.494 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_2 (TTL: 3600s)
+2025-09-29 17:52:38.495 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_3 (TTL: 3600s)
+2025-09-29 17:52:38.495 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_4 (TTL: 3600s)
+2025-09-29 17:52:38.495 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_5 (TTL: 3600s)
+2025-09-29 17:52:38.496 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_6 (TTL: 3600s)
+2025-09-29 17:52:38.496 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_7 (TTL: 3600s)
+2025-09-29 17:52:38.496 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_8 (TTL: 3600s)
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_9 (TTL: 3600s)
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_0
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_1
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_2
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_3
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_4
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_5
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_6
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_7
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_8
+2025-09-29 17:52:38.497 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_9
+2025-09-29 17:52:38.537 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/tmpqk24le01/large.bin to /tmp/tmpqk24le01/large_copy.bin
+2025-09-29 17:52:38.539 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/tmpqk24le01/large.bin
+2025-09-29 17:52:38.540 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/tmpqk24le01/large_copy.bin
+2025-09-29 17:52:38.552 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 1 days from /tmp/tmpuop7s_kv/many_files
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_0 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_1 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_2 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_3 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_4 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_5 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_6 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_7 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_8 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_9 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_10 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_11 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_12 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_13 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_14 (TTL: 3600s)
+2025-09-29 17:52:38.555 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_15 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_16 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_17 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_18 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_19 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_20 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_21 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_22 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_23 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_24 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_25 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_26 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_27 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_28 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_29 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_30 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_31 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_32 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_33 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_34 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_35 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_36 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_37 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_38 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_39 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_40 (TTL: 3600s)
+2025-09-29 17:52:38.556 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_41 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_42 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_43 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_44 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_45 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_46 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_47 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_48 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_49 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_50 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_51 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_52 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_53 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_54 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_55 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_56 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_57 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_58 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_59 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_60 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_61 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_62 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_63 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_64 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_65 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_66 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_67 (TTL: 3600s)
+2025-09-29 17:52:38.557 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_68 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_69 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_70 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_71 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_72 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_73 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_74 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_75 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_76 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_77 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_78 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_79 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_80 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_81 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_82 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_83 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_84 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_85 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_86 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_87 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_88 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_89 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_90 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_91 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_92 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_93 (TTL: 3600s)
+2025-09-29 17:52:38.558 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_94 (TTL: 3600s)
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_95 (TTL: 3600s)
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_96 (TTL: 3600s)
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_97 (TTL: 3600s)
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_98 (TTL: 3600s)
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_99 (TTL: 3600s)
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_0
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_1
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_2
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_3
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_4
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_5
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_6
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_7
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_8
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_9
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_10
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_11
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_12
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_13
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_14
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_15
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_16
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_17
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_18
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_19
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_20
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_21
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_22
+2025-09-29 17:52:38.559 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_23
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_24
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_25
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_26
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_27
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_28
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_29
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_30
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_31
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_32
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_33
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_34
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_35
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_36
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_37
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_38
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_39
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_40
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_41
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_42
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_43
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_44
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_45
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_46
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_47
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_48
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_49
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_50
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_51
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_52
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_53
+2025-09-29 17:52:38.560 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_54
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_55
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_56
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_57
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_58
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_59
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_60
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_61
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_62
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_63
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_64
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_65
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_66
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_67
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_68
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_69
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_70
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_71
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_72
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_73
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_74
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_75
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_76
+2025-09-29 17:52:38.561 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_77
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_78
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_79
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_80
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_81
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_82
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_83
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_84
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_85
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_86
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_87
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_88
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_89
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_90
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_91
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_92
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_93
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_94
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_95
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_96
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_97
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_98
+2025-09-29 17:52:38.562 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_99
+2025-09-29 17:52:38.562 | INFO     | fazztv.data.cache:clear:87 - Cache cleared
+2025-09-29 17:52:43.952 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: openrouter
+2025-09-29 17:52:43.952 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: openai
+2025-09-29 17:52:43.952 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: ollama
+2025-09-29 17:52:43.952 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: ollama
+2025-09-29 17:52:43.952 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: ollama
+2025-09-29 17:52:43.952 | INFO     | fazztv.providers.config:load_from_env:90 - Loaded Ollama provider
+2025-09-29 17:52:43.952 | INFO     | fazztv.api.openrouter_compat:__init__:29 - OpenRouterClient initialized with provider system
+2025-09-29 17:52:43.955 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: openrouter
+2025-09-29 17:52:43.956 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: openai
+2025-09-29 17:52:43.956 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: ollama
+2025-09-29 17:52:43.956 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: ollama
+2025-09-29 17:52:43.956 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: ollama
+2025-09-29 17:52:43.956 | INFO     | fazztv.providers.config:load_from_env:90 - Loaded Ollama provider
+2025-09-29 17:52:43.956 | INFO     | fazztv.api.openrouter_compat:__init__:29 - OpenRouterClient initialized with provider system
+2025-09-29 17:52:43.970 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test Artist - Test Song is not serialized
+2025-09-29 17:52:43.972 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test - Song is not serialized
+2025-09-29 17:52:43.976 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:43.976 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-29 17:52:43.979 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:43.979 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: FFmpeg error
+2025-09-29 17:52:43.983 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:43.984 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:85 - Broadcasting timeout for Test Artist - Test Song
+2025-09-29 17:52:43.988 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:43.989 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 1 - Song 1
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-29 17:52:43.992 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-29 17:52:43.995 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.996 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 2 - Song 2
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.996 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-29 17:52:43.997 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 2 successful, 1 failed
+2025-09-29 17:52:43.999 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-29 17:52:43.999 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 0 - Song 0
+2025-09-29 17:52:43.999 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.999 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-29 17:52:43.999 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 1 - Song 1
+2025-09-29 17:52:43.999 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-29 17:52:43.999 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-29 17:52:44.000 | WARNING  | fazztv.broadcasting.rtmp:broadcast_collection:130 - Stopping broadcast due to failure
+2025-09-29 17:52:44.000 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 2 items
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/2: Artist 0 - Song 0
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 0 - Song 0 to rtmp://test.server/live/stream
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 0 - Song 0
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/2: Artist 1 - Song 1
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 1 - Song 1 to rtmp://test.server/live/stream
+2025-09-29 17:52:44.003 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-29 17:52:44.003 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 1 successful, 1 failed
+2025-09-29 17:52:44.006 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 1 items
+2025-09-29 17:52:44.006 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/1: Artist - Song
+2025-09-29 17:52:44.006 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist - Song to rtmp://test.server/live/stream
+2025-09-29 17:52:44.006 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:90 - Broadcasting exception: Unexpected error
+2025-09-29 17:52:44.006 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 1 failed
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 3 items after filtering from 5 total
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 3 items
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 1/3: Artist 2 - Song 2
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 2 - Song 2 to rtmp://test.server/live/stream
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 2 - Song 2
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 2/3: Artist 3 - Song 3
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 3 - Song 3 to rtmp://test.server/live/stream
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 3 - Song 3
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:118 - Broadcasting item 3/3: Artist 4 - Song 4
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Artist 4 - Song 4 to rtmp://test.server/live/stream
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Artist 4 - Song 4
+2025-09-29 17:52:44.009 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 3 successful, 0 failed
+2025-09-29 17:52:44.012 | INFO     | fazztv.broadcasting.rtmp:broadcast_filtered:167 - Broadcasting 0 items after filtering from 3 total
+2025-09-29 17:52:44.012 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:115 - Starting broadcast of 0 items
+2025-09-29 17:52:44.012 | INFO     | fazztv.broadcasting.rtmp:broadcast_collection:143 - Broadcast complete: 0 successful, 0 failed
+2025-09-29 17:52:44.014 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-29 17:52:44.014 | INFO     | fazztv.broadcasting.rtmp:test_connection:198 - RTMP connection test successful
+2025-09-29 17:52:44.016 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-29 17:52:44.016 | ERROR    | fazztv.broadcasting.rtmp:test_connection:201 - RTMP connection test failed: Connection refused
+2025-09-29 17:52:44.017 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-29 17:52:44.018 | ERROR    | fazztv.broadcasting.rtmp:test_connection:205 - RTMP connection test timed out
+2025-09-29 17:52:44.019 | INFO     | fazztv.broadcasting.rtmp:test_connection:194 - Testing RTMP connection to rtmp://test.server/live/stream
+2025-09-29 17:52:44.019 | ERROR    | fazztv.broadcasting.rtmp:test_connection:208 - RTMP connection test error: Network error
+2025-09-29 17:52:44.023 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:44.024 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-29 17:52:44.024 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 17:52:44.024 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: Error
+2025-09-29 17:52:44.026 | INFO     | fazztv.broadcasting.rtmp:reset_stats:237 - Broadcasting statistics reset
+2025-09-29 17:52:44.036 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-14/test_serialize_successful0/Test Artist - Test Song.mp4
+2025-09-29 17:52:44.036 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.036 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.169 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-14/test_serialize_successful0/temp_audio.aac
+2025-09-29 17:52:44.170 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-29 17:52:44.174 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-29 17:52:44.174 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.174 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Failed to download audio for Test Artist - Test Song
+2025-09-29 17:52:44.177 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-14/test_serialize_video_download_0/Test Artist - Test Song.mp4
+2025-09-29 17:52:44.177 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.177 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.177 | WARNING  | fazztv.broadcasting.serializer:serialize_media_item:77 - Using default video due to download failure
+2025-09-29 17:52:44.214 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-14/test_serialize_video_download_0/temp_audio.aac
+2025-09-29 17:52:44.214 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_serialize_video_download_0/temp_audio.aac
+2025-09-29 17:52:44.214 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_serialize_video_download_0/default.mp4
+2025-09-29 17:52:44.214 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-29 17:52:44.218 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Artist - Song to /tmp/pytest-of-faz/pytest-14/test_serialize_with_trim0/Artist - Song.mp4
+2025-09-29 17:52:44.219 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/test
+2025-09-29 17:52:44.219 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/test
+2025-09-29 17:52:44.219 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Artist - Song
+2025-09-29 17:52:44.222 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/pytest-of-faz/pytest-14/test_serialize_with_show_info0/Test Artist - Test Song.mp4
+2025-09-29 17:52:44.222 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.223 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.256 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-14/test_serialize_with_show_info0/temp_audio.aac
+2025-09-29 17:52:44.256 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_serialize_with_show_info0/temp_audio.aac
+2025-09-29 17:52:44.256 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_serialize_with_show_info0/temp_video.mp4
+2025-09-29 17:52:44.256 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:110 - Successfully serialized Test Artist - Test Song
+2025-09-29 17:52:44.261 | INFO     | fazztv.broadcasting.serializer:serialize_media_item:64 - Serializing Test Artist - Test Song to /tmp/Test Artist - Test Song.mp4
+2025-09-29 17:52:44.261 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:70 - Downloading audio from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.261 | DEBUG    | fazztv.broadcasting.serializer:serialize_media_item:74 - Downloading video from https://youtube.com/watch?v=test
+2025-09-29 17:52:44.295 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-14/test_serialize_video_processin0/temp_audio.aac
+2025-09-29 17:52:44.295 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_serialize_video_processin0/temp_audio.aac
+2025-09-29 17:52:44.295 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_serialize_video_processin0/temp_video.mp4
+2025-09-29 17:52:44.295 | ERROR    | fazztv.broadcasting.serializer:serialize_media_item:116 - Serialization error for Test Artist - Test Song: Video processing failed for Test Artist - Test Song
+2025-09-29 17:52:44.297 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 3/3 items
+2025-09-29 17:52:44.299 | WARNING  | fazztv.broadcasting.serializer:serialize_collection:152 - Failed to serialize Artist1 - Song1
+2025-09-29 17:52:44.299 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/3 items
+2025-09-29 17:52:44.301 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 2/2 items
+2025-09-29 17:52:44.304 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 1/1 items
+2025-09-29 17:52:44.306 | INFO     | fazztv.broadcasting.serializer:serialize_collection:154 - Serialized 0/0 items
+2025-09-29 17:52:44.312 | WARNING  | fazztv.broadcasting.serializer:_trim_media:181 - Could not determine duration for /tmp/pytest-of-faz/pytest-14/test_trim_media_no_duration0/input.mp3
+2025-09-29 17:52:44.315 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_trim_media_with_max_durat0/input.mp3
+2025-09-29 17:52:44.319 | INFO     | fazztv.broadcasting.serializer:_create_default_video:228 - Created default video at /tmp/pytest-of-faz/pytest-14/test_create_default_video_succ0/default.mp4
+2025-09-29 17:52:44.323 | ERROR    | fazztv.broadcasting.serializer:_create_default_video:231 - Failed to create default video: Command 'ffmpeg' returned non-zero exit status 1.
+2025-09-29 17:52:44.327 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 3 serialized files
+2025-09-29 17:52:44.329 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-29 17:52:44.331 | INFO     | fazztv.broadcasting.serializer:cleanup_serialized:252 - Cleaned up 0 serialized files
+2025-09-29 17:52:44.742 | ERROR    | fazztv.processors.audio:normalize_audio:44 - Audio normalization error: FFmpeg error
+2025-09-29 17:52:44.759 | ERROR    | fazztv.processors.audio:add_fade:98 - Audio fade error: FFmpeg error
+2025-09-29 17:52:44.762 | ERROR    | fazztv.processors.audio:mix_audio:119 - No input files provided for mixing
+2025-09-29 17:52:44.779 | ERROR    | fazztv.processors.audio:mix_audio:153 - Audio mixing error: FFmpeg error
+2025-09-29 17:52:44.792 | ERROR    | fazztv.processors.audio:extract_segment:198 - Audio segment extraction error: FFmpeg error
+2025-09-29 17:52:44.805 | ERROR    | fazztv.processors.audio:apply_effects:238 - Audio effects error: FFmpeg error
+2025-09-29 17:52:44.812 | ERROR    | fazztv.processors.audio:_get_audio_duration:256 - Error getting audio duration: FFprobe error
+2025-09-29 17:52:44.815 | ERROR    | fazztv.processors.audio:_get_audio_duration:256 - Error getting audio duration: could not convert string to float: 'not_a_number'
+2025-09-29 17:52:45.038 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.040 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.041 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.042 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.043 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.043 | WARNING  | fazztv.providers.base:chat:156 - Provider mock does not support chat
+2025-09-29 17:52:45.044 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.045 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.046 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.047 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.052 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.052 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.052 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.052 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.052 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.052 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.054 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.054 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.054 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.054 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.054 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.054 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.054 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.055 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.055 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.055 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.055 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.055 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.055 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.056 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider2
+2025-09-29 17:52:45.057 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.057 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.057 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.057 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.057 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.057 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.057 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider provider1 is not available
+2025-09-29 17:52:45.058 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider2
+2025-09-29 17:52:45.059 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.059 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.059 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.059 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.059 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.059 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.059 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider provider1 is not available
+2025-09-29 17:52:45.059 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider provider2 is not available
+2025-09-29 17:52:45.059 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider provider3 is not available
+2025-09-29 17:52:45.060 | ERROR    | fazztv.providers.manager:query_with_fallback:63 - All providers failed
+2025-09-29 17:52:45.061 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.061 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.061 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.061 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.061 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.061 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.061 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider provider1 is not available
+2025-09-29 17:52:45.061 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider2
+2025-09-29 17:52:45.063 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.063 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.063 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.063 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.063 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.063 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.064 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.065 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.065 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.065 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.065 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.065 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.065 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.065 | DEBUG    | fazztv.providers.manager:chat_with_fallback:90 - Trying chat with provider: provider1
+2025-09-29 17:52:45.066 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.066 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.066 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.066 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.066 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.066 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.067 | DEBUG    | fazztv.providers.manager:chat_with_fallback:90 - Trying chat with provider: provider1
+2025-09-29 17:52:45.067 | ERROR    | fazztv.providers.manager:chat_with_fallback:98 - Chat failed with provider1: Chat failed
+2025-09-29 17:52:45.067 | DEBUG    | fazztv.providers.manager:chat_with_fallback:90 - Trying chat with provider: provider2
+2025-09-29 17:52:45.068 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.068 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.068 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.069 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.069 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.069 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.070 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.070 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.070 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.070 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.070 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.070 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.071 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.071 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.071 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.071 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.071 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.071 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.072 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.073 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.073 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.073 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.073 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.073 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.074 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.074 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.074 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.074 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.074 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.074 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.076 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.076 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.076 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.076 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.076 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.076 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.076 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider provider2 is not available
+2025-09-29 17:52:45.078 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.078 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.078 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.078 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.079 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.079 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.080 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.080 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.080 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.080 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.081 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.081 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.082 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.082 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.082 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.083 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.083 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.083 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.083 | ERROR    | fazztv.providers.manager:batch_query:198 - Provider nonexistent not found
+2025-09-29 17:52:45.084 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.084 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.084 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.084 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.084 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.084 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.085 | ERROR    | fazztv.providers.manager:batch_query:213 - Batch query failed for prompt: Query failed
+2025-09-29 17:52:45.086 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.086 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.086 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.086 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.086 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.086 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.086 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.087 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider2
+2025-09-29 17:52:45.087 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.088 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.088 | INFO     | fazztv.providers.manager:reset_usage_stats:236 - Usage statistics reset
+2025-09-29 17:52:45.089 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.089 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.089 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.089 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.089 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.089 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.090 | INFO     | fazztv.providers.manager:enable_fallback:241 - Fallback disabled
+2025-09-29 17:52:45.090 | INFO     | fazztv.providers.manager:enable_fallback:241 - Fallback enabled
+2025-09-29 17:52:45.090 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.manager:enable_load_balancing:246 - Load balancing enabled
+2025-09-29 17:52:45.091 | INFO     | fazztv.providers.manager:enable_load_balancing:246 - Load balancing disabled
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.092 | INFO     | fazztv.providers.manager:enable_load_balancing:246 - Load balancing enabled
+2025-09-29 17:52:45.092 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.093 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider2
+2025-09-29 17:52:45.093 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider3
+2025-09-29 17:52:45.093 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider1
+2025-09-29 17:52:45.093 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider2
+2025-09-29 17:52:45.093 | DEBUG    | fazztv.providers.manager:query_with_fallback:48 - Trying provider: provider3
+2025-09-29 17:52:45.095 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: mock
+2025-09-29 17:52:45.097 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: mock
+2025-09-29 17:52:45.097 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: mock
+2025-09-29 17:52:45.097 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: mock
+2025-09-29 17:52:45.098 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: test
+2025-09-29 17:52:45.098 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: test
+2025-09-29 17:52:45.100 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: test
+2025-09-29 17:52:45.100 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: test
+2025-09-29 17:52:45.101 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.102 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.102 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.102 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.102 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider3
+2025-09-29 17:52:45.102 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider3
+2025-09-29 17:52:45.103 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: available
+2025-09-29 17:52:45.103 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: available
+2025-09-29 17:52:45.103 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: unavailable
+2025-09-29 17:52:45.103 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: unavailable
+2025-09-29 17:52:45.103 | DEBUG    | fazztv.providers.registry:get_available_providers:90 - Provider unavailable is not available
+2025-09-29 17:52:45.104 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: text_provider
+2025-09-29 17:52:45.104 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: text_provider
+2025-09-29 17:52:45.104 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: chat_provider
+2025-09-29 17:52:45.104 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: chat_provider
+2025-09-29 17:52:45.104 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: multi_provider
+2025-09-29 17:52:45.104 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: multi_provider
+2025-09-29 17:52:45.105 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.106 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.106 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.106 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.107 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: text_provider
+2025-09-29 17:52:45.107 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: text_provider
+2025-09-29 17:52:45.107 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: chat_provider
+2025-09-29 17:52:45.107 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: chat_provider
+2025-09-29 17:52:45.108 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: expensive
+2025-09-29 17:52:45.108 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: expensive
+2025-09-29 17:52:45.108 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: cheap
+2025-09-29 17:52:45.108 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: cheap
+2025-09-29 17:52:45.108 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: free
+2025-09-29 17:52:45.108 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: free
+2025-09-29 17:52:45.109 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: test
+2025-09-29 17:52:45.109 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: test
+2025-09-29 17:52:45.110 | INFO     | fazztv.providers.registry:remove_provider:195 - Removed provider: test
+2025-09-29 17:52:45.110 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider1
+2025-09-29 17:52:45.111 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider1
+2025-09-29 17:52:45.111 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: provider2
+2025-09-29 17:52:45.111 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: provider2
+2025-09-29 17:52:45.111 | INFO     | fazztv.providers.registry:clear:202 - Cleared all providers from registry
+2025-09-29 17:52:45.112 | INFO     | fazztv.providers.registry:register_provider_class:33 - Registered provider class: mock
+2025-09-29 17:52:45.112 | INFO     | fazztv.providers.base:__init__:74 - Initialized provider: test
+2025-09-29 17:52:45.112 | INFO     | fazztv.providers.registry:add_provider:54 - Added provider instance: test
+2025-09-29 17:52:45.280 | WARNING  | old_models:cleanup:87 - Could not remove /tmp/tmpmezapcn5.mp4: Permission denied
+2025-09-29 17:52:45.436 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-14/test_safe_delete_file0/test.txt
+2025-09-29 17:52:45.438 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-14/test_safe_delete_directory0/test_dir
+2025-09-29 17:52:45.439 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /tmp/pytest-of-faz/pytest-14/test_safe_delete_nonexistent0/does_not_exist
+2025-09-29 17:52:45.443 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-14/test_safe_delete_nested_direct0/nested
+2025-09-29 17:52:45.458 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-14/test_copy_file_success0/source.txt to /tmp/pytest-of-faz/pytest-14/test_copy_file_success0/dest.txt
+2025-09-29 17:52:45.460 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-14/test_copy_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-14/test_copy_file_to_new_director0/new_dir/dest.txt
+2025-09-29 17:52:45.461 | WARNING  | fazztv.utils.file:copy_file:97 - Destination already exists: /tmp/pytest-of-faz/pytest-14/test_copy_file_exists_no_overw0/dest.txt
+2025-09-29 17:52:45.463 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-14/test_copy_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-14/test_copy_file_exists_with_ove0/dest.txt
+2025-09-29 17:52:45.467 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-14/test_copy_preserves_metadata0/source.txt to /tmp/pytest-of-faz/pytest-14/test_copy_preserves_metadata0/dest.txt
+2025-09-29 17:52:45.469 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-14/test_move_file_success0/source.txt to /tmp/pytest-of-faz/pytest-14/test_move_file_success0/dest.txt
+2025-09-29 17:52:45.471 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-14/test_move_file_to_new_director0/source.txt to /tmp/pytest-of-faz/pytest-14/test_move_file_to_new_director0/new_dir/dest.txt
+2025-09-29 17:52:45.473 | WARNING  | fazztv.utils.file:move_file:125 - Destination already exists: /tmp/pytest-of-faz/pytest-14/test_move_file_exists_no_overw0/dest.txt
+2025-09-29 17:52:45.475 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-14/test_move_file_exists_with_ove0/source.txt to /tmp/pytest-of-faz/pytest-14/test_move_file_exists_with_ove0/dest.txt
+2025-09-29 17:52:45.488 | WARNING  | fazztv.utils.file:find_files:156 - Directory does not exist: /tmp/pytest-of-faz/pytest-14/test_find_files_nonexistent_di0/does_not_exist
+2025-09-29 17:52:45.497 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_deletes0/old.txt
+2025-09-29 17:52:45.497 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_deletes0
+2025-09-29 17:52:45.499 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_pattern0/old.txt
+2025-09-29 17:52:45.499 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_pattern0
+2025-09-29 17:52:45.504 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 7 days from /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_ignores0
+2025-09-29 17:52:45.506 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_boundar0/file1.txt
+2025-09-29 17:52:45.506 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 1 files older than 7 days from /tmp/pytest-of-faz/pytest-14/test_cleanup_old_files_boundar0
+2025-09-29 17:52:45.521 | ERROR    | fazztv.utils.logging:log_exception:81 - test context: Test error
+2025-09-29 17:52:45.522 | ERROR    | fazztv.utils.logging:log_exception:85 - Test error
+Traceback (most recent call last):
+
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pytest/__main__.py", line 9, in <module>
+    raise SystemExit(pytest.console_main())
+                     │      └ <function console_main at 0x73b898076840>
+                     └ <module 'pytest' from '/home/faz/miniconda3/lib/python3.12/site-packages/pytest/__init__.py'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/config/__init__.py", line 201, in console_main
+    code = main()
+           └ <function main at 0x73b8980767a0>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/config/__init__.py", line 175, in main
+    ret: ExitCode | int = config.hook.pytest_cmdline_main(config=config)
+         │                │      │    │                          └ <_pytest.config.Config object at 0x73b897e14080>
+         │                │      │    └ <HookCaller 'pytest_cmdline_main'>
+         │                │      └ <_pytest.config.compat.PathAwareHookProxy object at 0x73b897e50b00>
+         │                └ <_pytest.config.Config object at 0x73b897e14080>
+         └ <enum 'ExitCode'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_hooks.py", line 513, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           │    │         │    │     │    │                  │       └ True
+           │    │         │    │     │    │                  └ {'config': <_pytest.config.Config object at 0x73b897e14080>}
+           │    │         │    │     │    └ <member '_hookimpls' of 'HookCaller' objects>
+           │    │         │    │     └ <HookCaller 'pytest_cmdline_main'>
+           │    │         │    └ <member 'name' of 'HookCaller' objects>
+           │    │         └ <HookCaller 'pytest_cmdline_main'>
+           │    └ <member '_hookexec' of 'HookCaller' objects>
+           └ <HookCaller 'pytest_cmdline_main'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           │    │               │          │        │       └ True
+           │    │               │          │        └ {'config': <_pytest.config.Config object at 0x73b897e14080>}
+           │    │               │          └ [<HookImpl plugin_name='main', plugin=<module '_pytest.main' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/...
+           │    │               └ 'pytest_cmdline_main'
+           │    └ <function _multicall at 0x73b8987b9bc0>
+           └ <_pytest.config.PytestPluginManager object at 0x73b897de2e70>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_callers.py", line 103, in _multicall
+    res = hook_impl.function(*args)
+          │         │         └ [<_pytest.config.Config object at 0x73b897e14080>]
+          │         └ <member 'function' of 'HookImpl' objects>
+          └ <HookImpl plugin_name='main', plugin=<module '_pytest.main' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/m...
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/main.py", line 330, in pytest_cmdline_main
+    return wrap_session(config, _main)
+           │            │       └ <function _main at 0x73b8980ef060>
+           │            └ <_pytest.config.Config object at 0x73b897e14080>
+           └ <function wrap_session at 0x73b8980eef20>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/main.py", line 283, in wrap_session
+    session.exitstatus = doit(config, session) or 0
+    │       │            │    │       └ <Session  exitstatus=<ExitCode.OK: 0> testsfailed=61 testscollected=1008>
+    │       │            │    └ <_pytest.config.Config object at 0x73b897e14080>
+    │       │            └ <function _main at 0x73b8980ef060>
+    │       └ <ExitCode.OK: 0>
+    └ <Session  exitstatus=<ExitCode.OK: 0> testsfailed=61 testscollected=1008>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/main.py", line 337, in _main
+    config.hook.pytest_runtestloop(session=session)
+    │      │    │                          └ <Session  exitstatus=<ExitCode.OK: 0> testsfailed=61 testscollected=1008>
+    │      │    └ <HookCaller 'pytest_runtestloop'>
+    │      └ <_pytest.config.compat.PathAwareHookProxy object at 0x73b897e50b00>
+    └ <_pytest.config.Config object at 0x73b897e14080>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_hooks.py", line 513, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           │    │         │    │     │    │                  │       └ True
+           │    │         │    │     │    │                  └ {'session': <Session  exitstatus=<ExitCode.OK: 0> testsfailed=61 testscollected=1008>}
+           │    │         │    │     │    └ <member '_hookimpls' of 'HookCaller' objects>
+           │    │         │    │     └ <HookCaller 'pytest_runtestloop'>
+           │    │         │    └ <member 'name' of 'HookCaller' objects>
+           │    │         └ <HookCaller 'pytest_runtestloop'>
+           │    └ <member '_hookexec' of 'HookCaller' objects>
+           └ <HookCaller 'pytest_runtestloop'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           │    │               │          │        │       └ True
+           │    │               │          │        └ {'session': <Session  exitstatus=<ExitCode.OK: 0> testsfailed=61 testscollected=1008>}
+           │    │               │          └ [<HookImpl plugin_name='main', plugin=<module '_pytest.main' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/...
+           │    │               └ 'pytest_runtestloop'
+           │    └ <function _multicall at 0x73b8987b9bc0>
+           └ <_pytest.config.PytestPluginManager object at 0x73b897de2e70>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_callers.py", line 103, in _multicall
+    res = hook_impl.function(*args)
+          │         │         └ [<Session  exitstatus=<ExitCode.OK: 0> testsfailed=61 testscollected=1008>]
+          │         └ <member 'function' of 'HookImpl' objects>
+          └ <HookImpl plugin_name='main', plugin=<module '_pytest.main' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/m...
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/main.py", line 362, in pytest_runtestloop
+    item.config.hook.pytest_runtest_protocol(item=item, nextitem=nextitem)
+    │    │                                        │              └ <Function test_log_performance>
+    │    │                                        └ <Function test_log_exception>
+    │    └ <member 'config' of 'Node' objects>
+    └ <Function test_log_exception>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_hooks.py", line 513, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           │    │         │    │     │    │                  │       └ True
+           │    │         │    │     │    │                  └ {'item': <Function test_log_exception>, 'nextitem': <Function test_log_performance>}
+           │    │         │    │     │    └ <member '_hookimpls' of 'HookCaller' objects>
+           │    │         │    │     └ <HookCaller 'pytest_runtest_protocol'>
+           │    │         │    └ <member 'name' of 'HookCaller' objects>
+           │    │         └ <HookCaller 'pytest_runtest_protocol'>
+           │    └ <member '_hookexec' of 'HookCaller' objects>
+           └ <HookCaller 'pytest_runtest_protocol'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           │    │               │          │        │       └ True
+           │    │               │          │        └ {'item': <Function test_log_exception>, 'nextitem': <Function test_log_performance>}
+           │    │               │          └ [<HookImpl plugin_name='runner', plugin=<module '_pytest.runner' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pyt...
+           │    │               └ 'pytest_runtest_protocol'
+           │    └ <function _multicall at 0x73b8987b9bc0>
+           └ <_pytest.config.PytestPluginManager object at 0x73b897de2e70>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_callers.py", line 103, in _multicall
+    res = hook_impl.function(*args)
+          │         │         └ [<Function test_log_exception>, <Function test_log_performance>]
+          │         └ <member 'function' of 'HookImpl' objects>
+          └ <HookImpl plugin_name='runner', plugin=<module '_pytest.runner' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pyte...
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/runner.py", line 113, in pytest_runtest_protocol
+    runtestprotocol(item, nextitem=nextitem)
+    │               │              └ <Function test_log_performance>
+    │               └ <Function test_log_exception>
+    └ <function runtestprotocol at 0x73b8980ee200>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/runner.py", line 132, in runtestprotocol
+    reports.append(call_and_report(item, "call", log))
+    │       │      │               │             └ True
+    │       │      │               └ <Function test_log_exception>
+    │       │      └ <function call_and_report at 0x73b8980ee660>
+    │       └ <method 'append' of 'list' objects>
+    └ [<TestReport 'tests/unit/utils/test_logging.py::TestLoggingUtils::test_log_exception' when='setup' outcome='passed'>]
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/runner.py", line 241, in call_and_report
+    call = CallInfo.from_call(
+           │        └ <classmethod(<function CallInfo.from_call at 0x73b8980ee980>)>
+           └ <class '_pytest.runner.CallInfo'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/runner.py", line 341, in from_call
+    result: TResult | None = func()
+            │                └ <function call_and_report.<locals>.<lambda> at 0x73b8941f7ec0>
+            └ +TResult
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/runner.py", line 242, in <lambda>
+    lambda: runtest_hook(item=item, **kwds), when=when, reraise=reraise
+            │                 │       └ {}
+            │                 └ <Function test_log_exception>
+            └ <HookCaller 'pytest_runtest_call'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_hooks.py", line 513, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           │    │         │    │     │    │                  │       └ False
+           │    │         │    │     │    │                  └ {'item': <Function test_log_exception>}
+           │    │         │    │     │    └ <member '_hookimpls' of 'HookCaller' objects>
+           │    │         │    │     └ <HookCaller 'pytest_runtest_call'>
+           │    │         │    └ <member 'name' of 'HookCaller' objects>
+           │    │         └ <HookCaller 'pytest_runtest_call'>
+           │    └ <member '_hookexec' of 'HookCaller' objects>
+           └ <HookCaller 'pytest_runtest_call'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           │    │               │          │        │       └ False
+           │    │               │          │        └ {'item': <Function test_log_exception>}
+           │    │               │          └ [<HookImpl plugin_name='runner', plugin=<module '_pytest.runner' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pyt...
+           │    │               └ 'pytest_runtest_call'
+           │    └ <function _multicall at 0x73b8987b9bc0>
+           └ <_pytest.config.PytestPluginManager object at 0x73b897de2e70>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_callers.py", line 103, in _multicall
+    res = hook_impl.function(*args)
+          │         │         └ [<Function test_log_exception>]
+          │         └ <member 'function' of 'HookImpl' objects>
+          └ <HookImpl plugin_name='runner', plugin=<module '_pytest.runner' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pyte...
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/runner.py", line 174, in pytest_runtest_call
+    item.runtest()
+    │    └ <function Function.runtest at 0x73b897fb1120>
+    └ <Function test_log_exception>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/python.py", line 1627, in runtest
+    self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+    │    │                                   └ <Function test_log_exception>
+    │    └ <property object at 0x73b898089580>
+    └ <Function test_log_exception>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_hooks.py", line 513, in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           │    │         │    │     │    │                  │       └ True
+           │    │         │    │     │    │                  └ {'pyfuncitem': <Function test_log_exception>}
+           │    │         │    │     │    └ <member '_hookimpls' of 'HookCaller' objects>
+           │    │         │    │     └ <HookCaller 'pytest_pyfunc_call'>
+           │    │         │    └ <member 'name' of 'HookCaller' objects>
+           │    │         └ <HookCaller 'pytest_pyfunc_call'>
+           │    └ <member '_hookexec' of 'HookCaller' objects>
+           └ <HookCaller 'pytest_pyfunc_call'>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_manager.py", line 120, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           │    │               │          │        │       └ True
+           │    │               │          │        └ {'pyfuncitem': <Function test_log_exception>}
+           │    │               │          └ [<HookImpl plugin_name='python', plugin=<module '_pytest.python' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pyt...
+           │    │               └ 'pytest_pyfunc_call'
+           │    └ <function _multicall at 0x73b8987b9bc0>
+           └ <_pytest.config.PytestPluginManager object at 0x73b897de2e70>
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/pluggy/_callers.py", line 103, in _multicall
+    res = hook_impl.function(*args)
+          │         │         └ [<Function test_log_exception>]
+          │         └ <member 'function' of 'HookImpl' objects>
+          └ <HookImpl plugin_name='python', plugin=<module '_pytest.python' from '/home/faz/miniconda3/lib/python3.12/site-packages/_pyte...
+  File "/home/faz/miniconda3/lib/python3.12/site-packages/_pytest/python.py", line 159, in pytest_pyfunc_call
+    result = testfunction(**testargs)
+             │              └ {}
+             └ <bound method TestLoggingUtils.test_log_exception of <utils.test_logging.TestLoggingUtils object at 0x73b895664710>>
+
+> File "/home/faz/development/HollowCityDriver/.city-driver-worktrees/faz-wt-20250929-2726425/tests/unit/utils/test_logging.py", line 33, in test_log_exception
+    raise ValueError("Test error")
+
+ValueError: Test error
+2025-09-29 17:52:45.532 | DEBUG    | fazztv.utils.logging:log_performance:100 - fast_func completed in 0.50s
+2025-09-29 17:52:45.532 | WARNING  | fazztv.utils.logging:log_performance:98 - slow_func took 2.00s (threshold: 1.0s)
+2025-09-29 17:52:45.545 | INFO     | utils.test_logging:test_create_audit_logger:62 - Audit message
