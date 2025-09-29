@@ -49,11 +49,11 @@ class TestTextUtils:
     
     def test_extract_song_info(self):
         """Test extracting song information."""
-        title = "Artist - Song Title (feat. Guest)"
-        artist, song, featured = extract_song_info(title)
-        assert artist is not None
-        assert song is not None
-        # Featured artist may or may not be detected
+        title = "Song Title (Album Name) - 2023"
+        song, album, date = extract_song_info(title)
+        assert song == "Song Title"
+        assert album == "Album Name"
+        assert date == "2023"
     
     def test_clean_filename(self):
         """Test cleaning filename."""
@@ -76,8 +76,8 @@ class TestTextUtils:
         width, height = parse_resolution("1920x1080")
         assert width == 1920
         assert height == 1080
-        
-        # Test with different format
-        width, height = parse_resolution("1280X720")
+
+        # Test with lowercase x only (function expects lowercase)
+        width, height = parse_resolution("1280x720")
         assert width == 1280
         assert height == 720

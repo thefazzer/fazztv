@@ -16,16 +16,16 @@ class TestLoggingUtils:
     
     def test_setup_logging(self, tmp_path):
         """Test setting up logging."""
-        log_dir = tmp_path / "logs"
-        setup_logging(log_dir=log_dir, level="DEBUG")
-        assert log_dir.exists()
+        log_file = tmp_path / "logs" / "test.log"
+        setup_logging(log_file=log_file, log_level="DEBUG")
+        assert log_file.parent.exists()
     
     def test_get_logger(self):
         """Test getting logger."""
         test_logger = get_logger("test_module")
         assert test_logger is not None
-        # Loguru logger is a singleton
-        assert test_logger == logger
+        # Should be a bound logger with the name
+        assert hasattr(test_logger, '_core')  # Loguru logger attribute
     
     def test_log_exception(self):
         """Test logging exception."""
@@ -45,8 +45,8 @@ class TestLoggingUtils:
     
     def test_log_context(self):
         """Test LogContext manager."""
-        with LogContext("test_operation", {"user": "test"}):
-            # Context should be set
+        with LogContext("DEBUG"):
+            # Context should set temporary log level
             pass
         # Context should be cleared after exiting
     

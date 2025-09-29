@@ -1,5 +1,6 @@
 """Media serialization for broadcasting."""
 
+import subprocess
 import tempfile
 import random
 from typing import Optional, List, Dict, Any
@@ -7,7 +8,7 @@ from pathlib import Path
 from loguru import logger
 
 from fazztv.models import MediaItem, ProcessingError
-from fazztv.processors import VideoProcessor
+from fazztv.processors import VideoProcessor, AudioProcessor
 from fazztv.downloaders import YouTubeDownloader, CachedDownloader
 from fazztv.config import get_settings
 from fazztv.utils.file import get_temp_path, safe_delete
@@ -171,8 +172,6 @@ class MediaSerializer:
         Returns:
             Path to trimmed media file
         """
-        from fazztv.processors import AudioProcessor
-        
         # Get media duration
         audio_proc = AudioProcessor()
         duration = audio_proc._get_audio_duration(media_path)
@@ -205,12 +204,10 @@ class MediaSerializer:
     def _create_default_video(self) -> Path:
         """
         Create a default video when download fails.
-        
+
         Returns:
             Path to default video file
         """
-        import subprocess
-        
         output_path = get_temp_path(suffix=".mp4")
         
         # Create a simple test pattern video

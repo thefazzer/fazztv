@@ -1,8 +1,8 @@
 """Media item model for FazzTV."""
 
-from typing import Optional
+from typing import Optional, Dict, Any
 from pathlib import Path
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from fazztv.exceptions import ValidationError
 
@@ -10,7 +10,7 @@ from fazztv.exceptions import ValidationError
 @dataclass
 class MediaItem:
     """Represents a media item to be broadcast."""
-    
+
     artist: str
     song: str
     url: str
@@ -18,6 +18,8 @@ class MediaItem:
     length_percent: int = 100
     duration: Optional[int] = None
     serialized: Optional[Path] = None
+    source_path: Optional[Path] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
     def __post_init__(self):
         """Validate media item after initialization."""
@@ -33,9 +35,12 @@ class MediaItem:
         if not self.url:
             raise ValidationError("URL is required")
         
-        # Convert serialized to Path if it's a string
+        # Convert paths to Path objects if they're strings
         if self.serialized and not isinstance(self.serialized, Path):
             self.serialized = Path(self.serialized)
+
+        if self.source_path and not isinstance(self.source_path, Path):
+            self.source_path = Path(self.source_path)
     
     def is_serialized(self) -> bool:
         """Check if the media item has been serialized."""

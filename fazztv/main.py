@@ -6,6 +6,7 @@ Orchestrates the video broadcasting pipeline with modular components.
 
 import random
 import argparse
+from pathlib import Path
 from typing import List, Optional
 from loguru import logger
 
@@ -13,6 +14,7 @@ from fazztv.models import MediaItem
 from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.config.settings import Settings
+from fazztv.config import constants
 from fazztv.api.openrouter import OpenRouterClient
 from fazztv.api.youtube import YouTubeSearchClient
 from fazztv.data.shows import FTV_SHOWS
@@ -28,7 +30,7 @@ class FazzTVApplication:
         Initialize the FazzTV application.
 
         Args:
-            settings: Optional settings instance (creates default if not provided)
+            settings: Optional settings (creates default if None)
         """
         self.settings = settings or Settings()
         print_banner('full')  # Display City Driver banner on startup
@@ -135,7 +137,9 @@ class FazzTVApplication:
         media_items = []
         
         for artist in artists:
-            length_percent = random.randint(50, 100) if randomize_length else 100
+            length_percent = (
+                random.randint(50, 100) if randomize_length else 100
+            )
             media_item = self.create_media_item(artist, length_percent)
             
             if media_item:
@@ -166,13 +170,22 @@ class FazzTVApplication:
         shows = FTV_SHOWS if include_shows else None
         
         for item in media_items:
-            if self.serializer.serialize_media_item(item, ftv_shows=shows):
+            if self.serializer.serialize_media_item(
+                    item, ftv_shows=shows
+            ):
                 serialized_items.append(item)
-                logger.info(f"Serialized media item for {item.artist}")
+                logger.info(
+                    f"Serialized media item for {item.artist}"
+                )
             else:
-                logger.warning(f"Failed to serialize media item for {item.artist}")
+                logger.warning(
+                    f"Failed to serialize media item for {item.artist}"
+                )
         
-        logger.info(f"Serialized {len(serialized_items)}/{len(media_items)} media items")
+        logger.info(
+            f"Serialized {len(serialized_items)}/{len(media_items)} "
+            "media items"
+        )
         return serialized_items
     
     def broadcast_collection(
@@ -193,10 +206,15 @@ class FazzTVApplication:
         if filter_func is None:
             filter_func = lambda item: True  # Accept all items by default
         
-        results = self.broadcaster.broadcast_filtered_collection(media_items, filter_func)
+        results = self.broadcaster.broadcast_filtered_collection(
+            media_items, filter_func
+        )
         
         successful = sum(1 for _, success in results if success)
-        logger.info(f"Successfully broadcast {successful}/{len(results)} media items")
+        logger.info(
+            f"Successfully broadcast {successful}/{len(results)} "
+            "media items"
+        )
         
         return results
     
@@ -312,7 +330,6 @@ def main():
         settings.enable_logo = False
     
     if args.cache_dir:
-        from pathlib import Path
         settings.cache_dir = Path(args.cache_dir)
         settings.cache_dir.mkdir(parents=True, exist_ok=True)
     

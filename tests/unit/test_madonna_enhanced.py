@@ -20,9 +20,7 @@ from fazztv.madonna import (
     calculate_days_old,
     cleanup_environment,
     build_ffmpeg_filter,
-    create_media_item_from_episode,
-    _get_cached_audio,
-    _cache_audio_file
+    create_media_item_from_episode
 )
 from fazztv.models import MediaItem
 
@@ -296,38 +294,39 @@ class TestMediaItemCreation(unittest.TestCase):
         mock_logger.error.assert_called()
 
 
-class TestCacheFunctions(unittest.TestCase):
-    """Test cases for cache-related functions."""
-
-    @patch('fazztv.madonna.os.path.exists')
-    def test_get_cached_audio_exists(self, mock_exists):
-        """Test getting cached audio when file exists."""
-        mock_exists.return_value = True
-
-        result = _get_cached_audio('test_guid', 'test_song.aac')
-
-        self.assertIsNotNone(result)
-        self.assertIn('test_guid', result)
-
-    @patch('fazztv.madonna.os.path.exists')
-    def test_get_cached_audio_not_exists(self, mock_exists):
-        """Test getting cached audio when file doesn't exist."""
-        mock_exists.return_value = False
-
-        result = _get_cached_audio('test_guid', 'test_song.aac')
-
-        self.assertIsNone(result)
-
-    @patch('fazztv.madonna.shutil.copy')
-    @patch('fazztv.madonna.logger')
-    def test_cache_audio_file_success(self, mock_logger, mock_copy):
-        """Test successful audio file caching."""
-        result = _cache_audio_file('/tmp/source.aac', 'test_guid')
-
-        self.assertIsNotNone(result)
-        self.assertIn('test_guid', result)
-        mock_copy.assert_called_once()
-        mock_logger.debug.assert_called()
+# Commented out - these functions no longer exist in madonna.py
+# class TestCacheFunctions(unittest.TestCase):
+#     """Test cases for cache-related functions."""
+#
+#     @patch('fazztv.madonna.os.path.exists')
+#     def test_get_cached_audio_exists(self, mock_exists):
+#         """Test getting cached audio when file exists."""
+#         mock_exists.return_value = True
+#
+#         result = _get_cached_audio('test_guid', 'test_song.aac')
+#
+#         self.assertIsNotNone(result)
+#         self.assertIn('test_guid', result)
+#
+#     @patch('fazztv.madonna.os.path.exists')
+#     def test_get_cached_audio_not_exists(self, mock_exists):
+#         """Test getting cached audio when file doesn't exist."""
+#         mock_exists.return_value = False
+#
+#         result = _get_cached_audio('test_guid', 'test_song.aac')
+#
+#         self.assertIsNone(result)
+#
+#     @patch('fazztv.madonna.shutil.copy')
+#     @patch('fazztv.madonna.logger')
+#     def test_cache_audio_file_success(self, mock_logger, mock_copy):
+#         """Test successful audio file caching."""
+#         result = _cache_audio_file('/tmp/source.aac', 'test_guid')
+#
+#         self.assertIsNotNone(result)
+#         self.assertIn('test_guid', result)
+#         mock_copy.assert_called_once()
+#         mock_logger.debug.assert_called()
 
 
 if __name__ == '__main__':

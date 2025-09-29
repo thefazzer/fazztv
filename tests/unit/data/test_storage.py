@@ -4,88 +4,108 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock, mock_open
 from pathlib import Path
 import shutil
+import json
+import pickle
 
-from fazztv.data.storage import *
+from fazztv.data.storage import DataStorage
 
 
 class TestStorage:
     """Test suite for storage functionality."""
-    
+
     @pytest.fixture
     def storage(self, tmp_path):
         """Create storage instance."""
-        return Storage(base_dir=tmp_path)
-    
+        return DataStorage(storage_dir=tmp_path)
+
     def test_initialization(self, tmp_path):
         """Test storage initialization."""
-        storage = Storage(base_dir=tmp_path)
-        assert storage.base_dir == tmp_path
+        storage = DataStorage(storage_dir=tmp_path)
+        assert storage.storage_dir == tmp_path
         assert tmp_path.exists()
-    
+
     def test_save_file(self, storage, tmp_path):
-        """Test saving file."""
-        content = b"test content"
-        file_path = storage.save_file("test.txt", content)
-        
-        assert file_path.exists()
-        assert file_path.read_bytes() == content
-    
+        """Test storing data as JSON."""
+        data = {"key": "value", "number": 42}
+        result = storage.store("test_key", data)
+
+        assert result is True
+        stored_file = tmp_path / "test_key.json"
+        assert stored_file.exists()
+        with open(stored_file) as f:
+            loaded = json.load(f)
+        assert loaded == data
+
     def test_load_file(self, storage, tmp_path):
-        """Test loading file."""
-        test_file = tmp_path / "test.txt"
-        test_file.write_text("content")
-        
-        content = storage.load_file("test.txt")
-        assert content == "content"
-    
+        """Test retrieving stored data."""
+        data = {"key": "value"}
+        test_file = tmp_path / "test_key.json"
+        with open(test_file, 'w') as f:
+            json.dump(data, f)
+
+        retrieved = storage.retrieve("test_key")
+        assert retrieved == data
+
     def test_delete_file(self, storage, tmp_path):
-        """Test deleting file."""
-        test_file = tmp_path / "test.txt"
-        test_file.write_text("content")
-        
-        storage.delete_file("test.txt")
+        """Test deleting stored data."""
+        test_file = tmp_path / "test_key.json"
+        test_file.write_text('{"key": "value"}')
+
+        result = storage.delete("test_key")
+        assert result is True
         assert not test_file.exists()
-    
+
     def test_list_files(self, storage, tmp_path):
-        """Test listing files."""
+        """Test listing stored keys."""
         for i in range(3):
-            (tmp_path / f"file{i}.txt").write_text(f"content{i}")
-        
-        files = storage.list_files("*.txt")
-        assert len(files) == 3
-    
-    def test_copy_file(self, storage, tmp_path):
-        """Test copying file."""
-        src = tmp_path / "source.txt"
-        src.write_text("content")
-        
-        storage.copy_file("source.txt", "dest.txt")
-        dest = tmp_path / "dest.txt"
-        assert dest.exists()
-        assert dest.read_text() == "content"
-    
-    def test_move_file(self, storage, tmp_path):
-        """Test moving file."""
-        src = tmp_path / "source.txt"
-        src.write_text("content")
-        
-        storage.move_file("source.txt", "dest.txt")
-        dest = tmp_path / "dest.txt"
-        assert dest.exists()
-        assert not src.exists()
-    
-    def test_create_directory(self, storage, tmp_path):
-        """Test creating directory."""
-        storage.create_directory("subdir/nested")
-        dir_path = tmp_path / "subdir" / "nested"
-        assert dir_path.exists()
-        assert dir_path.is_dir()
-    
+            (tmp_path / f"file{i}.json").write_text(f'{{"data": {i}}}')
+
+        keys = storage.list_keys()
+        assert len(keys) == 3
+        assert "file0" in keys
+        assert "file1" in keys
+        assert "file2" in keys
+
+    def test_copy_file(self, storage):
+        """Test storing and retrieving with pickle format."""
+        data = {"complex": [1, 2, 3], "nested": {"a": 1}}
+
+        # Store with pickle format
+        result = storage.store("pickle_test", data, format="pickle")
+        assert result is True
+
+        # Retrieve with pickle format
+        retrieved = storage.retrieve("pickle_test", format="pickle")
+        assert retrieved == data
+
+    def test_move_file(self, storage):
+        """Test checking if data exists."""
+        storage.store("exists_test", {"data": "value"})
+
+        assert storage.exists("exists_test") is True
+        assert storage.exists("nonexistent") is False
+
+    def test_create_directory(self, storage):
+        """Test storing and retrieving metadata."""
+        storage.store("data_key", {"data": "value"})
+        metadata = {"description": "Test data", "version": 1}
+
+        result = storage.store_metadata("data_key", metadata)
+        assert result is True
+
+        retrieved_meta = storage.retrieve_metadata("data_key")
+        assert retrieved_meta["description"] == "Test data"
+        assert retrieved_meta["version"] == 1
+        assert "stored_at" in retrieved_meta
+
     def test_get_file_info(self, storage, tmp_path):
-        """Test getting file info."""
-        test_file = tmp_path / "test.txt"
-        test_file.write_text("content")
-        
-        info = storage.get_file_info("test.txt")
-        assert info["size"] == 7
-        assert info["exists"] is True
+        """Test getting storage information."""
+        # Add some test data
+        storage.store("key1", {"data": "value1"})
+        storage.store("key2", {"data": "value2"})
+
+        info = storage.get_storage_info()
+        assert info["directory"] == str(tmp_path)
+        assert info["file_count"] == 2
+        assert "total_size" in info
+        assert "total_size_mb" in info

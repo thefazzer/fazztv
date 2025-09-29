@@ -2,6 +2,7 @@
 
 import json
 import pickle
+import shutil
 from pathlib import Path
 from typing import Any, Optional, Dict, List
 from datetime import datetime
@@ -233,8 +234,6 @@ class DataStorage:
         Returns:
             True if successful
         """
-        import shutil
-        
         try:
             backup_dir.mkdir(parents=True, exist_ok=True)
             backup_path = backup_dir / f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"

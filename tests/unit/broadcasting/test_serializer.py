@@ -306,7 +306,7 @@ class TestSerializeCollection:
 class TestTrimMedia:
     """Test media trimming functionality."""
     
-    @patch('fazztv.processors.AudioProcessor')
+    @patch('fazztv.broadcasting.serializer.AudioProcessor')
     @patch('fazztv.broadcasting.serializer.get_temp_path')
     @patch('fazztv.broadcasting.serializer.safe_delete')
     def test_trim_media_successful(self, mock_delete, mock_temp_path, mock_audio_proc, media_serializer, tmp_path):
@@ -329,7 +329,7 @@ class TestTrimMedia:
         )
         mock_delete.assert_called_once_with(input_path)
     
-    @patch('fazztv.processors.AudioProcessor')
+    @patch('fazztv.broadcasting.serializer.AudioProcessor')
     def test_trim_media_no_duration(self, mock_audio_proc, media_serializer, tmp_path):
         """Test trim returns original when duration cannot be determined."""
         input_path = tmp_path / "input.mp3"
@@ -342,7 +342,7 @@ class TestTrimMedia:
         
         assert result == input_path
     
-    @patch('fazztv.processors.AudioProcessor')
+    @patch('fazztv.broadcasting.serializer.AudioProcessor')
     @patch('fazztv.broadcasting.serializer.get_temp_path')
     def test_trim_media_with_max_duration(self, mock_temp_path, mock_audio_proc, media_serializer, tmp_path):
         """Test trimming respects maximum duration."""
