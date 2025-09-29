@@ -6,11 +6,12 @@ from loguru import logger
 
 from fazztv.models import MediaItem
 from fazztv.config import constants
+from fazztv.utils.error_handling import log_exceptions, handle_subprocess_result, validate_file_exists
 
 class RTMPBroadcaster:
     """Handles broadcasting of serialized MediaItems to RTMP endpoints."""
     
-    def __init__(self, rtmp_url: str = "rtmp://127.0.0.1:1935/live/test"):
+    def __init__(self, rtmp_url: str = constants.DEFAULT_RTMP_URL):
         """
         Initialize the broadcaster with an RTMP URL.
         
@@ -19,6 +20,7 @@ class RTMPBroadcaster:
         """
         self.rtmp_url = rtmp_url
     
+    @log_exceptions(return_value=False)
     def broadcast_item(self, media_item: MediaItem) -> bool:
         """
         Broadcast a single media item to the RTMP endpoint.
@@ -32,10 +34,9 @@ class RTMPBroadcaster:
         if not media_item.is_serialized():
             logger.error(f"Media item {media_item} is not serialized")
             return False
-        
+
         serialized_path = media_item.serialized
-        if not os.path.exists(serialized_path):
-            logger.error(f"Serialized file {serialized_path} does not exist")
+        if not validate_file_exists(serialized_path, "Broadcasting"):
             return False
         
         cmd = [
@@ -49,10 +50,7 @@ class RTMPBroadcaster:
         logger.debug(f"Broadcasting {media_item} to {self.rtmp_url}")
         try:
             result = subprocess.run(cmd, capture_output=True, timeout=constants.FFMPEG_TIMEOUT)
-            if result.returncode != 0:
-                logger.error(f"Broadcasting error: {result.stderr.decode('utf-8', 'ignore')}")
-                return False
-            return True
+            return handle_subprocess_result(result, f"Broadcasting {media_item}")
         except Exception as e:
             logger.error(f"Broadcasting exception: {e}")
             return False

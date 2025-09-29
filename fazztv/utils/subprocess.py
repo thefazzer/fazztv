@@ -1,6 +1,7 @@
 """Subprocess utilities for safe command execution."""
 import subprocess
 import logging
+import shlex
 from typing import Optional, List, Union, Tuple
 from pathlib import Path
 
@@ -32,7 +33,6 @@ def safe_subprocess_run(
     try:
         # Convert string commands to list for safer execution
         if isinstance(cmd, str):
-            import shlex
             cmd = shlex.split(cmd)
             logger.warning("String command converted to list for safer execution")
 

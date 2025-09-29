@@ -1,0 +1,56 @@
+"""UI-specific constants for FazzTV video overlays and visual elements."""
+
+# Video Dimensions
+UI_BASE_WIDTH = 2080
+UI_BASE_HEIGHT = 1170
+UI_MARQUEE_HEIGHT = 50
+
+# Video scaling
+UI_VIDEO_SCALE = "2080:1170"
+UI_LOGO_SCALE = "250:250"
+UI_BULB_SCALE = "95:95"
+UI_MARQUEE_SCALE = "2080:50"
+
+# Font Sizes
+UI_WAR_TITLE_FONT_SIZE = 50
+UI_TITLE_FONT_SIZE = 40
+UI_COMMENTARY_FONT_SIZE = 36
+UI_AGE_TEXT_FONT_SIZE = 28
+
+# Text Positions
+UI_WAR_TITLE_Y = 30
+UI_TITLE_Y = 90
+UI_BULB_Y = 175
+UI_BULB_X_OFFSET = 20  # (W/2) - 20
+UI_AGE_TEXT1_Y = 280
+UI_AGE_TEXT2_Y = 330
+
+# Border widths
+UI_WAR_TITLE_BORDER_WIDTH = 4
+UI_TITLE_BORDER_WIDTH = 4
+UI_COMMENTARY_BORDER_WIDTH = 3
+UI_AGE_TEXT_BORDER_WIDTH = 3
+
+# Marquee settings
+UI_MARQUEE_SCROLL_MULTIPLIER = 40  # mod(40*t\\,w+text_w)
+UI_MARQUEE_Y_OFFSET = 10  # h-th-10
+
+# Logo position
+UI_LOGO_X = 200
+UI_LOGO_Y = 0
+
+# Overlay offset
+UI_OVERLAY_BOTTOM_OFFSET = 10  # main_h-overlay_h-10
+
+# FFmpeg frame rate
+UI_FFMPEG_FRAME_RATE = "10"
+
+# Background color settings
+UI_BACKGROUND_COLOR = "black"
+UI_NULL_VIDEO_SIZE = "640x480"
+UI_NULL_VIDEO_DURATION = 10
+UI_NULL_VIDEO_RATE = 30
+
+# Audio settings
+UI_AUDIO_SAMPLE_RATE = 44100
+UI_AUDIO_CHANNELS = "stereo"

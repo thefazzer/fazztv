@@ -1,4 +1,4 @@
-import argparse 
+import argparse
 import shutil
 import sys
 from datetime import date, datetime
@@ -12,11 +12,36 @@ import subprocess
 from typing import List, Optional, Tuple
 import re
 import uuid
+import tempfile
+import traceback
+import yt_dlp
 from fazztv.models import MediaItem
 from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.utils.ascii_art import print_banner
+from fazztv.utils.file_utils import is_valid_file, ensure_directory_exists, safe_copy_file
+from fazztv.utils.download_utils import (
+    get_cached_file, cache_file, get_yt_dlp_audio_options, get_yt_dlp_video_options,
+    find_downloaded_audio_file, move_audio_to_output, prepare_output_directory,
+    prepare_base_output_path, download_with_yt_dlp
+)
+from fazztv.utils.error_handling import log_exceptions, safe_execute
+from fazztv.utils.ffmpeg_utils import (
+    build_ffmpeg_inputs, build_ffmpeg_filter, build_ffmpeg_command, execute_ffmpeg_command
+)
 from fazztv.config import constants
+from fazztv.config.ui_constants import (
+    UI_BASE_WIDTH, UI_BASE_HEIGHT, UI_MARQUEE_HEIGHT, UI_VIDEO_SCALE,
+    UI_LOGO_SCALE, UI_BULB_SCALE, UI_MARQUEE_SCALE, UI_WAR_TITLE_FONT_SIZE,
+    UI_TITLE_FONT_SIZE, UI_COMMENTARY_FONT_SIZE, UI_AGE_TEXT_FONT_SIZE,
+    UI_WAR_TITLE_Y, UI_TITLE_Y, UI_BULB_Y, UI_BULB_X_OFFSET,
+    UI_AGE_TEXT1_Y, UI_AGE_TEXT2_Y, UI_WAR_TITLE_BORDER_WIDTH,
+    UI_TITLE_BORDER_WIDTH, UI_COMMENTARY_BORDER_WIDTH, UI_AGE_TEXT_BORDER_WIDTH,
+    UI_MARQUEE_SCROLL_MULTIPLIER, UI_MARQUEE_Y_OFFSET, UI_LOGO_X, UI_LOGO_Y,
+    UI_OVERLAY_BOTTOM_OFFSET, UI_FFMPEG_FRAME_RATE, UI_BACKGROUND_COLOR,
+    UI_NULL_VIDEO_SIZE, UI_NULL_VIDEO_DURATION, UI_NULL_VIDEO_RATE,
+    UI_AUDIO_SAMPLE_RATE, UI_AUDIO_CHANNELS
+)
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
@@ -27,7 +52,7 @@ load_dotenv()
 # ---------------------------------------------------------------------------
 STREAM_KEY = None
 SEARCH_LIMIT = constants.SEARCH_LIMIT
-LOG_FILE = "madonna_broadcast.log"
+LOG_FILE = constants.MADONNA_LOG_FILE
 
 BASE_RES = constants.BASE_RESOLUTION
 FADE_LENGTH = constants.DEFAULT_FADE_LENGTH
@@ -35,7 +60,7 @@ MARQUEE_DURATION = constants.MARQUEE_DURATION
 SCROLL_SPEED = constants.SCROLL_SPEED
 ELAPSED_TUNE_SECONDS = constants.ELAPSED_TUNE_SECONDS
 
-DEFAULT_VIDEO = "madonna-rotator.mp4"
+DEFAULT_VIDEO = constants.DEFAULT_VIDEO_FILE
 
 # Path to the JSON data file
 DATA_FILE = os.path.join(os.path.dirname(__file__), "madonna_data.json")
@@ -51,36 +76,32 @@ logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 #                       HELPER FUNCTIONS
 # ---------------------------------------------------------------------------
 
+@log_exceptions(return_value={"episodes": []})
 def load_madonna_data():
     """Load Madonna and war documentary data from JSON file."""
-    try:
-        with open(DATA_FILE, 'r') as f:
-            data = json.load(f)
-        
-        # Add GUIDs to episodes that don't have them
-        modified = False
-        for episode in data['episodes']:
-            if 'guid' not in episode:
-                episode['guid'] = str(uuid.uuid4())
-                modified = True
-        
-        # Save the updated data if any GUIDs were added
-        if modified:
-            with open(DATA_FILE, 'w') as f:
-                json.dump(data, f, indent=2)
-            logger.info(f"Added GUIDs to episodes in {DATA_FILE}")
-        
-        logger.info(f"Successfully loaded {len(data['episodes'])} episodes from {DATA_FILE}")
-        return data
-    except Exception as e:
-        logger.error(f"Error loading data from {DATA_FILE}: {e}")
-        return {"episodes": []}
+    with open(DATA_FILE, 'r') as f:
+        data = json.load(f)
+
+    # Add GUIDs to episodes that don't have them
+    modified = False
+    for episode in data['episodes']:
+        if 'guid' not in episode:
+            episode['guid'] = str(uuid.uuid4())
+            modified = True
+
+    # Save the updated data if any GUIDs were added
+    if modified:
+        with open(DATA_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+        logger.info(f"Added GUIDs to episodes in {DATA_FILE}")
+
+    logger.info(f"Successfully loaded {len(data['episodes'])} episodes from {DATA_FILE}")
+    return data
 
 def get_madonna_song_url(song_name):
     """Search for a Madonna song on YouTube."""
     logger.debug(f"Searching for Madonna song: {song_name}...")
-    import yt_dlp
-    query = f"Madonna {song_name} official music video"
+    query = constants.MADONNA_SEARCH_TEMPLATE.format(song_name=song_name)
     ydl_opts = {
         "quiet": True,
         "default_search": "ytsearch",
@@ -88,7 +109,7 @@ def get_madonna_song_url(song_name):
         "max_downloads": SEARCH_LIMIT,
         "nopart": True,
         "no_resume": True,
-        "fragment_retries": 999
+        "fragment_retries": constants.FRAGMENT_RETRIES_MAX
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -104,126 +125,46 @@ def get_madonna_song_url(song_name):
         logger.error(f"Error searching Madonna - {song_name}: {e}")
         return None
 
-def _get_cached_audio(guid, output_file):
-    """Check for and use cached audio file if available."""
-    if not guid:
-        return False
-    cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
-    if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
-        logger.info(f"Using cached audio file for GUID {guid}")
-        shutil.copy(cached_file, output_file)
-        return True
-    return False
+# Note: Utility functions moved to fazztv.utils.download_utils
 
-def _cache_audio_file(output_file, guid):
-    """Cache audio file for future use."""
-    if not guid:
-        return
-    cached_file = os.path.join(TEMP_DIR, f"{guid}_audio.aac")
-    logger.debug(f"Caching audio file to {cached_file}")
-    shutil.copy(output_file, cached_file)
-
-def _prepare_output_directory(output_file):
-    """Ensure output directory exists."""
-    output_dir = os.path.dirname(output_file)
-    if output_dir and not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-def _get_yt_dlp_audio_opts(base_output):
-    """Get yt-dlp options for audio download."""
-    return {
-        "format": "bestaudio/best",
-        "max_duration": ELAPSED_TUNE_SECONDS,
-        "outtmpl": f"{base_output}.%(ext)s",
-        "quiet": False,
-        "verbose": True,
-        "overwrites": True,
-        "continuedl": False,
-        "postprocessors": [{
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "aac",
-            "preferredquality": "192",
-        }]
-    }
-
-def _find_downloaded_audio_file(base_output):
-    """Find the audio file created by yt-dlp."""
-    possible_extensions = ['.aac', '.m4a', '.aac.m4a', '.aac.mp4', '.mp3']
-
-    # Try standard extensions
-    for ext in possible_extensions:
-        potential_file = f"{base_output}{ext}"
-        if os.path.exists(potential_file) and os.path.getsize(potential_file) > 0:
-            logger.debug(f"Found audio file: {potential_file} ({os.path.getsize(potential_file)} bytes)")
-            return potential_file
-
-    # Try directory search if standard approach fails
-    dir_path = os.path.dirname(base_output)
-    base_name = os.path.basename(base_output)
-    logger.debug(f"Searching directory {dir_path} for files starting with {base_name}")
-
-    for file in os.listdir(dir_path):
-        if file.startswith(base_name) and os.path.getsize(os.path.join(dir_path, file)) > 0:
-            found_file = os.path.join(dir_path, file)
-            logger.debug(f"Found alternative audio file: {found_file}")
-            return found_file
-
-    return None
-
-def _move_audio_to_output(found_file, output_file):
-    """Move downloaded audio file to expected location."""
-    if found_file != output_file:
-        logger.debug(f"Renaming {found_file} to {output_file}")
-        if os.path.exists(output_file):
-            os.remove(output_file)
-        os.rename(found_file, output_file)
-
+@log_exceptions(return_value=False)
 def download_audio_only(url, output_file, guid=None):
     """Download only the audio from a YouTube video."""
     # Try to use cached version
-    if _get_cached_audio(guid, output_file):
+    if get_cached_file(guid, output_file, TEMP_DIR, 'audio'):
         return True
 
     logger.debug(f"Downloading audio from {url} to {output_file}")
-    import yt_dlp
 
     # Prepare output directory
-    _prepare_output_directory(output_file)
+    if not prepare_output_directory(output_file):
+        return False
 
     # Create base output path without extension
-    base_output = os.path.splitext(output_file)[0]
-    if base_output.endswith('.aac'):
-        base_output = base_output[:-4]
+    base_output = prepare_base_output_path(output_file)
 
     # Get yt-dlp options
-    yt_dlp_opts = _get_yt_dlp_audio_opts(base_output)
+    yt_dlp_opts = get_yt_dlp_audio_options(base_output)
 
-    try:
-        # Download audio
-        with yt_dlp.YoutubeDL(yt_dlp_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
-            if not info:
-                logger.error(f"No information extracted for URL: {url}")
-                return False
-
-        # Find the downloaded file
-        found_file = _find_downloaded_audio_file(base_output)
-
-        if not found_file:
-            logger.error(f"No valid audio file found for {base_output}")
-            return False
-
-        # Move to expected location
-        _move_audio_to_output(found_file, output_file)
-
-        # Cache for future use
-        _cache_audio_file(output_file, guid)
-
-        return True
-
-    except Exception as e:
-        logger.error(f"Error downloading audio: {e}")
+    # Download audio
+    if not download_with_yt_dlp(url, yt_dlp_opts, "audio download"):
         return False
+
+    # Find the downloaded file
+    found_file = find_downloaded_audio_file(base_output)
+
+    if not found_file:
+        logger.error(f"No valid audio file found for {base_output}")
+        return False
+
+    # Move to expected location
+    if not move_audio_to_output(found_file, output_file):
+        return False
+
+    # Cache for future use
+    cache_file(output_file, guid, TEMP_DIR, 'audio')
+
+    return True
 
 def calculate_days_old(song_info: str) -> int:
         date_match = re.search(r'- ([A-Za-z]+ \d{1,2} \d{4})$', song_info)
@@ -233,52 +174,46 @@ def calculate_days_old(song_info: str) -> int:
             return days_old
         return 0
 
+@log_exceptions(return_value=False)
 def download_video_only(url, output_file, guid=None):
     """Download only the video from a YouTube video."""
     # Check if cached file exists
-    if guid:
-        cached_file = os.path.join(TEMP_DIR, f"{guid}_video.mp4")
-        if os.path.exists(cached_file) and os.path.getsize(cached_file) > 0:
-            logger.info(f"Using cached video file for GUID {guid}")
-            shutil.copy(cached_file, output_file)
-            return True
-    
-    logger.debug(f"Downloading video from {url} to {output_file}")
-    import yt_dlp
-    ydl_opts = {
-        "format": "bestvideo[ext=mp4]",
-        "max_duration": ELAPSED_TUNE_SECONDS,
-        "outtmpl": output_file,
-        "quiet": True,
-        "overwrites": True,
-        "continuedl": False,
-        "age_limit": 99  # Allow age-restricted content
-    }
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        
-        # Cache the file if guid is provided and download was successful
-        if guid and os.path.exists(output_file) and os.path.getsize(output_file) > 0:
-            cached_file = os.path.join(TEMP_DIR, f"{guid}_video.mp4")
-            logger.debug(f"Caching video file to {cached_file}")
-            shutil.copy(output_file, cached_file)
-            
+    if get_cached_file(guid, output_file, TEMP_DIR, 'video'):
         return True
-    except Exception as e:
-        logger.error(f"Error downloading video: {e}")
+
+    logger.debug(f"Downloading video from {url} to {output_file}")
+    ydl_opts = get_yt_dlp_video_options(output_file)
+
+    # Download video
+    if not download_with_yt_dlp(url, ydl_opts, "video download"):
         return False
 
+    # Cache the file if guid is provided and download was successful
+    cache_file(output_file, guid, TEMP_DIR, 'video')
+
+    return True
+
+@log_exceptions(return_value=None)
 def cleanup_environment():
     """Prepare environment without purging cached files."""
     # Clear pycache if in dev mode.
     if DEV_MODE:
         pycache_dir = os.path.join(os.path.dirname(__file__), "__pycache__")
         if os.path.exists(pycache_dir):
-            shutil.rmtree(pycache_dir)
+            safe_execute(
+                shutil.rmtree,
+                args=(pycache_dir,),
+                operation_name="clear pycache directory"
+            )
             logger.info("Cleared __pycache__ directory")
+
     # Ensure temp directory exists (do not purge it to enable caching).
-    os.makedirs(TEMP_DIR, exist_ok=True)
+    safe_execute(
+        os.makedirs,
+        args=(TEMP_DIR,),
+        kwargs={"exist_ok": True},
+        operation_name="create temp directory"
+    )
     logger.info(f"Using temp directory: {TEMP_DIR}")
 
 
@@ -301,137 +236,71 @@ def prepare_overlay_texts(episode, song_name):
     }
 
 
-def build_ffmpeg_inputs(episode):
-    """Build FFmpeg input arguments for media processing."""
-    video_file = episode.get("video_file", "").strip()
-    audio_file = episode.get("audio_file", "").strip()
-    input_args = []
-
-    # (0) Black background
-    input_args.extend(["-f", "lavfi", "-i", "color=c=black:s=2080x1170"])
-
-    # (1) Audio: use provided file if exists; else silent audio
-    if audio_file:
-        input_args.extend(["-i", audio_file])
-    else:
-        input_args.extend(["-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo"])
-
-    # (2) Video: use provided file if exists; else default if available; else dummy
-    if video_file:
-        input_args.extend(["-i", video_file])
-    elif os.path.exists(DEFAULT_VIDEO):
-        input_args.extend(["-i", DEFAULT_VIDEO])
-    else:
-        input_args.extend(["-f", "lavfi", "-i", "nullsrc=s=640x480:d=10:r=30"])
-
-    return input_args
+# Note: FFmpeg utility functions moved to fazztv.utils.ffmpeg_utils
 
 
-def build_ffmpeg_filter(texts, has_logo):
-    """Build FFmpeg filter_complex for video processing."""
-    # Marquee input
-    marquee_text = (
-        "color=c=black:s=2080x50,"
-        "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        "text='" + texts['commentary'] + "':"
-        "fontsize=36:fontcolor=white:bordercolor=black:borderw=3:"
-        "x=w-mod(40*t\\,w+text_w):"
-        "y=h-th-10"
-    )
-
-    filter_main = [
-        # Combine background and main video
-        "[0:v]scale=2080:1170[bg];[2:v]scale=2080:1170[vmain];[bg][vmain]overlay=0:0[base]",
-        # War and title text overlays
-        f"[base]drawtext=text='{texts['war_text']}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        "fontsize=50:fontcolor=red:bordercolor=black:borderw=4:x=(w-text_w)/2:y=30[war_titled]",
-        f"[war_titled]drawtext=text='{texts['title_text']}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        "fontsize=40:fontcolor=yellow:bordercolor=black:borderw=4:x=(w-text_w)/2:y=90[titled]",
-        # Example overlay: a did-you-know lightbulb
-        "movie=didyouknow-lightbulb.png[bulb]",
-        "[bulb]scale=95:95[scaled_bulb]",
-        "[titled][scaled_bulb]overlay=(W/2)-20:175[v2_with_bulb]",
-        # Age text overlay
-        f"[v2_with_bulb]drawtext=text='{texts['age_text1']}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        "fontsize=28:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=280[titledbylined]",
-        f"[titledbylined]drawtext=text='{texts['age_text2']}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf:"
-        "fontsize=28:fontcolor=white:bordercolor=black:borderw=3:x=(w-text_w)/2:y=330[titledbylined]",
-        # Marquee overlay
-        "[3:v]scale=2080:50[marq]",
-        "[titledbylined][marq]overlay=0:main_h-overlay_h-10[with_marq]"
-    ]
-
-    if has_logo:
-        filter_main.append("[4:v]scale=250:250[logo]")
-        filter_main.append("[with_marq][logo]overlay=200:0[outfinal]")
-    else:
-        filter_main.append("[with_marq]copy[outfinal]")
-
-    return ";".join(filter_main), marquee_text
+def _extract_song_name_from_title(title: str) -> str:
+    """Extract song name from episode title."""
+    song_match = re.match(r"^(.*?)\s*\(", title)
+    return song_match.group(1) if song_match else "Unknown Song"
 
 
+def _ensure_episode_guid(episode: dict) -> str:
+    """Ensure episode has a GUID, generating one if needed."""
+    guid = episode.get('guid')
+    if not guid:
+        guid = str(uuid.uuid4())
+        episode['guid'] = guid
+        logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
+    return guid
+
+
+# Note: _build_ffmpeg_command moved to fazztv.utils.ffmpeg_utils
+
+
+@log_exceptions(return_value=None)
 def create_media_item_from_episode(episode):
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
-    try:
-        # Extract song name from title
-        song_match = re.match(r"^(.*?)\s*\(", episode['title'])
-        song_name = song_match.group(1) if song_match else "Unknown Song"
 
-        # Ensure GUID exists
-        guid = episode.get('guid')
-        if not guid:
-            guid = str(uuid.uuid4())
-            episode['guid'] = guid
-            logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
+    # Extract song name from title
+    song_name = _extract_song_name_from_title(episode['title'])
 
-        texts = prepare_overlay_texts(episode, song_name)
+    # Ensure GUID exists
+    guid = _ensure_episode_guid(episode)
 
-        fztv_logo_exists = os.path.exists("fztv-logo.png")
+    texts = prepare_overlay_texts(episode, song_name)
 
-        # Build FFmpeg inputs
-        input_args = build_ffmpeg_inputs(episode)
+    fztv_logo_exists = os.path.exists(constants.DEFAULT_LOGO_FILE)
 
-        # Build filter complex
-        filter_complex, marquee_text = build_ffmpeg_filter(texts, fztv_logo_exists)
+    # Build FFmpeg inputs
+    input_args = build_ffmpeg_inputs(episode)
 
-        # Add marquee and optional logo inputs
-        input_args.extend(["-f", "lavfi", "-i", marquee_text])
-        if fztv_logo_exists:
-            input_args.extend(["-i", "fztv-logo.png"])
+    # Build filter complex
+    filter_complex, marquee_text = build_ffmpeg_filter(texts, fztv_logo_exists)
 
-        output_file = os.path.join(TEMP_DIR, f"{guid}_output.mp4")
-        cmd = [
-            "ffmpeg", "-y",
-            *input_args,
-            "-filter_complex", filter_complex,
-            "-r", "10",
-            "-map", "[outfinal]",
-            "-map", "1:a",
-            "-c:v", "h264_nvenc", "-preset", "fast",
-            "-c:a", "aac", "-b:a", "128k",
-            "-t", f"{ELAPSED_TUNE_SECONDS}",
-            output_file
-        ]
+    # Add marquee and optional logo inputs
+    input_args.extend(["-f", "lavfi", "-i", marquee_text])
+    if fztv_logo_exists:
+        input_args.extend(["-i", constants.DEFAULT_LOGO_FILE])
 
-        subprocess.run(cmd, check=True, timeout=constants.FFMPEG_TIMEOUT)
+    output_file = os.path.join(TEMP_DIR, f"{guid}{constants.OUTPUT_CACHE_SUFFIX}")
+    cmd = build_ffmpeg_command(input_args, filter_complex, output_file, ELAPSED_TUNE_SECONDS)
 
-        media_item = MediaItem(
-            artist="Madonna",
-            song=song_name,
-            url="",
-            taxprompt=episode['commentary'],
-            length_percent=100,
-            duration=ELAPSED_TUNE_SECONDS
-        )
-        media_item.serialized = output_file
-        return media_item
+    if not execute_ffmpeg_command(cmd, f"FFmpeg processing for episode '{episode['title']}'"):
+        logger.error(f"FFmpeg processing failed for episode '{episode['title']}'")
+        raise RuntimeError("FFmpeg processing failed")
 
-    except Exception as e:
-        logger.error(f"Error in create_media_item_from_episode: {e}")
-        import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        return None
+    media_item = MediaItem(
+        artist="Madonna",
+        song=song_name,
+        url="",
+        taxprompt=episode['commentary'],
+        length_percent=100,
+        duration=ELAPSED_TUNE_SECONDS
+    )
+    media_item.serialized = output_file
+    return media_item
 
 def setup_environment(dev_mode=False):
     global DEV_MODE
@@ -442,8 +311,6 @@ def setup_environment(dev_mode=False):
 
 
 def parse_arguments():
-    import tempfile
-    import time
     parser = argparse.ArgumentParser(description='Madonna Military History FazzTV broadcast')
     parser.add_argument('--guids', nargs='*', help='List of GUIDs to process',
                         default=["40a441fd-4ce8-49b2-82c4-356f8f13b8c5"])
@@ -460,6 +327,7 @@ def load_episodes():
     return episodes
 
 
+@log_exceptions(return_value=False)
 def process_episode_audio(episode, temp_dir):
     guid = episode.get('guid')
     audio_path = os.path.join(temp_dir, f"madonna_audio_{guid}.aac")
@@ -483,6 +351,7 @@ def process_episode_audio(episode, temp_dir):
     return True
 
 
+@log_exceptions(return_value=False)
 def process_episode_video(episode, temp_dir):
     guid = episode.get('guid')
     video_path = os.path.join(temp_dir, f"madonna_video_{guid}.mp4")
@@ -509,8 +378,8 @@ def process_episode_video(episode, temp_dir):
     return True
 
 
+@log_exceptions(return_value=[])
 def process_episodes(episodes):
-    import tempfile
     media_items = []
     temp_dir = os.path.join(tempfile.gettempdir(), "fazztv")
 
@@ -553,8 +422,7 @@ def main():
     setup_environment(args.dev)
     episodes = load_episodes()
 
-    rtmp_url = (f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}"
-                if STREAM_KEY else "rtmp://127.0.0.1:1935/live/test")
+    rtmp_url = constants.get_rtmp_url(STREAM_KEY)
 
     media_items = process_episodes(episodes)
 

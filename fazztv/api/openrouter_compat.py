@@ -1,5 +1,6 @@
 """Backward compatibility wrapper for OpenRouter client."""
 
+import json
 from typing import Optional, Dict, Any
 from loguru import logger
 
@@ -192,7 +193,6 @@ class OpenRouterClient:
 
         if response:
             try:
-                import json
                 # Try to extract JSON from response
                 json_start = response.find('{')
                 json_end = response.rfind('}') + 1

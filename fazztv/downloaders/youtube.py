@@ -9,6 +9,7 @@ import yt_dlp
 
 from fazztv.downloaders.base import BaseDownloader
 from fazztv.config import constants
+from fazztv.utils.error_handling import log_exceptions, safe_execute
 
 
 class YouTubeDownloader(BaseDownloader):
@@ -23,6 +24,7 @@ class YouTubeDownloader(BaseDownloader):
         """
         self.max_duration = max_duration or constants.ELAPSED_TUNE_SECONDS
         
+    @log_exceptions(return_value=False)
     def download(self, url: str, output_path: Path,
                  options: Optional[Dict[str, Any]] = None) -> bool:
         """Download complete media from YouTube."""
@@ -35,6 +37,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return self._execute_download(url, ydl_opts)
     
+    @log_exceptions(return_value=False)
     def download_audio(self, url: str, output_path: Path,
                       options: Optional[Dict[str, Any]] = None) -> bool:
         """Download only audio from YouTube."""
@@ -68,6 +71,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return success and output_path.exists()
     
+    @log_exceptions(return_value=False)
     def download_video(self, url: str, output_path: Path,
                       options: Optional[Dict[str, Any]] = None) -> bool:
         """Download only video from YouTube."""
@@ -83,6 +87,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return self._execute_download(url, ydl_opts)
     
+    @log_exceptions(return_value=[])
     def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Search YouTube for videos matching query."""
         logger.debug(f"Searching YouTube for: {query}")
@@ -95,27 +100,22 @@ class YouTubeDownloader(BaseDownloader):
             "extract_flat": False,
         }
         
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(f"ytsearch{limit}:{query}", download=False)
-                videos = info.get("entries", [])
-                
-                results = []
-                for video in videos:
-                    results.append({
-                        "title": video.get("title", "Unknown"),
-                        "url": video.get("webpage_url", ""),
-                        "duration": video.get("duration", 0),
-                        "id": video.get("id", ""),
-                        "uploader": video.get("uploader", "Unknown")
-                    })
-                
-                logger.info(f"Found {len(results)} results for query: {query}")
-                return results
-                
-        except Exception as e:
-            logger.error(f"Search error for '{query}': {e}")
-            return []
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f"ytsearch{limit}:{query}", download=False)
+            videos = info.get("entries", [])
+
+            results = []
+            for video in videos:
+                results.append({
+                    "title": video.get("title", "Unknown"),
+                    "url": video.get("webpage_url", ""),
+                    "duration": video.get("duration", 0),
+                    "id": video.get("id", ""),
+                    "uploader": video.get("uploader", "Unknown")
+                })
+
+            logger.info(f"Found {len(results)} results for query: {query}")
+            return results
     
     def get_random_result(self, query: str, limit: int = 5) -> Optional[Tuple[str, str]]:
         """
@@ -153,18 +153,15 @@ class YouTubeDownloader(BaseDownloader):
         
         return options
     
+    @log_exceptions(return_value=False)
     def _execute_download(self, url: str, options: dict) -> bool:
         """Execute the actual download with yt-dlp."""
-        try:
-            with yt_dlp.YoutubeDL(options) as ydl:
-                info = ydl.extract_info(url, download=True)
-                if not info:
-                    logger.error(f"No information extracted for URL: {url}")
-                    return False
-                return True
-        except Exception as e:
-            logger.error(f"Download error: {e}")
-            return False
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(url, download=True)
+            if not info:
+                logger.error(f"No information extracted for URL: {url}")
+                return False
+            return True
     
     def _find_output_file(self, base_path: str, extensions: list) -> Optional[Path]:
         """Find the actual output file with any of the given extensions."""

@@ -306,7 +306,7 @@ def main():
     
     if args.test_mode:
         settings.stream_key = None
-        settings.rtmp_url = "rtmp://127.0.0.1:1935/live/test"
+        settings.rtmp_url = constants.DEFAULT_RTMP_URL
     
     if args.no_logo:
         settings.enable_logo = False

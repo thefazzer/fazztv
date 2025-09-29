@@ -223,7 +223,7 @@ class ApplicationFactory:
         
         if hasattr(args, 'test_mode') and args.test_mode:
             settings.stream_key = None
-            settings.rtmp_url = "rtmp://127.0.0.1:1935/live/test"
+            settings.rtmp_url = constants.DEFAULT_RTMP_URL
         
         if hasattr(args, 'no_logo') and args.no_logo:
             settings.enable_logo = False
@@ -246,7 +246,7 @@ class ApplicationFactory:
         
         settings = Settings()
         settings.stream_key = None
-        settings.rtmp_url = "rtmp://127.0.0.1:1935/live/test"
+        settings.rtmp_url = constants.DEFAULT_RTMP_URL
         settings.log_level = "DEBUG"
         settings.cache_dir = Path("/tmp/fazztv_test")
         settings.cache_dir.mkdir(parents=True, exist_ok=True)
