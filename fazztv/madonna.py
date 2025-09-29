@@ -1,3 +1,21 @@
+"""
+Madonna Military History FazzTV Module
+
+This module provides functionality for creating video content that combines Madonna songs
+with historical military content. It handles downloading, processing, and broadcasting
+of multimedia content with overlay text and effects.
+
+Main Features:
+    - Download audio/video content from YouTube
+    - Process media with FFmpeg (overlays, effects, transitions)
+    - Generate educational content combining music and history
+    - Broadcast to RTMP endpoints
+    - Cache management for downloaded content
+
+Usage:
+    python madonna.py --guids <guid1> <guid2> --dev
+"""
+
 import argparse
 import shutil
 import sys
