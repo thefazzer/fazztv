@@ -78254,3 +78254,243 @@ ValueError: Test error
 2025-09-29 18:24:58.957 | DEBUG    | fazztv.utils.logging:log_performance:100 - fast_func completed in 0.50s
 2025-09-29 18:24:58.957 | WARNING  | fazztv.utils.logging:log_performance:98 - slow_func took 2.00s (threshold: 1.0s)
 2025-09-29 18:24:58.965 | INFO     | utils.test_logging:test_create_audit_logger:62 - Audit message
+2025-09-29 18:35:08.661 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/pytest-of-faz/pytest-19/test_file_operations_workflow0/test_workflow/source.txt to /tmp/pytest-of-faz/pytest-19/test_file_operations_workflow0/test_workflow/dest.txt
+2025-09-29 18:35:08.662 | DEBUG    | fazztv.utils.file:move_file:132 - Moved /tmp/pytest-of-faz/pytest-19/test_file_operations_workflow0/test_workflow/dest.txt to /tmp/pytest-of-faz/pytest-19/test_file_operations_workflow0/test_workflow/moved.txt
+2025-09-29 18:35:08.662 | DEBUG    | fazztv.utils.file:safe_delete:41 - Deleted directory: /tmp/pytest-of-faz/pytest-19/test_file_operations_workflow0/test_workflow
+2025-09-29 18:35:08.670 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: test_key (TTL: 3600s)
+2025-09-29 18:35:08.670 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: test_key
+2025-09-29 18:35:08.670 | DEBUG    | fazztv.data.cache:delete:78 - Deleted cache key: test_key
+2025-09-29 18:35:08.675 | WARNING  | fazztv.utils.file:safe_delete:44 - Path does not exist: /nonexistent/path/file.txt
+2025-09-29 18:35:08.675 | ERROR    | fazztv.utils.file:copy_file:107 - Error copying file: [Errno 2] No such file or directory: '/nonexistent/path/file.txt'
+2025-09-29 18:35:08.675 | ERROR    | fazztv.utils.file:move_file:135 - Error moving file: [Errno 2] No such file or directory: '/nonexistent/path/file.txt'
+2025-09-29 18:35:08.679 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_0 (TTL: 3600s)
+2025-09-29 18:35:08.679 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_1 (TTL: 3600s)
+2025-09-29 18:35:08.679 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_2 (TTL: 3600s)
+2025-09-29 18:35:08.679 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_3 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_4 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_5 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_6 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_7 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_8 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_9 (TTL: 3600s)
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_0
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_1
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_2
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_3
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_4
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_5
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_6
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_7
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_8
+2025-09-29 18:35:08.680 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_9
+2025-09-29 18:35:08.732 | DEBUG    | fazztv.utils.file:copy_file:104 - Copied /tmp/tmpx49kiu81/large.bin to /tmp/tmpx49kiu81/large_copy.bin
+2025-09-29 18:35:08.733 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/tmpx49kiu81/large.bin
+2025-09-29 18:35:08.735 | DEBUG    | fazztv.utils.file:safe_delete:37 - Deleted file: /tmp/tmpx49kiu81/large_copy.bin
+2025-09-29 18:35:08.752 | INFO     | fazztv.utils.file:cleanup_old_files:220 - Deleted 0 files older than 1 days from /tmp/tmp5em8oxw_/many_files
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_0 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_1 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_2 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_3 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_4 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_5 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_6 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_7 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_8 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_9 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_10 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_11 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_12 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_13 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_14 (TTL: 3600s)
+2025-09-29 18:35:08.762 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_15 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_16 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_17 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_18 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_19 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_20 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_21 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_22 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_23 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_24 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_25 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_26 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_27 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_28 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_29 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_30 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_31 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_32 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_33 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_34 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_35 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_36 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_37 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_38 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_39 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_40 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_41 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_42 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_43 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_44 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_45 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_46 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_47 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_48 (TTL: 3600s)
+2025-09-29 18:35:08.763 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_49 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_50 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_51 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_52 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_53 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_54 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_55 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_56 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_57 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_58 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_59 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_60 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_61 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_62 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_63 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_64 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_65 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_66 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_67 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_68 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_69 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_70 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_71 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_72 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_73 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_74 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_75 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_76 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_77 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_78 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_79 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_80 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_81 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_82 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_83 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_84 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_85 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_86 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_87 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_88 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_89 (TTL: 3600s)
+2025-09-29 18:35:08.764 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_90 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_91 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_92 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_93 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_94 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_95 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_96 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_97 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_98 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:set:64 - Cached value for key: key_99 (TTL: 3600s)
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_0
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_1
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_2
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_3
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_4
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_5
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_6
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_7
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_8
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_9
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_10
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_11
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_12
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_13
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_14
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_15
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_16
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_17
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_18
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_19
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_20
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_21
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_22
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_23
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_24
+2025-09-29 18:35:08.765 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_25
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_26
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_27
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_28
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_29
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_30
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_31
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_32
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_33
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_34
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_35
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_36
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_37
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_38
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_39
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_40
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_41
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_42
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_43
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_44
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_45
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_46
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_47
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_48
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_49
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_50
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_51
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_52
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_53
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_54
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_55
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_56
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_57
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_58
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_59
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_60
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_61
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_62
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_63
+2025-09-29 18:35:08.766 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_64
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_65
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_66
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_67
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_68
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_69
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_70
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_71
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_72
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_73
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_74
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_75
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_76
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_77
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_78
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_79
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_80
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_81
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_82
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_83
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_84
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_85
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_86
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_87
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_88
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_89
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_90
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_91
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_92
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_93
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_94
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_95
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_96
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_97
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_98
+2025-09-29 18:35:08.767 | DEBUG    | fazztv.data.cache:get:38 - Cache hit for key: key_99
+2025-09-29 18:35:08.768 | INFO     | fazztv.data.cache:clear:87 - Cache cleared
+2025-09-29 18:35:14.442 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test Artist - Test Song is not serialized
+2025-09-29 18:35:14.443 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:45 - Media item Test - Song is not serialized
+2025-09-29 18:35:14.446 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 18:35:14.447 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:79 - Successfully broadcast Test Artist - Test Song
+2025-09-29 18:35:14.449 | INFO     | fazztv.broadcasting.rtmp:broadcast_item:64 - Broadcasting Test Artist - Test Song to rtmp://test.server/live/stream
+2025-09-29 18:35:14.449 | ERROR    | fazztv.broadcasting.rtmp:broadcast_item:75 - Broadcasting failed: FFmpeg error
