@@ -350,7 +350,7 @@ class GitHubRepoWizard:
 
         try:
             # Use GitOperations for reliable cloning
-            git_ops = GitOperations()
+            # Note: GitOperations available if needed
 
             # Create parent directory if needed
             local_path.parent.mkdir(parents=True, exist_ok=True)
@@ -368,7 +368,6 @@ class GitHubRepoWizard:
 
                 # Checkout default branch if different from main
                 if repo.default_branch != "main":
-                    git_ops_local = GitOperations(str(local_path))
                     subprocess.run(
                         ["git", "checkout", repo.default_branch],
                         cwd=str(local_path),

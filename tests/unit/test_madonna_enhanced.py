@@ -246,8 +246,8 @@ class TestMediaItemCreation(unittest.TestCase):
     @patch('fazztv.madonna.get_madonna_song_url')
     @patch('fazztv.madonna.download_audio_only')
     @patch('fazztv.madonna.download_video_only')
-    @patch('fazztv.madonna.subprocess.run')
-    @patch('fazztv.madonna.tempfile.NamedTemporaryFile')
+    @patch('subprocess.run')
+    @patch('tempfile.NamedTemporaryFile')
     def test_create_media_item_from_episode_success(self, mock_tempfile, mock_subprocess,
                                                      mock_download_video, mock_download_audio,
                                                      mock_get_url):

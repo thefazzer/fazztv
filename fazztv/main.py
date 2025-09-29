@@ -204,7 +204,8 @@ class FazzTVApplication:
             List of (MediaItem, success) tuples
         """
         if filter_func is None:
-            filter_func = lambda item: True  # Accept all items by default
+            def filter_func(item):
+                return True  # Accept all items by default
         
         results = self.broadcaster.broadcast_filtered_collection(
             media_items, filter_func
