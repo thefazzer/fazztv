@@ -86,7 +86,7 @@ CITY_DRIVER_COMPACT = """
       ▓▓▓▓▓▓
 """
 
-def display_banner(style='full'):
+def display_banner(style: str = 'full') -> str:
     """
     Display the City Driver banner art.
 
@@ -103,6 +103,6 @@ def display_banner(style='full'):
     }
     return banners.get(style, CITY_DRIVER_BANNER)
 
-def print_banner(style='full'):
+def print_banner(style: str = 'full') -> None:
     """Print the City Driver banner to console."""
     print(display_banner(style))

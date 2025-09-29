@@ -307,7 +307,7 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main():
+def main() -> None:
     """Main entry point for the application."""
     parser = create_parser()
     args = parser.parse_args()

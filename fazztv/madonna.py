@@ -4,6 +4,7 @@ import sys
 from datetime import date, datetime
 import random
 import os
+from typing import Optional, List, Tuple, Dict
 from loguru import logger
 import json
 import re
@@ -23,6 +24,11 @@ from fazztv.utils.ffmpeg_utils import (
     build_ffmpeg_inputs, build_ffmpeg_filter, build_ffmpeg_command, execute_ffmpeg_command
 )
 from fazztv.config import constants
+from fazztv.utils.guid_utils import ensure_guid
+from fazztv.utils.episode_utils import (
+    extract_song_name, validate_episode_data, sanitize_text_for_overlay,
+    get_episode_defaults, validate_media_file, get_alternative_url
+)
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
@@ -58,7 +64,7 @@ logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 # ---------------------------------------------------------------------------
 
 @log_exceptions(return_value={"episodes": []})
-def load_madonna_data():
+def load_madonna_data() -> Dict[str, List[dict]]:
     """Load Madonna and war documentary data from JSON file."""
     with open(DATA_FILE, 'r') as f:
         data = json.load(f)
@@ -67,7 +73,7 @@ def load_madonna_data():
     modified = False
     for episode in data['episodes']:
         if 'guid' not in episode:
-            episode['guid'] = str(uuid.uuid4())
+            ensure_guid(episode)
             modified = True
 
     # Save the updated data if any GUIDs were added
@@ -79,7 +85,7 @@ def load_madonna_data():
     logger.info(f"Successfully loaded {len(data['episodes'])} episodes from {DATA_FILE}")
     return data
 
-def get_madonna_song_url(song_name: str) -> str | None:
+def get_madonna_song_url(song_name: str) -> Optional[str]:
     """Search for a Madonna song on YouTube."""
     logger.debug(f"Searching for Madonna song: {song_name}...")
     query = constants.MADONNA_SEARCH_TEMPLATE.format(song_name=song_name)
@@ -148,12 +154,13 @@ def download_audio_only(url: str, output_file: str, guid: str | None = None) -> 
     return True
 
 def calculate_days_old(song_info: str) -> int:
-        date_match = re.search(r'- ([A-Za-z]+ \d{1,2} \d{4})$', song_info)
-        if date_match:
-            reference_date = datetime.strptime(date_match.group(1), '%B %d %Y').date()
-            days_old = (date.today() - reference_date).days
-            return days_old
-        return 0
+    """Calculate days since release date in song info."""
+    date_match = re.search(r'- ([A-Za-z]+ \d{1,2} \d{4})$', song_info)
+    if date_match:
+        reference_date = datetime.strptime(date_match.group(1), '%B %d %Y').date()
+        days_old = (date.today() - reference_date).days
+        return days_old
+    return 0
 
 @log_exceptions(return_value=False)
 def download_video_only(url: str, output_file: str, guid: str | None = None) -> bool:
@@ -198,18 +205,19 @@ def cleanup_environment() -> None:
     logger.info(f"Using temp directory: {TEMP_DIR}")
 
 
-def prepare_overlay_texts(episode, song_name):
+def prepare_overlay_texts(episode: dict, song_name: str) -> Dict[str, str]:
     """Prepare text overlays for the video."""
-    title_text = episode['title'].replace("'", r"\\'")
+    episode = get_episode_defaults(episode)
+    title_text = sanitize_text_for_overlay(episode['title'])
 
     # Handle optional war_title field
-    war_title = episode.get('war_title', 'Unknown Historical Event')
-    war_text = war_title.replace("'", r"\\'")
-    war_topic = war_title.split(':')[0].replace("'", r"\\'")
+    war_title = episode['war_title']
+    war_text = sanitize_text_for_overlay(war_title)
+    war_topic = sanitize_text_for_overlay(war_title.split(':')[0])
 
     # Handle optional commentary field
-    commentary = episode.get('commentary', 'No commentary available')
-    commentary_text = commentary.split(':')[0].replace("'", r"\\'")
+    commentary = episode['commentary']
+    commentary_text = sanitize_text_for_overlay(commentary.split(':')[0])
 
     age_days = '{:,}'.format(calculate_days_old(episode['title']))
     age_text1 = (f"Madonnas {song_name} is {age_days} days old today -")
@@ -227,20 +235,8 @@ def prepare_overlay_texts(episode, song_name):
 # Note: FFmpeg utility functions moved to fazztv.utils.ffmpeg_utils
 
 
-def _extract_song_name_from_title(title: str) -> str:
-    """Extract song name from episode title."""
-    song_match = re.match(r"^(.*?)\s*\(", title)
-    return song_match.group(1) if song_match else "Unknown Song"
 
 
-def _ensure_episode_guid(episode: dict) -> str:
-    """Ensure episode has a GUID, generating one if needed."""
-    guid = episode.get('guid')
-    if not guid:
-        guid = str(uuid.uuid4())
-        episode['guid'] = guid
-        logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
-    return guid
 
 
 # Note: _build_ffmpeg_command moved to fazztv.utils.ffmpeg_utils
@@ -252,10 +248,10 @@ def create_media_item_from_episode(episode: dict) -> MediaItem | None:
     logger.info(f"Creating media item for '{episode['title']}'")
 
     # Extract song name from title
-    song_name = _extract_song_name_from_title(episode['title'])
+    song_name = extract_song_name(episode['title'])
 
     # Ensure GUID exists
-    guid = _ensure_episode_guid(episode)
+    guid = ensure_guid(episode)
 
     texts = prepare_overlay_texts(episode, song_name)
 
@@ -293,7 +289,7 @@ def create_media_item_from_episode(episode: dict) -> MediaItem | None:
     media_item.serialized = output_file
     return media_item
 
-def setup_environment(dev_mode=False):
+def setup_environment(dev_mode: bool = False) -> None:
     global DEV_MODE
     DEV_MODE = dev_mode
     print_banner('full')
@@ -301,7 +297,7 @@ def setup_environment(dev_mode=False):
     logger.info("=== Starting Madonna Military History FazzTV broadcast ===")
 
 
-def parse_arguments():
+def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Madonna Military History FazzTV broadcast')
     parser.add_argument('--guids', nargs='*', help='List of GUIDs to process',
                         default=["40a441fd-4ce8-49b2-82c4-356f8f13b8c5"])
@@ -309,7 +305,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def load_episodes():
+def load_episodes() -> List[dict]:
     data = load_madonna_data()
     episodes = data.get('episodes')
     if not episodes:
@@ -319,7 +315,7 @@ def load_episodes():
 
 
 @log_exceptions(return_value=False)
-def process_episode_audio(episode, temp_dir):
+def process_episode_audio(episode: dict, temp_dir: str) -> bool:
     guid = episode.get('guid')
     audio_path = os.path.join(temp_dir, f"madonna_audio_{guid}.aac")
 
@@ -334,7 +330,7 @@ def process_episode_audio(episode, temp_dir):
                     return False
             else:
                 return False
-        if not os.path.exists(audio_path) or os.path.getsize(audio_path) == 0:
+        if not validate_media_file(audio_path):
             logger.error(f"Audio file is missing or empty: {audio_path}")
             return False
         logger.debug(f"Successfully obtained audio at {audio_path}")
@@ -343,7 +339,7 @@ def process_episode_audio(episode, temp_dir):
 
 
 @log_exceptions(return_value=False)
-def process_episode_video(episode, temp_dir):
+def process_episode_video(episode: dict, temp_dir: str) -> bool:
     guid = episode.get('guid')
     video_path = os.path.join(temp_dir, f"madonna_video_{guid}.mp4")
 
@@ -357,7 +353,7 @@ def process_episode_video(episode, temp_dir):
                 else:
                     return False
             else:
-                if not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
+                if not validate_media_file(video_path):
                     logger.error(f"Video file is missing or empty: {video_path}")
                     return False
                 logger.debug(f"Successfully obtained video at {video_path}")
@@ -370,16 +366,12 @@ def process_episode_video(episode, temp_dir):
 
 
 @log_exceptions(return_value=[])
-def process_episodes(episodes):
+def process_episodes(episodes: List[dict]) -> List[MediaItem]:
     media_items = []
     temp_dir = os.path.join(tempfile.gettempdir(), "fazztv")
 
     for episode in episodes:
-        guid = episode.get('guid')
-        if not guid:
-            guid = str(uuid.uuid4())
-            episode['guid'] = guid
-            logger.info(f"Generated new GUID {guid} for episode '{episode['title']}'")
+        guid = ensure_guid(episode)
 
         if not process_episode_audio(episode, temp_dir):
             continue
@@ -395,7 +387,7 @@ def process_episodes(episodes):
     return media_items
 
 
-def broadcast_media(media_items, rtmp_url):
+def broadcast_media(media_items: List[MediaItem], rtmp_url: str) -> List[Tuple[MediaItem, bool]]:
     broadcaster = RTMPBroadcaster(rtmp_url=rtmp_url)
     results = []
 
@@ -408,7 +400,7 @@ def broadcast_media(media_items, rtmp_url):
     return results
 
 
-def main():
+def main() -> None:
     args = parse_arguments()
     setup_environment(args.dev)
     episodes = load_episodes()
