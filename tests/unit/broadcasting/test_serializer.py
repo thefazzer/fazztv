@@ -7,7 +7,8 @@ from unittest.mock import Mock, patch, MagicMock, call
 import subprocess
 
 from fazztv.broadcasting.serializer import MediaSerializer
-from fazztv.models import MediaItem, ProcessingError
+from fazztv.models import MediaItem
+from fazztv.exceptions import ProcessingError
 
 
 @pytest.fixture

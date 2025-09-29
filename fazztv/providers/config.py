@@ -3,7 +3,7 @@
 import os
 import json
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
 from loguru import logger
 
 from fazztv.config import get_settings

@@ -152,7 +152,7 @@ class TestMediaSerializer:
         assert mock_processor.combine_audio_video.call_count == 2
 
     @patch("fazztv.broadcasting.serializer.get_settings")
-    @patch("fazztv.processors.AudioProcessor")
+    @patch("fazztv.broadcasting.serializer.AudioProcessor")
     def test_trim_media(self, mock_audio_proc_cls, mock_settings):
         """Test media trimming functionality."""
         mock_settings.return_value = Mock(
@@ -168,8 +168,9 @@ class TestMediaSerializer:
         serializer = MediaSerializer()
 
         with patch("fazztv.broadcasting.serializer.get_temp_path") as mock_temp:
-            mock_temp.return_value = Path("/tmp/trimmed.aac")
-            result = serializer._trim_media(Path("/tmp/original.aac"), 50)
+            with patch("fazztv.broadcasting.serializer.safe_delete") as mock_delete:
+                mock_temp.return_value = Path("/tmp/trimmed.aac")
+                result = serializer._trim_media(Path("/tmp/original.aac"), 50)
 
         assert result == Path("/tmp/trimmed.aac")
         assert mock_audio_proc.extract_segment.called

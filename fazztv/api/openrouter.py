@@ -1,6 +1,5 @@
 """OpenRouter API client for FazzTV - Compatibility layer."""
 
-from typing import Optional, Dict, Any
 from loguru import logger
 
 # Import the compatibility wrapper

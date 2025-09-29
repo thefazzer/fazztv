@@ -8,6 +8,7 @@ from loguru import logger
 
 from fazztv.models import MediaItem
 from fazztv.config.settings import Settings
+from fazztv.config import constants
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.api.openrouter import OpenRouterClient

@@ -1,8 +1,7 @@
 """Video processing functionality for FazzTV."""
 
 import subprocess
-import tempfile
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Optional, Any, List
 from pathlib import Path
 from loguru import logger
 

@@ -6,7 +6,8 @@ from pathlib import Path
 import subprocess
 
 from fazztv.broadcasting.rtmp import RTMPBroadcaster
-from fazztv.models import MediaItem, BroadcastError
+from fazztv.models import MediaItem
+from fazztv.exceptions import BroadcastError
 
 
 @pytest.fixture

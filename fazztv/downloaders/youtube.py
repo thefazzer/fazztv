@@ -1,6 +1,5 @@
 """YouTube downloader implementation for FazzTV."""
 
-import os
 import random
 from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
@@ -9,7 +8,7 @@ import yt_dlp
 
 from fazztv.downloaders.base import BaseDownloader
 from fazztv.config import constants
-from fazztv.utils.error_handling import log_exceptions, safe_execute
+from fazztv.utils.error_handling import log_exceptions
 
 
 class YouTubeDownloader(BaseDownloader):

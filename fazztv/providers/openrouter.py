@@ -1,10 +1,9 @@
 """OpenRouter provider implementation."""
 
 import requests
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 from loguru import logger
 
-from fazztv.config import constants
 from .base import BaseProvider, ProviderConfig, ModelCapability, ModelInfo
 
 

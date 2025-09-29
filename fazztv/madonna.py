@@ -3,23 +3,16 @@ import shutil
 import sys
 from datetime import date, datetime
 import random
-import time
 import os
-import requests
 from loguru import logger
 import json
-import subprocess
-from typing import List, Optional, Tuple
 import re
 import uuid
 import tempfile
-import traceback
 import yt_dlp
 from fazztv.models import MediaItem
-from fazztv.broadcasting.serializer import MediaSerializer
 from fazztv.broadcaster import RTMPBroadcaster
 from fazztv.utils.ascii_art import print_banner
-from fazztv.utils.file_utils import is_valid_file, ensure_directory_exists, safe_copy_file
 from fazztv.utils.download_utils import (
     get_cached_file, cache_file, get_yt_dlp_audio_options, get_yt_dlp_video_options,
     find_downloaded_audio_file, move_audio_to_output, prepare_output_directory,
@@ -30,18 +23,6 @@ from fazztv.utils.ffmpeg_utils import (
     build_ffmpeg_inputs, build_ffmpeg_filter, build_ffmpeg_command, execute_ffmpeg_command
 )
 from fazztv.config import constants
-from fazztv.config.ui_constants import (
-    UI_BASE_WIDTH, UI_BASE_HEIGHT, UI_MARQUEE_HEIGHT, UI_VIDEO_SCALE,
-    UI_LOGO_SCALE, UI_BULB_SCALE, UI_MARQUEE_SCALE, UI_WAR_TITLE_FONT_SIZE,
-    UI_TITLE_FONT_SIZE, UI_COMMENTARY_FONT_SIZE, UI_AGE_TEXT_FONT_SIZE,
-    UI_WAR_TITLE_Y, UI_TITLE_Y, UI_BULB_Y, UI_BULB_X_OFFSET,
-    UI_AGE_TEXT1_Y, UI_AGE_TEXT2_Y, UI_WAR_TITLE_BORDER_WIDTH,
-    UI_TITLE_BORDER_WIDTH, UI_COMMENTARY_BORDER_WIDTH, UI_AGE_TEXT_BORDER_WIDTH,
-    UI_MARQUEE_SCROLL_MULTIPLIER, UI_MARQUEE_Y_OFFSET, UI_LOGO_X, UI_LOGO_Y,
-    UI_OVERLAY_BOTTOM_OFFSET, UI_FFMPEG_FRAME_RATE, UI_BACKGROUND_COLOR,
-    UI_NULL_VIDEO_SIZE, UI_NULL_VIDEO_DURATION, UI_NULL_VIDEO_RATE,
-    UI_AUDIO_SAMPLE_RATE, UI_AUDIO_CHANNELS
-)
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
@@ -220,9 +201,16 @@ def cleanup_environment():
 def prepare_overlay_texts(episode, song_name):
     """Prepare text overlays for the video."""
     title_text = episode['title'].replace("'", r"\\'")
-    war_text = episode['war_title'].replace("'", r"\\'")
-    war_topic = episode['war_title'].split(':')[0].replace("'", r"\\'")
-    commentary = episode['commentary'].split(':')[0].replace("'", r"\\'")
+
+    # Handle optional war_title field
+    war_title = episode.get('war_title', 'Unknown Historical Event')
+    war_text = war_title.replace("'", r"\\'")
+    war_topic = war_title.split(':')[0].replace("'", r"\\'")
+
+    # Handle optional commentary field
+    commentary = episode.get('commentary', 'No commentary available')
+    commentary_text = commentary.split(':')[0].replace("'", r"\\'")
+
     age_days = '{:,}'.format(calculate_days_old(episode['title']))
     age_text1 = (f"Madonnas {song_name} is {age_days} days old today -")
     age_text2 = (f"so ancient its release date was closer in history to the {war_topic}!")
@@ -230,7 +218,7 @@ def prepare_overlay_texts(episode, song_name):
     return {
         'title_text': title_text,
         'war_text': war_text,
-        'commentary': commentary,
+        'commentary': commentary_text,
         'age_text1': age_text1,
         'age_text2': age_text2
     }
@@ -291,11 +279,14 @@ def create_media_item_from_episode(episode):
         logger.error(f"FFmpeg processing failed for episode '{episode['title']}'")
         raise RuntimeError("FFmpeg processing failed")
 
+    # Use music_url from episode data, or empty string if not available
+    music_url = episode.get('music_url', '')
+
     media_item = MediaItem(
         artist="Madonna",
         song=song_name,
-        url="",
-        taxprompt=episode['commentary'],
+        url=music_url,
+        taxprompt=episode.get('commentary', ''),
         length_percent=100,
         duration=ELAPSED_TUNE_SECONDS
     )

@@ -1,7 +1,5 @@
-import os
 import subprocess
-import tempfile
-from typing import List, Optional, Callable, Tuple
+from typing import List, Callable, Tuple
 from loguru import logger
 
 from fazztv.models import MediaItem

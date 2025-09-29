@@ -1,9 +1,8 @@
 """Audio equalizer/visualizer generation for FazzTV."""
 
-from typing import List, Tuple
+from typing import List
 from loguru import logger
 
-from fazztv.config import constants
 
 
 class EqualizerGenerator:
@@ -57,7 +56,11 @@ class EqualizerGenerator:
         band_outputs = []
         
         # Generate each frequency band visualization
-        for i, (freq, width) in enumerate(self.frequencies):
+        # Use min to ensure we don't exceed available frequencies
+        band_count = min(self.bands, len(self.frequencies))
+
+        for i in range(band_count):
+            freq, width = self.frequencies[i]
             band_filter = self._build_band_filter(
                 audio_input=audio_input,
                 band_index=i,
@@ -67,6 +70,25 @@ class EqualizerGenerator:
             )
             filter_parts.append(band_filter)
             band_outputs.append(f"band{i}")
+
+        # If we need more bands than we have frequencies, generate additional bands
+        # with extended frequency ranges
+        if self.bands > len(self.frequencies):
+            for i in range(len(self.frequencies), self.bands):
+                # Generate higher frequency bands
+                base_freq = 2000 * (i - len(self.frequencies) + 1)
+                freq = min(base_freq, 20000)
+                width = freq // 4
+
+                band_filter = self._build_band_filter(
+                    audio_input=audio_input,
+                    band_index=i,
+                    frequency=freq,
+                    bandwidth=width,
+                    color=self.colors[i % len(self.colors)]
+                )
+                filter_parts.append(band_filter)
+                band_outputs.append(f"band{i}")
         
         # Stack bands horizontally
         stack_filter = f"[{']['.join(band_outputs)}]hstack=inputs={self.bands}[eq_raw]"

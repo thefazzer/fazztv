@@ -2,7 +2,11 @@
 
 from fazztv.utils.text import sanitize_for_ffmpeg, extract_title_parts
 from fazztv.utils.datetime import calculate_days_old, parse_date
-from fazztv.utils.file import ensure_directory, safe_delete, get_file_size
+from fazztv.utils.file import (
+    ensure_directory, safe_delete, get_file_size, copy_file, move_file,
+    is_valid_file, is_valid_audio_file, is_valid_video_file, find_files,
+    cleanup_old_files, get_directory_size
+)
 from fazztv.utils.logging import setup_logging
 from fazztv.utils.git_operations import GitOperations, git_fetch, git_pull
 
@@ -14,6 +18,14 @@ __all__ = [
     'ensure_directory',
     'safe_delete',
     'get_file_size',
+    'copy_file',
+    'move_file',
+    'is_valid_file',
+    'is_valid_audio_file',
+    'is_valid_video_file',
+    'find_files',
+    'cleanup_old_files',
+    'get_directory_size',
     'setup_logging',
     'GitOperations',
     'git_fetch',

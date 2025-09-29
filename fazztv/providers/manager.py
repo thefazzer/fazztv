@@ -3,7 +3,7 @@
 from typing import Optional, List, Dict, Any
 from loguru import logger
 
-from .base import BaseProvider, ModelCapability, ModelInfo
+from .base import BaseProvider, ModelCapability
 from .registry import ProviderRegistry
 
 
@@ -43,7 +43,7 @@ class ProviderManager:
         """
         providers = self._get_ordered_providers(preferred_provider, capability)
 
-        for provider in providers:
+        for i, provider in enumerate(providers):
             try:
                 logger.debug(f"Trying provider: {provider.get_name()}")
                 response = provider.query(prompt, **kwargs)
@@ -57,8 +57,9 @@ class ProviderManager:
             except Exception as e:
                 logger.error(f"Provider {provider.get_name()} failed: {e}")
 
-                if not self.fallback_enabled:
-                    return None
+            # If fallback is disabled, only try the first provider
+            if not self.fallback_enabled:
+                return None
 
         logger.error("All providers failed")
         return None
@@ -154,7 +155,13 @@ class ProviderManager:
             Dictionary mapping provider names to responses
         """
         if providers is None:
-            provider_instances = self.registry.get_available_providers()
+            # Get all providers, not just available ones, for comparison
+            all_provider_names = self.registry.list_providers()
+            provider_instances = [
+                self.registry.get_provider(name)
+                for name in all_provider_names
+                if self.registry.get_provider(name)
+            ]
         else:
             provider_instances = [
                 self.registry.get_provider(name)
@@ -166,9 +173,8 @@ class ProviderManager:
         for provider in provider_instances:
             try:
                 response = provider.query(prompt, **kwargs)
-                if response:
-                    responses[provider.get_name()] = response
-                    self._track_usage(provider.get_name())
+                responses[provider.get_name()] = response
+                self._track_usage(provider.get_name())
             except Exception as e:
                 logger.error(f"Error querying {provider.get_name()}: {e}")
                 responses[provider.get_name()] = f"Error: {str(e)}"
@@ -265,15 +271,30 @@ class ProviderManager:
         # Add preferred provider first
         if preferred:
             provider = self.registry.get_provider(preferred)
-            if provider and provider.check_availability():
-                if not capability or provider.supports_capability(capability):
-                    providers.append(provider)
+            if provider:
+                # When fallback is disabled, include even unavailable providers
+                # for the preferred provider
+                if (self.fallback_enabled and provider.check_availability()) or not self.fallback_enabled:
+                    if not capability or provider.supports_capability(capability):
+                        providers.append(provider)
 
-        # Add other available providers
-        if capability:
-            other_providers = self.registry.find_providers_by_capability(capability)
+        # Add other providers based on fallback setting
+        if self.fallback_enabled:
+            # Use available providers when fallback is enabled
+            if capability:
+                other_providers = self.registry.find_providers_by_capability(capability)
+            else:
+                other_providers = self.registry.get_available_providers()
         else:
-            other_providers = self.registry.get_available_providers()
+            # When fallback is disabled, we should only have the preferred provider
+            # or if no preferred, just the first provider from all providers
+            if not preferred:
+                all_provider_names = self.registry.list_providers()
+                if all_provider_names:
+                    first_provider = self.registry.get_provider(all_provider_names[0])
+                    if first_provider and (not capability or first_provider.supports_capability(capability)):
+                        providers.append(first_provider)
+            other_providers = []
 
         for provider in other_providers:
             if provider not in providers:

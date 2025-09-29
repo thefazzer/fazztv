@@ -32,9 +32,12 @@ class OllamaProvider(BaseProvider):
         model: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: int = 500,
+        timeout: Optional[int] = None,
         **kwargs
     ) -> Optional[str]:
         """Send a query to Ollama."""
+        from fazztv.exceptions import APIError
+
         try:
             data = {
                 "model": model or self.config.default_model,
@@ -52,11 +55,16 @@ class OllamaProvider(BaseProvider):
             response = requests.post(
                 f"{self.config.base_url}/api/generate",
                 json=data,
-                timeout=self.config.timeout
+                timeout=timeout or self.config.timeout
             )
             response.raise_for_status()
 
-            result = response.json()
+            try:
+                result = response.json()
+            except ValueError as e:
+                logger.error(f"Invalid JSON response from Ollama: {e}")
+                raise APIError(f"Invalid response format: {e}")
+
             content = result.get("response", "")
 
             if content:
@@ -64,17 +72,23 @@ class OllamaProvider(BaseProvider):
                 return content
 
             logger.error("No content in Ollama response")
-            return None
+            raise APIError("Missing response field")
 
-        except requests.exceptions.ConnectionError:
+        except APIError:
+            # Re-raise APIError without wrapping
+            raise
+        except (requests.exceptions.ConnectionError, ConnectionError) as e:
             logger.error(f"Cannot connect to Ollama at {self.config.base_url}")
-            return None
+            raise APIError(f"Connection error: {e}")
         except requests.exceptions.Timeout:
-            logger.error(f"Ollama request timed out after {self.config.timeout}s")
-            return None
+            logger.error(f"Ollama request timed out after {timeout or self.config.timeout}s")
+            raise APIError(f"Request timeout after {timeout or self.config.timeout}s")
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"HTTP error from Ollama: {e}")
+            raise APIError(f"HTTP {e.response.status_code}: {e.response.text}")
         except Exception as e:
             logger.error(f"Unexpected error querying Ollama: {e}")
-            return None
+            raise APIError(f"Unexpected error: {e}")
 
     def chat(
         self,

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 from loguru import logger
 
-from fazztv.config import get_settings, constants
+from fazztv.config import get_settings
 
 
 def setup_logging(

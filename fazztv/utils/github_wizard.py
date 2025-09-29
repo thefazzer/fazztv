@@ -5,10 +5,9 @@ Interactive CLI wizard for adding, editing, and managing GitHub repositories.
 """
 
 import json
-import os
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 from dataclasses import dataclass, asdict
 import subprocess
 from fazztv.utils.git_operations import GitOperations

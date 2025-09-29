@@ -1,15 +1,14 @@
 """Download utilities for FazzTV media processing."""
 
 import os
-import tempfile
-from typing import Optional, List, Dict, Any
+from typing import Optional, Dict, Any
 from pathlib import Path
 import yt_dlp
 from loguru import logger
 
 from fazztv.config import constants
-from fazztv.utils.file_utils import is_valid_file, safe_copy_file, ensure_directory_exists
-from fazztv.utils.error_handling import log_exceptions, safe_execute
+from fazztv.utils.file import is_valid_file, copy_file, ensure_directory
+from fazztv.utils.error_handling import log_exceptions
 
 
 def get_cache_file_path(temp_dir: str, guid: str, file_type: str) -> str:
@@ -57,7 +56,7 @@ def get_cached_file(guid: Optional[str], output_file: str, temp_dir: str, file_t
 
     if is_valid_file(cached_file, f"Cached {file_type} check"):
         logger.info(f"Using cached {file_type} file for GUID {guid}")
-        return safe_copy_file(cached_file, output_file, overwrite=True)
+        return copy_file(Path(cached_file), Path(output_file), overwrite=True)
 
     return False
 
@@ -78,7 +77,7 @@ def cache_file(output_file: str, guid: Optional[str], temp_dir: str, file_type: 
 
     cached_file = get_cache_file_path(temp_dir, guid, file_type)
     logger.debug(f"Caching {file_type} file to {cached_file}")
-    safe_copy_file(output_file, cached_file, overwrite=True)
+    copy_file(Path(output_file), Path(cached_file), overwrite=True)
 
 
 def get_yt_dlp_audio_options(base_output: str) -> Dict[str, Any]:
@@ -203,7 +202,8 @@ def prepare_output_directory(output_file: str) -> bool:
     """
     output_dir = os.path.dirname(output_file)
     if output_dir:
-        return ensure_directory_exists(output_dir)
+        ensure_directory(Path(output_dir))
+        return True
     return True
 
 

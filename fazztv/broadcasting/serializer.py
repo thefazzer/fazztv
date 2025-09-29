@@ -3,11 +3,12 @@
 import subprocess
 import tempfile
 import random
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 from pathlib import Path
 from loguru import logger
 
-from fazztv.models import MediaItem, ProcessingError
+from fazztv.models import MediaItem
+from fazztv.exceptions import ProcessingError
 from fazztv.processors import VideoProcessor, AudioProcessor
 from fazztv.downloaders import YouTubeDownloader, CachedDownloader
 from fazztv.config import get_settings

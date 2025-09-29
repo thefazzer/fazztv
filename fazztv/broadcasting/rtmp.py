@@ -2,10 +2,10 @@
 
 import subprocess
 from typing import List, Tuple, Optional, Callable
-from pathlib import Path
 from loguru import logger
 
-from fazztv.models import MediaItem, BroadcastError
+from fazztv.models import MediaItem
+from fazztv.exceptions import BroadcastError
 from fazztv.config import get_settings
 
 

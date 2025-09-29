@@ -1,10 +1,11 @@
 """File system utilities for FazzTV."""
 
-import os
 import shutil
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Union
 from loguru import logger
+
+from fazztv.config import constants
 
 
 def ensure_directory(path: Path) -> Path:
@@ -322,3 +323,143 @@ def safe_mkdir(path: Path) -> Path:
         The path object
     """
     return ensure_directory(path)
+
+
+def is_valid_file(file_path: Union[str, Path], operation_name: str = "file operation") -> bool:
+    """
+    Validate that a file exists, is readable, and has content.
+
+    Args:
+        file_path: Path to file to check
+        operation_name: Name of operation for logging
+
+    Returns:
+        True if file is valid, False otherwise
+    """
+    if not file_path:
+        logger.error(f"{operation_name}: No file path provided")
+        return False
+
+    path = Path(file_path) if isinstance(file_path, str) else file_path
+
+    if not path.exists():
+        logger.error(f"{operation_name}: File does not exist: {path}")
+        return False
+
+    if not path.is_file():
+        logger.error(f"{operation_name}: Path is not a file: {path}")
+        return False
+
+    if path.stat().st_size == 0:
+        logger.error(f"{operation_name}: File is empty: {path}")
+        return False
+
+    try:
+        # Test if file is readable
+        with path.open('rb') as f:
+            f.read(1)
+    except (IOError, OSError) as e:
+        logger.error(f"{operation_name}: File is not readable: {path}, Error: {e}")
+        return False
+
+    return True
+
+
+def is_valid_audio_file(file_path: Union[str, Path]) -> bool:
+    """
+    Validate that a file is a valid audio file.
+
+    Args:
+        file_path: Path to audio file
+
+    Returns:
+        True if file is a valid audio file, False otherwise
+    """
+    path = Path(file_path) if isinstance(file_path, str) else file_path
+
+    if not is_valid_file(path, "Audio validation"):
+        return False
+
+    # Check file extension
+    if path.suffix.lower() not in constants.AUDIO_EXTENSIONS:
+        logger.error(f"Audio validation: Invalid audio file extension: {path.suffix}")
+        return False
+
+    return True
+
+
+def is_valid_video_file(file_path: Union[str, Path]) -> bool:
+    """
+    Validate that a file is a valid video file.
+
+    Args:
+        file_path: Path to video file
+
+    Returns:
+        True if file is a valid video file, False otherwise
+    """
+    path = Path(file_path) if isinstance(file_path, str) else file_path
+
+    if not is_valid_file(path, "Video validation"):
+        return False
+
+    # Check file extension
+    if path.suffix.lower() not in constants.VIDEO_EXTENSIONS:
+        logger.error(f"Video validation: Invalid video file extension: {path.suffix}")
+        return False
+
+    return True
+
+
+def get_file_size_mb(file_path: Union[str, Path]) -> Optional[float]:
+    """
+    Get file size in megabytes.
+
+    Args:
+        file_path: Path to file
+
+    Returns:
+        File size in MB or None if file doesn't exist
+    """
+    path = Path(file_path) if isinstance(file_path, str) else file_path
+
+    if not path.exists():
+        return None
+
+    try:
+        size_bytes = path.stat().st_size
+        return size_bytes / (1024 * 1024)  # Convert to MB
+    except (OSError, IOError):
+        return None
+
+
+def find_files_by_extension(directory: Union[str, Path], extensions: List[str]) -> List[Path]:
+    """
+    Find all files in directory with specific extensions.
+
+    Args:
+        directory: Directory to search
+        extensions: List of extensions to match (including dot)
+
+    Returns:
+        List of Path objects for matching files
+    """
+    dir_path = Path(directory) if isinstance(directory, str) else directory
+
+    if not dir_path.exists() or not dir_path.is_dir():
+        logger.error(f"Find files: Invalid directory: {dir_path}")
+        return []
+
+    matching_files = []
+    for extension in extensions:
+        pattern = f"*{extension}"
+        matching_files.extend(dir_path.glob(pattern))
+
+    # Filter for valid files only
+    valid_files = []
+    for file_path in matching_files:
+        if is_valid_file(file_path, "File search"):
+            valid_files.append(file_path)
+
+    logger.debug(f"Found {len(valid_files)} valid files with extensions {extensions} in {dir_path}")
+    return valid_files

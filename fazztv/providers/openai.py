@@ -12,6 +12,10 @@ class OpenAIProvider(BaseProvider):
 
     def __init__(self, config: ProviderConfig):
         """Initialize OpenAI provider."""
+        # Validate API key
+        if not config.api_key:
+            raise ValueError("OpenAI API key is required")
+
         if not config.base_url:
             config.base_url = "https://api.openai.com/v1"
         if not config.default_model:
