@@ -1,5 +1,6 @@
 """Overlay management for video processing."""
 
+import subprocess
 from typing import Optional, Tuple, List
 from pathlib import Path
 from abc import ABC, abstractmethod
@@ -240,8 +241,6 @@ class OverlayManager:
         Returns:
             True if successful, False otherwise
         """
-        import subprocess
-
         if not self.overlays:
             return False
 

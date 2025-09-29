@@ -1,6 +1,7 @@
 """Episode model for FazzTV."""
 
 import uuid
+import re
 from typing import Optional, Dict, Any
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -46,13 +47,11 @@ class Episode:
     
     def get_song_name(self) -> str:
         """Extract song name from title."""
-        import re
         match = re.match(r"^(.*?)\s*\(", self.title)
         return match.group(1) if match else self.title
     
     def get_album_name(self) -> Optional[str]:
         """Extract album name from title."""
-        import re
         match = re.search(r"\((.*?)\)", self.title)
         return match.group(1) if match else None
     
@@ -76,7 +75,6 @@ class Episode:
             return calculate_days_old(self.release_date)
         
         # Try to extract date from title
-        import re
         date_match = re.search(r'- ([A-Za-z]+ \d{1,2} \d{4})$', self.title)
         if date_match:
             return calculate_days_old(date_match.group(1))

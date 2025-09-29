@@ -79,7 +79,7 @@ def load_madonna_data():
     logger.info(f"Successfully loaded {len(data['episodes'])} episodes from {DATA_FILE}")
     return data
 
-def get_madonna_song_url(song_name):
+def get_madonna_song_url(song_name: str) -> str | None:
     """Search for a Madonna song on YouTube."""
     logger.debug(f"Searching for Madonna song: {song_name}...")
     query = constants.MADONNA_SEARCH_TEMPLATE.format(song_name=song_name)
@@ -109,7 +109,7 @@ def get_madonna_song_url(song_name):
 # Note: Utility functions moved to fazztv.utils.download_utils
 
 @log_exceptions(return_value=False)
-def download_audio_only(url, output_file, guid=None):
+def download_audio_only(url: str, output_file: str, guid: str | None = None) -> bool:
     """Download only the audio from a YouTube video."""
     # Try to use cached version
     if get_cached_file(guid, output_file, TEMP_DIR, 'audio'):
@@ -156,7 +156,7 @@ def calculate_days_old(song_info: str) -> int:
         return 0
 
 @log_exceptions(return_value=False)
-def download_video_only(url, output_file, guid=None):
+def download_video_only(url: str, output_file: str, guid: str | None = None) -> bool:
     """Download only the video from a YouTube video."""
     # Check if cached file exists
     if get_cached_file(guid, output_file, TEMP_DIR, 'video'):
@@ -175,7 +175,7 @@ def download_video_only(url, output_file, guid=None):
     return True
 
 @log_exceptions(return_value=None)
-def cleanup_environment():
+def cleanup_environment() -> None:
     """Prepare environment without purging cached files."""
     # Clear pycache if in dev mode.
     if DEV_MODE:
@@ -247,7 +247,7 @@ def _ensure_episode_guid(episode: dict) -> str:
 
 
 @log_exceptions(return_value=None)
-def create_media_item_from_episode(episode):
+def create_media_item_from_episode(episode: dict) -> MediaItem | None:
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
 
