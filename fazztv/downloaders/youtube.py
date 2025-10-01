@@ -8,7 +8,7 @@ import yt_dlp
 
 from fazztv.downloaders.base import BaseDownloader
 from fazztv.config import constants
-from fazztv.utils.error_handling import log_exceptions
+from fazztv.core.error_handling import handle_errors
 
 
 class YouTubeDownloader(BaseDownloader):
@@ -23,7 +23,7 @@ class YouTubeDownloader(BaseDownloader):
         """
         self.max_duration = max_duration or constants.ELAPSED_TUNE_SECONDS
         
-    @log_exceptions(return_value=False)
+    @handle_errors(operation="download", component="youtube_downloader", return_value=False)
     def download(self, url: str, output_path: Path,
                  options: Optional[Dict[str, Any]] = None) -> bool:
         """Download complete media from YouTube."""
@@ -36,7 +36,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return self._execute_download(url, ydl_opts)
     
-    @log_exceptions(return_value=False)
+    @handle_errors(operation="download_audio", component="youtube_downloader", return_value=False)
     def download_audio(self, url: str, output_path: Path,
                       options: Optional[Dict[str, Any]] = None) -> bool:
         """Download only audio from YouTube."""
@@ -70,7 +70,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return success and output_path.exists()
     
-    @log_exceptions(return_value=False)
+    @handle_errors(operation="download_video", component="youtube_downloader", return_value=False)
     def download_video(self, url: str, output_path: Path,
                       options: Optional[Dict[str, Any]] = None) -> bool:
         """Download only video from YouTube."""
@@ -86,7 +86,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return self._execute_download(url, ydl_opts)
     
-    @log_exceptions(return_value=[])
+    @handle_errors(operation="search", component="youtube_downloader", return_value=[])
     def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Search YouTube for videos matching query."""
         logger.debug(f"Searching YouTube for: {query}")
@@ -152,7 +152,7 @@ class YouTubeDownloader(BaseDownloader):
         
         return options
     
-    @log_exceptions(return_value=False)
+    @handle_errors(operation="execute_download", component="youtube_downloader", return_value=False)
     def _execute_download(self, url: str, options: dict) -> bool:
         """Execute the actual download with yt-dlp."""
         with yt_dlp.YoutubeDL(options) as ydl:

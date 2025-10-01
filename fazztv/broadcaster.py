@@ -4,7 +4,8 @@ from loguru import logger
 
 from fazztv.models import MediaItem
 from fazztv.config import constants
-from fazztv.utils.error_handling import log_exceptions, handle_subprocess_result, validate_file_exists
+from fazztv.core.error_handling import handle_errors
+from fazztv.utils.error_handling import handle_subprocess_result, validate_file_exists
 
 class RTMPBroadcaster:
     """Handles broadcasting of serialized MediaItems to RTMP endpoints."""
@@ -18,7 +19,7 @@ class RTMPBroadcaster:
         """
         self.rtmp_url = rtmp_url
     
-    @log_exceptions(return_value=False)
+    @handle_errors(operation="broadcast_item", component="broadcaster", return_value=False)
     def broadcast_item(self, media_item: MediaItem) -> bool:
         """
         Broadcast a single media item to the RTMP endpoint.

@@ -118,85 +118,110 @@ class OpenAIProvider(BaseProvider):
 
     def list_models(self) -> List[ModelInfo]:
         """List available models from OpenAI."""
-        models = []
-
         try:
-            headers = {
-                "Authorization": f"Bearer {self.config.api_key}",
-                "Content-Type": "application/json"
-            }
-
-            response = requests.get(
-                f"{self.config.base_url}/models",
-                headers=headers,
-                timeout=self.config.timeout
-            )
-            response.raise_for_status()
-
-            data = response.json()
-
-            for model_data in data.get("data", []):
-                model_id = model_data.get("id", "")
-
-                # Map model to appropriate capabilities
-                capabilities = []
-                if "gpt" in model_id or "turbo" in model_id:
-                    capabilities = [
-                        ModelCapability.CHAT,
-                        ModelCapability.TEXT_GENERATION,
-                        ModelCapability.CODE_GENERATION,
-                        ModelCapability.TRANSLATION,
-                        ModelCapability.SUMMARIZATION
-                    ]
-                elif "embedding" in model_id:
-                    capabilities = [ModelCapability.EMBEDDING]
-                elif "moderation" in model_id:
-                    capabilities = [ModelCapability.MODERATION]
-                else:
-                    capabilities = [ModelCapability.TEXT_GENERATION]
-
-                # Estimate costs (simplified)
-                cost_per_token = 0.002 if "gpt-4" in model_id else 0.0002
-
-                model = ModelInfo(
-                    id=model_id,
-                    name=model_id,
-                    provider="openai",
-                    capabilities=capabilities,
-                    context_length=8192 if "gpt-3.5" in model_id else 4096,
-                    cost_per_token=cost_per_token,
-                    free_tier=False,
-                    description=f"OpenAI {model_id} model"
-                )
-                models.append(model)
-
+            model_data = self._fetch_models_from_api()
+            return self._parse_models_response(model_data)
         except Exception as e:
             logger.error(f"Failed to list OpenAI models: {e}")
-            # Return some default models
-            models = [
-                ModelInfo(
-                    id="gpt-3.5-turbo",
-                    name="GPT-3.5 Turbo",
-                    provider="openai",
-                    capabilities=self.config.capabilities or [],
-                    context_length=4096,
-                    cost_per_token=0.0002,
-                    free_tier=False,
-                    description="Fast and efficient chat model"
-                ),
-                ModelInfo(
-                    id="gpt-4",
-                    name="GPT-4",
-                    provider="openai",
-                    capabilities=self.config.capabilities or [],
-                    context_length=8192,
-                    cost_per_token=0.002,
-                    free_tier=False,
-                    description="Most capable GPT-4 model"
-                )
-            ]
+            return self._get_default_models()
 
+    def _fetch_models_from_api(self) -> Dict[str, Any]:
+        """Fetch raw model data from OpenAI API."""
+        headers = {
+            "Authorization": f"Bearer {self.config.api_key}",
+            "Content-Type": "application/json"
+        }
+
+        response = requests.get(
+            f"{self.config.base_url}/models",
+            headers=headers,
+            timeout=self.config.timeout
+        )
+        response.raise_for_status()
+        return response.json()
+
+    def _parse_models_response(self, data: Dict[str, Any]) -> List[ModelInfo]:
+        """Parse API response and create ModelInfo objects."""
+        models = []
+        for model_data in data.get("data", []):
+            model_id = model_data.get("id", "")
+            if model_id:
+                model = self._create_model_info(model_id)
+                models.append(model)
         return models
+
+    def _create_model_info(self, model_id: str) -> ModelInfo:
+        """Create ModelInfo object from model ID."""
+        return ModelInfo(
+            model_id=model_id,
+            name=model_id,
+            provider="openai",
+            capabilities=self._get_model_capabilities(model_id),
+            context_length=self._get_context_length(model_id),
+            cost_per_token=self._get_cost_per_token(model_id),
+            free_tier=False,
+            description=f"OpenAI {model_id} model"
+        )
+
+    def _get_model_capabilities(self, model_id: str) -> List[ModelCapability]:
+        """Map model ID to appropriate capabilities."""
+        model_lower = model_id.lower()
+
+        if "gpt" in model_lower or "turbo" in model_lower:
+            return [
+                ModelCapability.CHAT,
+                ModelCapability.TEXT_GENERATION,
+                ModelCapability.CODE_GENERATION,
+                ModelCapability.TRANSLATION,
+                ModelCapability.SUMMARIZATION
+            ]
+        elif "embedding" in model_lower:
+            return [ModelCapability.EMBEDDING]
+        elif "moderation" in model_lower:
+            return [ModelCapability.MODERATION]
+        else:
+            return [ModelCapability.TEXT_GENERATION]
+
+    def _get_context_length(self, model_id: str) -> int:
+        """Get context length for model."""
+        if "gpt-3.5" in model_id:
+            return 8192
+        elif "gpt-4" in model_id:
+            return 8192
+        else:
+            return 4096
+
+    def _get_cost_per_token(self, model_id: str) -> float:
+        """Estimate cost per token for model."""
+        if "gpt-4" in model_id:
+            return 0.002
+        else:
+            return 0.0002
+
+    def _get_default_models(self) -> List[ModelInfo]:
+        """Return default models when API call fails."""
+        return [
+            ModelInfo(
+                model_id="gpt-3.5-turbo",
+                name="GPT-3.5 Turbo",
+                provider="openai",
+                capabilities=self.config.capabilities or [],
+                context_length=4096,
+                cost_per_token=0.0002,
+                free_tier=False,
+                description="Fast and efficient chat model"
+            ),
+            ModelInfo(
+                model_id="gpt-4",
+                name="GPT-4",
+                provider="openai",
+                capabilities=self.config.capabilities or [],
+                context_length=8192,
+                cost_per_token=0.002,
+                free_tier=False,
+                description="Most capable GPT-4 model"
+            )
+        ]
 
     def check_availability(self) -> bool:
         """Check if OpenAI is available."""

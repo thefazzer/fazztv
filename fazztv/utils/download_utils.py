@@ -8,7 +8,7 @@ from loguru import logger
 
 from fazztv.config import constants
 from fazztv.utils.file import is_valid_file, copy_file, ensure_directory
-from fazztv.utils.error_handling import log_exceptions
+from fazztv.core.error_handling import handle_errors
 
 
 def get_cache_file_path(temp_dir: str, guid: str, file_type: str) -> str:
@@ -35,7 +35,7 @@ def get_cache_file_path(temp_dir: str, guid: str, file_type: str) -> str:
     return os.path.join(temp_dir, f"{guid}{suffix}")
 
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="get_cached_file", component="download_utils", return_value=False)
 def get_cached_file(guid: Optional[str], output_file: str, temp_dir: str, file_type: str) -> bool:
     """
     Check for and use cached file if available.
@@ -61,7 +61,7 @@ def get_cached_file(guid: Optional[str], output_file: str, temp_dir: str, file_t
     return False
 
 
-@log_exceptions(return_value=None)
+@handle_errors(operation="cache_file", component="download_utils", return_value=None)
 def cache_file(output_file: str, guid: Optional[str], temp_dir: str, file_type: str) -> None:
     """
     Cache file for future use.
@@ -127,7 +127,7 @@ def get_yt_dlp_video_options(output_file: str) -> Dict[str, Any]:
     }
 
 
-@log_exceptions(return_value=None)
+@handle_errors(operation="find_downloaded_audio", component="download_utils", return_value=None)
 def find_downloaded_audio_file(base_output: str) -> Optional[str]:
     """
     Find the audio file created by yt-dlp.
@@ -162,7 +162,7 @@ def find_downloaded_audio_file(base_output: str) -> Optional[str]:
     return None
 
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="move_audio_to_output", component="download_utils", return_value=False)
 def move_audio_to_output(found_file: str, output_file: str) -> bool:
     """
     Move downloaded audio file to expected location.
@@ -189,7 +189,7 @@ def move_audio_to_output(found_file: str, output_file: str) -> bool:
         return False
 
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="prepare_output_dir", component="download_utils", return_value=False)
 def prepare_output_directory(output_file: str) -> bool:
     """
     Ensure output directory exists.
@@ -223,7 +223,7 @@ def prepare_base_output_path(output_file: str) -> str:
     return base_output
 
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="download_with_yt_dlp", component="download_utils", return_value=False)
 def download_with_yt_dlp(url: str, yt_dlp_opts: Dict[str, Any], operation_name: str) -> bool:
     """
     Download media using yt-dlp with given options.

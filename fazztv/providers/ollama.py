@@ -173,7 +173,7 @@ class OllamaProvider(BaseProvider):
                     context_length = 32768
 
                 model = ModelInfo(
-                    id=model_name,
+                    model_id=model_name,
                     name=model_name,
                     provider="ollama",
                     capabilities=capabilities,
@@ -193,7 +193,7 @@ class OllamaProvider(BaseProvider):
         if not models:
             models = [
                 ModelInfo(
-                    id="llama2",
+                    model_id="llama2",
                     name="Llama 2",
                     provider="ollama",
                     capabilities=self.config.capabilities or [],

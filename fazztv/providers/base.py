@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union, Tuple
 from loguru import logger
 
 
@@ -24,31 +24,46 @@ class ModelCapability(Enum):
 @dataclass
 class ProviderConfig:
     """Configuration for a provider."""
-    name: str
+    provider_id: str
     api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    endpoint: Optional[str] = None
     default_model: Optional[str] = None
-    timeout: int = 30
+    timeout: int = 60
     max_retries: int = 3
+    model_aliases: Optional[Dict[str, str]] = None
     custom_headers: Optional[Dict[str, str]] = None
     capabilities: Optional[List[ModelCapability]] = None
 
+    # Keep compatibility fields
+    name: Optional[str] = None
+    base_url: Optional[str] = None
+
     def validate(self) -> bool:
         """Validate the configuration."""
-        if not self.name:
+        if not self.provider_id:
             return False
         return True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Post-initialization processing."""
         if self.capabilities is None:
             self.capabilities = []
+
+        # Ensure compatibility between name/provider_id and base_url/endpoint
+        if not self.name:
+            self.name = self.provider_id
+        if not self.base_url:
+            self.base_url = self.endpoint
+        if not self.endpoint:
+            self.endpoint = self.base_url
+        if not self.model_aliases:
+            self.model_aliases = {}
 
 
 @dataclass
 class ModelInfo:
     """Information about a specific model."""
-    id: str
+    model_id: str
     name: str
     provider: str
     capabilities: List[ModelCapability]
@@ -57,11 +72,19 @@ class ModelInfo:
     free_tier: bool = False
     description: Optional[str] = None
 
+    # Keep compatibility field
+    id: Optional[str] = None
+
+    def __post_init__(self) -> None:
+        """Post-initialization processing."""
+        if not self.id:
+            self.id = self.model_id
+
 
 class BaseProvider(ABC):
     """Abstract base class for AI model providers."""
 
-    def __init__(self, config: ProviderConfig):
+    def __init__(self, config: ProviderConfig) -> None:
         """
         Initialize the provider.
 
@@ -69,9 +92,10 @@ class BaseProvider(ABC):
             config: Provider configuration
         """
         if not config.validate():
-            raise ValueError(f"Invalid configuration for provider {config.name}")
+            raise ValueError(f"Invalid configuration for provider {config.provider_id}")
         self.config = config
-        logger.info(f"Initialized provider: {config.name}")
+        self.provider_id = config.provider_id
+        logger.info(f"Initialized provider: {config.provider_id}")
 
     @abstractmethod
     def query(
@@ -129,7 +153,7 @@ class BaseProvider(ABC):
 
     def get_name(self) -> str:
         """Get provider name."""
-        return self.config.name
+        return self.config.provider_id
 
     def get_default_model(self) -> Optional[str]:
         """Get default model for this provider."""

@@ -11,7 +11,7 @@ class TestOpenAIProvider:
     @pytest.fixture
     def provider(self):
         """Create an OpenAI provider instance."""
-        config = ProviderConfig(name="openai", api_key="test_key")
+        config = ProviderConfig(provider_id="openai", api_key="test_key")
         return OpenAIProvider(config)
 
     def test_initialization(self, provider):
@@ -23,7 +23,7 @@ class TestOpenAIProvider:
 
     def test_initialization_without_api_key(self):
         """Test provider initialization without API key."""
-        config = ProviderConfig(name="openai")  # No API key provided
+        config = ProviderConfig(provider_id="openai")  # No API key provided
         with pytest.raises(ValueError) as exc_info:
             # The validation should occur during provider initialization
             provider = OpenAIProvider(config)
@@ -33,7 +33,7 @@ class TestOpenAIProvider:
     def test_initialization_with_custom_config(self):
         """Test provider initialization with custom configuration."""
         config = ProviderConfig(
-            name="openai",
+            provider_id="openai",
             api_key="test_key",
             default_model="gpt-4",
             base_url="https://api.openai.com/v1"

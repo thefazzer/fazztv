@@ -26,7 +26,7 @@ class MockProvider(BaseProvider):
     def list_models(self):
         return [
             ModelInfo(
-                id=f"{self.config.name}-model",
+                model_id=f"{self.config.name}-model",
                 name=f"{self.config.name.title()} Model",
                 provider=self.config.name,
                 capabilities=self.config.capabilities or [],
@@ -54,15 +54,15 @@ class TestProviderManager:
         # Add mock providers
         configs = [
             ProviderConfig(
-                name="provider1",
+                provider_id="provider1",
                 capabilities=[ModelCapability.TEXT_GENERATION, ModelCapability.CHAT]
             ),
             ProviderConfig(
-                name="provider2",
+                provider_id="provider2",
                 capabilities=[ModelCapability.TEXT_GENERATION, ModelCapability.CHAT]
             ),
             ProviderConfig(
-                name="provider3",
+                provider_id="provider3",
                 capabilities=[ModelCapability.TEXT_GENERATION]
             )
         ]

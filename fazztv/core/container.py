@@ -95,7 +95,8 @@ class ServiceRegistry:
         )
 
         self._registrations[service_type] = registration
-        logger.debug(f"Registered {service_type.__name__} with scope {scope.value}")
+        service_name = getattr(service_type, '__name__', str(service_type))
+        logger.debug(f"Registered {service_name} with scope {scope.value}")
 
     def _extract_dependencies(self, target: Type) -> List[Type]:
         """Extract dependencies from constructor or factory signature."""
@@ -148,11 +149,13 @@ class DIContainer:
     def _resolve_internal(self, service_type: Type) -> Any:
         """Internal resolution method with circular dependency detection."""
         if service_type in self.registry._building:
-            raise RuntimeError(f"Circular dependency detected for {service_type.__name__}")
+            service_name = getattr(service_type, '__name__', str(service_type))
+            raise RuntimeError(f"Circular dependency detected for {service_name}")
 
         registration = self.registry.get_registration(service_type)
         if not registration:
-            raise ValueError(f"Service {service_type.__name__} is not registered")
+            service_name = getattr(service_type, '__name__', str(service_type))
+            raise ValueError(f"Service {service_name} is not registered")
 
         # Handle singleton scope
         if registration.scope == ServiceScope.SINGLETON:
@@ -175,7 +178,8 @@ class DIContainer:
             elif registration.scope == ServiceScope.SCOPED:
                 self._scoped_instances[service_type] = instance
 
-            logger.debug(f"Created instance of {service_type.__name__}")
+            service_name = getattr(service_type, '__name__', str(service_type))
+            logger.debug(f"Created instance of {service_name}")
             return instance
 
         finally:
@@ -211,7 +215,7 @@ class DIContainer:
             return {}
 
         return {
-            "service_type": service_type.__name__,
+            "service_type": getattr(service_type, '__name__', str(service_type)),
             "implementation": registration.implementation.__name__ if registration.implementation else "factory",
             "scope": registration.scope.value,
             "dependencies": [dep.__name__ for dep in registration.dependencies],
@@ -227,7 +231,9 @@ class DIContainer:
             # Check for missing dependencies
             for dep_type in registration.dependencies:
                 if not self.registry.is_registered(dep_type):
-                    errors.append(f"Service {service_type.__name__} depends on unregistered service {dep_type.__name__}")
+                    service_name = getattr(service_type, '__name__', str(service_type))
+                    dep_name = getattr(dep_type, '__name__', str(dep_type))
+                    errors.append(f"Service {service_name} depends on unregistered service {dep_name}")
 
         # Check for circular dependencies (basic check)
         try:
@@ -241,7 +247,8 @@ class DIContainer:
     def _check_circular_dependencies(self, service_type: Type, visited: Set[Type]) -> None:
         """Check for circular dependencies recursively."""
         if service_type in visited:
-            raise RuntimeError(f"Circular dependency detected involving {service_type.__name__}")
+            service_name = getattr(service_type, '__name__', str(service_type))
+            raise RuntimeError(f"Circular dependency detected involving {service_name}")
 
         registration = self.registry.get_registration(service_type)
         if not registration:

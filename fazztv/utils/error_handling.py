@@ -2,9 +2,11 @@
 
 import functools
 import os
+import time
 import traceback
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Callable, Optional, Type, TypeVar, Union
 from loguru import logger
+import requests
 
 T = TypeVar('T')
 
@@ -190,3 +192,158 @@ class ErrorContext:
     def get_result(self, success_value: Any = True) -> Any:
         """Get the result based on success/failure."""
         return success_value if self.success else self.return_value
+
+
+def safe_file_operation(operation_name: str) -> Callable:
+    """Decorator for safe file operations with consistent error handling.
+
+    Args:
+        operation_name: Descriptive name for the operation being performed
+
+    Returns:
+        Decorated function with error handling
+    """
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except FileNotFoundError as e:
+                logger.error(f"{operation_name} failed - file not found: {e}")
+                return None
+            except PermissionError as e:
+                logger.error(f"{operation_name} failed - permission denied: {e}")
+                return None
+            except IOError as e:
+                logger.error(f"{operation_name} failed - I/O error: {e}")
+                return None
+            except Exception as e:
+                logger.error(f"{operation_name} failed with unexpected error: {e}")
+                return None
+        return wrapper
+    return decorator
+
+
+def safe_api_call(
+    provider_name: str,
+    max_retries: int = 3,
+    backoff_factor: float = 2.0
+) -> Callable:
+    """Decorator for API calls with timeout and request exception handling.
+
+    Args:
+        provider_name: Name of the API provider
+        max_retries: Maximum number of retry attempts
+        backoff_factor: Exponential backoff multiplier
+
+    Returns:
+        Decorated function with API error handling and retries
+    """
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any:
+            last_exception = None
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except requests.exceptions.Timeout as e:
+                    last_exception = e
+                    wait_time = backoff_factor ** attempt
+                    logger.warning(
+                        f"{provider_name} API timeout (attempt {attempt + 1}/{max_retries}). "
+                        f"Retrying in {wait_time}s..."
+                    )
+                    time.sleep(wait_time)
+                except requests.exceptions.ConnectionError as e:
+                    last_exception = e
+                    logger.error(f"{provider_name} API connection error: {e}")
+                    if attempt < max_retries - 1:
+                        wait_time = backoff_factor ** attempt
+                        time.sleep(wait_time)
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"{provider_name} API request failed: {e}")
+                    return None
+                except Exception as e:
+                    logger.error(f"{provider_name} API unexpected error: {e}")
+                    return None
+
+            logger.error(
+                f"{provider_name} API failed after {max_retries} attempts: {last_exception}"
+            )
+            return None
+        return wrapper
+    return decorator
+
+
+def retry_on_exception(
+    exceptions: Union[Type[Exception], tuple],
+    max_retries: int = 3,
+    delay: float = 1.0,
+    backoff: float = 2.0
+) -> Callable:
+    """Retry decorator for specific exceptions.
+
+    Args:
+        exceptions: Exception type(s) to retry on
+        max_retries: Maximum number of retry attempts
+        delay: Initial delay between retries
+        backoff: Delay multiplier for each retry
+
+    Returns:
+        Decorated function with retry logic
+    """
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any:
+            current_delay = delay
+            last_exception = None
+
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    last_exception = e
+                    if attempt < max_retries - 1:
+                        logger.warning(
+                            f"Attempt {attempt + 1}/{max_retries} failed for {func.__name__}: {e}. "
+                            f"Retrying in {current_delay}s..."
+                        )
+                        time.sleep(current_delay)
+                        current_delay *= backoff
+                    else:
+                        logger.error(
+                            f"All {max_retries} attempts failed for {func.__name__}: {e}"
+                        )
+
+            if last_exception:
+                raise last_exception
+
+        return wrapper
+    return decorator
+
+
+def handle_and_convert(
+    exception_type: Type[Exception],
+    target_exception: Type[Exception],
+    message_prefix: str = ""
+) -> Callable:
+    """Convert one exception type to another with optional message prefix.
+
+    Args:
+        exception_type: Exception type to catch
+        target_exception: Exception type to raise instead
+        message_prefix: Optional prefix for the new exception message
+
+    Returns:
+        Decorated function with exception conversion
+    """
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any:
+            try:
+                return func(*args, **kwargs)
+            except exception_type as e:
+                new_message = f"{message_prefix}{str(e)}" if message_prefix else str(e)
+                raise target_exception(new_message) from e
+        return wrapper
+    return decorator

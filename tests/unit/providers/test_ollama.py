@@ -12,7 +12,7 @@ class TestOllamaProvider:
     @pytest.fixture
     def provider(self):
         """Create an Ollama provider instance."""
-        config = ProviderConfig(name="ollama")
+        config = ProviderConfig(provider_id="ollama")
         return OllamaProvider(config)
 
     def test_initialization(self, provider):
@@ -24,7 +24,7 @@ class TestOllamaProvider:
     def test_initialization_with_custom_config(self):
         """Test provider initialization with custom configuration."""
         config = ProviderConfig(
-            name="ollama",
+            provider_id="ollama",
             base_url="http://custom:8080",
             default_model="mistral"
         )

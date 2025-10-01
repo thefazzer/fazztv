@@ -23,7 +23,7 @@ class MockProvider(BaseProvider):
     def list_models(self):
         return [
             ModelInfo(
-                id=f"{self.config.name}-model",
+                model_id=f"{self.config.name}-model",
                 name=f"{self.config.name.title()} Model",
                 provider=self.config.name,
                 capabilities=self.config.capabilities or [],
@@ -66,7 +66,7 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
         registry.register_provider_class("mock", MockProvider)
 
-        config = ProviderConfig(name="mock")
+        config = ProviderConfig(provider_id="mock")
         registry.add_provider(config)
 
         assert "mock" in registry.list_providers()
@@ -76,7 +76,7 @@ class TestProviderRegistry:
         """Test adding provider with explicit class."""
         registry = ProviderRegistry()
 
-        config = ProviderConfig(name="test")
+        config = ProviderConfig(provider_id="test")
         registry.add_provider(config, MockProvider)
 
         assert "test" in registry.list_providers()
@@ -85,14 +85,14 @@ class TestProviderRegistry:
         """Test adding provider without registered class."""
         registry = ProviderRegistry()
 
-        config = ProviderConfig(name="unknown")
+        config = ProviderConfig(provider_id="unknown")
         with pytest.raises(ValueError):
             registry.add_provider(config)
 
     def test_get_provider(self):
         """Test getting a provider by name."""
         registry = ProviderRegistry()
-        config = ProviderConfig(name="test")
+        config = ProviderConfig(provider_id="test")
         registry.add_provider(config, MockProvider)
 
         provider = registry.get_provider("test")
@@ -107,9 +107,9 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
 
         configs = [
-            ProviderConfig(name="provider1"),
-            ProviderConfig(name="provider2"),
-            ProviderConfig(name="provider3")
+            ProviderConfig(provider_id="provider1"),
+            ProviderConfig(provider_id="provider2"),
+            ProviderConfig(provider_id="provider3")
         ]
 
         for config in configs:
@@ -126,11 +126,11 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
 
         # Add available provider
-        config1 = ProviderConfig(name="available")
+        config1 = ProviderConfig(provider_id="available")
         registry.add_provider(config1, MockProvider)
 
         # Add unavailable provider
-        config2 = ProviderConfig(name="unavailable")
+        config2 = ProviderConfig(provider_id="unavailable")
         registry.add_provider(config2, MockProvider)
         provider2 = registry.get_provider("unavailable")
         provider2.available = False
@@ -144,15 +144,15 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
 
         config1 = ProviderConfig(
-            name="text_provider",
+            provider_id="text_provider",
             capabilities=[ModelCapability.TEXT_GENERATION]
         )
         config2 = ProviderConfig(
-            name="chat_provider",
+            provider_id="chat_provider",
             capabilities=[ModelCapability.CHAT]
         )
         config3 = ProviderConfig(
-            name="multi_provider",
+            provider_id="multi_provider",
             capabilities=[
                 ModelCapability.TEXT_GENERATION,
                 ModelCapability.CHAT
@@ -186,8 +186,8 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
 
         configs = [
-            ProviderConfig(name="provider1"),
-            ProviderConfig(name="provider2")
+            ProviderConfig(provider_id="provider1"),
+            ProviderConfig(provider_id="provider2")
         ]
 
         for config in configs:
@@ -203,11 +203,11 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
 
         config1 = ProviderConfig(
-            name="text_provider",
+            provider_id="text_provider",
             capabilities=[ModelCapability.TEXT_GENERATION]
         )
         config2 = ProviderConfig(
-            name="chat_provider",
+            provider_id="chat_provider",
             capabilities=[ModelCapability.CHAT]
         )
 
@@ -236,7 +236,7 @@ class TestProviderRegistry:
                 if self.config.name == "expensive":
                     return [
                         ModelInfo(
-                            id="expensive-model",
+                            model_id="expensive-model",
                             name="Expensive Model",
                             provider=self.config.name,
                             capabilities=self.config.capabilities or [],
@@ -247,7 +247,7 @@ class TestProviderRegistry:
                 elif self.config.name == "cheap":
                     return [
                         ModelInfo(
-                            id="cheap-model",
+                            model_id="cheap-model",
                             name="Cheap Model",
                             provider=self.config.name,
                             capabilities=self.config.capabilities or [],
@@ -258,7 +258,7 @@ class TestProviderRegistry:
                 else:  # free
                     return [
                         ModelInfo(
-                            id="free-model",
+                            model_id="free-model",
                             name="Free Model",
                             provider=self.config.name,
                             capabilities=self.config.capabilities or [],
@@ -268,9 +268,9 @@ class TestProviderRegistry:
                     ]
 
         configs = [
-            ProviderConfig(name="expensive"),
-            ProviderConfig(name="cheap"),
-            ProviderConfig(name="free")
+            ProviderConfig(provider_id="expensive"),
+            ProviderConfig(provider_id="cheap"),
+            ProviderConfig(provider_id="free")
         ]
 
         for config in configs:
@@ -278,22 +278,22 @@ class TestProviderRegistry:
 
         # Get cheapest model (should be free)
         cheapest = registry.get_cheapest_model()
-        assert cheapest.id == "free-model"
+        assert cheapest.model_id == "free-model"
 
         # Get cheapest non-free model
         cheapest_paid = registry.get_cheapest_model(free_only=False)
-        assert cheapest_paid.id == "free-model"  # Still free since it's cheapest
+        assert cheapest_paid.model_id == "free-model"  # Still free since it's cheapest
 
         # Get free model only
         free_model = registry.get_cheapest_model(free_only=True)
-        assert free_model.id == "free-model"
+        assert free_model.model_id == "free-model"
         assert free_model.free_tier is True
 
     def test_remove_provider(self):
         """Test removing a provider."""
         registry = ProviderRegistry()
 
-        config = ProviderConfig(name="test")
+        config = ProviderConfig(provider_id="test")
         registry.add_provider(config, MockProvider)
 
         assert "test" in registry.list_providers()
@@ -312,8 +312,8 @@ class TestProviderRegistry:
         registry = ProviderRegistry()
 
         configs = [
-            ProviderConfig(name="provider1"),
-            ProviderConfig(name="provider2")
+            ProviderConfig(provider_id="provider1"),
+            ProviderConfig(provider_id="provider2")
         ]
 
         for config in configs:
@@ -330,7 +330,7 @@ class TestProviderRegistry:
         registry.register_provider_class("mock", MockProvider)
 
         config = ProviderConfig(
-            name="test",
+            provider_id="test",
             capabilities=[ModelCapability.TEXT_GENERATION],
             default_model="test-model"
         )

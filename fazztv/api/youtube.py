@@ -116,7 +116,7 @@ class YouTubeSearchClient:
         
         if min_duration:
             # Filter by duration
-            results = [r for r in results if r.get("duration", 0) >= min_duration]
+            results = [video_result for video_result in results if video_result.get("duration", 0) >= min_duration]
         
         if results:
             # Prefer longer documentaries
@@ -239,7 +239,7 @@ class YouTubeSearchClient:
         
         # Remove common words
         common_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for'}
-        keywords = [k for k in keywords if k not in common_words]
+        keywords = [keyword for keyword in keywords if keyword not in common_words]
         
         # Build search query
         query = " ".join(keywords[:5])  # Use top 5 keywords

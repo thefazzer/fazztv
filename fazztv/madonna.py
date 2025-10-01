@@ -37,7 +37,8 @@ from fazztv.utils.download_utils import (
     find_downloaded_audio_file, move_audio_to_output, prepare_output_directory,
     prepare_base_output_path, download_with_yt_dlp
 )
-from fazztv.utils.error_handling import log_exceptions, safe_execute
+from fazztv.core.error_handling import handle_errors
+from fazztv.utils.error_handling import safe_execute
 from fazztv.utils.ffmpeg_utils import (
     build_ffmpeg_inputs, build_ffmpeg_filter, build_ffmpeg_command, execute_ffmpeg_command
 )
@@ -81,7 +82,7 @@ logger.add(LOG_FILE, rotation="10 MB", level="DEBUG")
 #                       HELPER FUNCTIONS
 # ---------------------------------------------------------------------------
 
-@log_exceptions(return_value={"episodes": []})
+@handle_errors(operation="load_episodes_data", component="madonna", return_value={"episodes": []})
 def load_madonna_data() -> Dict[str, List[dict]]:
     """Load Madonna and war documentary data from JSON file."""
     with open(DATA_FILE, 'r') as f:
@@ -132,7 +133,7 @@ def get_madonna_song_url(song_name: str) -> Optional[str]:
 
 # Note: Utility functions moved to fazztv.utils.download_utils
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="download_audio_only", component="madonna", return_value=False)
 def download_audio_only(url: str, output_file: str, guid: str | None = None) -> bool:
     """Download only the audio from a YouTube video."""
     # Try to use cached version
@@ -180,7 +181,7 @@ def calculate_days_old(song_info: str) -> int:
         return days_old
     return 0
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="download_video_only", component="madonna", return_value=False)
 def download_video_only(url: str, output_file: str, guid: str | None = None) -> bool:
     """Download only the video from a YouTube video."""
     # Check if cached file exists
@@ -199,7 +200,7 @@ def download_video_only(url: str, output_file: str, guid: str | None = None) -> 
 
     return True
 
-@log_exceptions(return_value=None)
+@handle_errors(operation="cleanup_environment", component="madonna", return_value=None)
 def cleanup_environment() -> None:
     """Prepare environment without purging cached files."""
     # Clear pycache if in dev mode.
@@ -260,7 +261,7 @@ def prepare_overlay_texts(episode: dict, song_name: str) -> Dict[str, str]:
 # Note: _build_ffmpeg_command moved to fazztv.utils.ffmpeg_utils
 
 
-@log_exceptions(return_value=None)
+@handle_errors(operation="create_media_item", component="madonna", return_value=None)
 def create_media_item_from_episode(episode: dict) -> MediaItem | None:
     """Create a MediaItem from an episode in the JSON data."""
     logger.info(f"Creating media item for '{episode['title']}'")
@@ -332,7 +333,7 @@ def load_episodes() -> List[dict]:
     return episodes
 
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="process_episode_audio", component="madonna", return_value=False)
 def process_episode_audio(episode: dict, temp_dir: str) -> bool:
     guid = episode.get('guid')
     audio_path = os.path.join(temp_dir, f"madonna_audio_{guid}.aac")
@@ -356,7 +357,7 @@ def process_episode_audio(episode: dict, temp_dir: str) -> bool:
     return True
 
 
-@log_exceptions(return_value=False)
+@handle_errors(operation="process_episode_video", component="madonna", return_value=False)
 def process_episode_video(episode: dict, temp_dir: str) -> bool:
     guid = episode.get('guid')
     video_path = os.path.join(temp_dir, f"madonna_video_{guid}.mp4")
@@ -383,7 +384,7 @@ def process_episode_video(episode: dict, temp_dir: str) -> bool:
     return True
 
 
-@log_exceptions(return_value=[])
+@handle_errors(operation="process_episodes", component="madonna", return_value=[])
 def process_episodes(episodes: List[dict]) -> List[MediaItem]:
     media_items = []
     temp_dir = os.path.join(tempfile.gettempdir(), "fazztv")
